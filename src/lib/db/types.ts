@@ -85,8 +85,20 @@ export interface Suppression {
   at: Date;
 }
 
+/** Minimal document collection used by the DockCrate domain (tenants, catalog, deployments...). Equality filters only. */
+export interface Collection<T extends { id: string }> {
+  get(id: string): Promise<T | null>;
+  find(filter?: Partial<T>): Promise<T[]>;
+  /** Insert or replace by id. */
+  put(doc: T): Promise<void>;
+  delete(id: string): Promise<void>;
+}
+
 export interface Db {
   readonly app: string;
+
+  /** Generic app collection (documents carry `id`; the driver adds `app` scoping). */
+  collection<T extends { id: string }>(name: string): Collection<T>;
 
   // billing
   getBillingAccount(orgId: string): Promise<BillingAccount | null>;

@@ -5,7 +5,9 @@ import { memoryAdapter } from "better-auth/adapters/memory";
 import { passkey } from "@better-auth/passkey";
 import { apiKey } from "@better-auth/api-key";
 import { product } from "@/config/product";
-import { appName, appUrl, dbDriver, env, isProd } from "@/lib/env";
+import { appName, appUrl, dbDriver, entraConfigured, env, isProd } from "@/lib/env";
+import { envCredentialSigner } from "@/lib/graph/credential";
+import { ENTRA_AUTHORITY, assertWorkAccount } from "./entra";
 import { sendMail } from "@/lib/mail";
 import { inviteEmail, magicLinkEmail } from "@/lib/mail/templates";
 import { isDisposableEmail } from "@/lib/security/disposable";
@@ -68,15 +70,28 @@ export function createAuth(db: BetterAuthOptions["database"]) {
     },
     rateLimit: { enabled: true, window: 60, max: 60, storage: "database" },
     emailAndPassword: { enabled: false },
-    socialProviders:
-      e.GOOGLE_CLIENT_ID && e.GOOGLE_CLIENT_SECRET
-        ? { google: { clientId: e.GOOGLE_CLIENT_ID, clientSecret: e.GOOGLE_CLIENT_SECRET } }
-        : undefined,
+    // Microsoft Entra work accounts only (D-07): `organizations` authority, personal MSA tenant rejected twice
+    // (by Better Auth's issuer check and by assertWorkAccount, which gives the clear message).
+    socialProviders: entraConfigured(e)
+      ? {
+          microsoft: {
+            clientId: e.ENTRA_CLIENT_ID!,
+            clientSecret: e.ENTRA_CLIENT_SECRET ?? "",
+            ...(e.ENTRA_CLIENT_SECRET ? {} : { clientAssertion: ({ clientId, tokenEndpoint }: { clientId: string; tokenEndpoint: string }) => envCredentialSigner().signAssertion({ clientId, tokenEndpoint }) }),
+            tenantId: ENTRA_AUTHORITY,
+            scope: ["openid", "profile", "email", "User.Read"],
+            mapProfileToUser: (profile: Record<string, unknown>) => {
+              assertWorkAccount({ tid: profile.tid as string | undefined, iss: profile.iss as string | undefined });
+              return {};
+            },
+          },
+        }
+      : undefined,
     user: {
       deleteUser: { enabled: true },
       additionalFields: { analyticsConsent: { type: "boolean", required: false, defaultValue: false, input: true } },
     },
-    account: { accountLinking: { enabled: true, trustedProviders: ["google"] } },
+    account: { accountLinking: { enabled: true, trustedProviders: ["microsoft"] } },
     databaseHooks: {
       user: {
         create: {
@@ -88,14 +103,19 @@ export function createAuth(db: BetterAuthOptions["database"]) {
       },
     },
     plugins: [
-      magicLink({
-        expiresIn: 600,
-        disableSignUp: false,
-        sendMagicLink: async ({ email, url }) => {
-          const m = magicLinkEmail(url);
-          await sendMail({ to: email, ...m, category: "transactional" });
-        },
-      }),
+      // Email link sign in exists only in stub mode (no Entra app configured: local dev and e2e). With Entra it is not registered.
+      ...(entraConfigured(e)
+        ? []
+        : [
+            magicLink({
+              expiresIn: 600,
+              disableSignUp: false,
+              sendMagicLink: async ({ email, url }) => {
+                const m = magicLinkEmail(url);
+                await sendMail({ to: email, ...m, category: "transactional" });
+              },
+            }),
+          ]),
       twoFactor({ issuer: product.name, skipVerificationOnEnable: false }),
       passkey({ rpName: product.fullName, rpID: new URL(base).hostname, origin: base }),
       organization({

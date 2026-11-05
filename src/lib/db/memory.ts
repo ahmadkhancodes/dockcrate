@@ -1,5 +1,5 @@
 import { uuidv7 } from "@/lib/ids";
-import type { AuditEntry, BillingAccount, Db, Entitlement, Suppression, WebhookDelivery, WebhookEndpoint } from "./types";
+import type { AuditEntry, Collection, BillingAccount, Db, Entitlement, Suppression, WebhookDelivery, WebhookEndpoint } from "./types";
 
 /** In-memory Db for tests, local dev and stub mode. Same semantics as the Mongo driver (dbContract.ts). */
 export function createMemoryDb(app: string, config: Record<string, string> = {}): Db {
@@ -13,11 +13,32 @@ export function createMemoryDb(app: string, config: Record<string, string> = {})
   const deliveries = new Map<string, WebhookDelivery>();
   const suppressions = new Map<string, Suppression>();
   const cfg = new Map(Object.entries(config));
+  const colls = new Map<string, Map<string, { id: string }>>();
   const clone = <T>(x: T): T => structuredClone(x);
   const sKey = (email: string, scope = "all") => `${email.toLowerCase()}|${scope}`;
 
   return {
     app,
+    collection<T extends { id: string }>(name: string): Collection<T> {
+      if (!colls.has(name)) colls.set(name, new Map());
+      const m = colls.get(name) as Map<string, T>;
+      return {
+        async get(id) {
+          const d = m.get(id);
+          return d ? clone(d) : null;
+        },
+        async find(filter = {}) {
+          const entries = Object.entries(filter);
+          return [...m.values()].filter((d) => entries.every(([k, v]) => (d as Record<string, unknown>)[k] === v)).map(clone);
+        },
+        async put(doc) {
+          m.set(doc.id, clone(doc));
+        },
+        async delete(id) {
+          m.delete(id);
+        },
+      };
+    },
     async getBillingAccount(id) {
       const a = accounts.get(id);
       return a ? clone(a) : null;

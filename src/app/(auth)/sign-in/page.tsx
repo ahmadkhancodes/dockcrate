@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { afterSignIn } from "@/components/app/redirect";
 import { product } from "@/config/product";
 import { getSession } from "@/lib/auth/session";
+import { entraConfigured } from "@/lib/env";
 import { SignInForm } from "./sign-in-form";
 
 export const metadata = { title: "Sign in" };
@@ -18,9 +19,9 @@ export default async function SignInPage({ searchParams }: { searchParams: SP })
     <>
       <div className="flex flex-col gap-2">
         <h1 className="heading-5 text-text">Sign in to {product.name}</h1>
-        <p className="body-6 text-text-subtle">Use your work email. We send a link, so there is no password to remember. Microsoft work account sign in arrives in the next milestone. New here? The same link creates your account.</p>
+        <p className="body-6 text-text-subtle">Sign in with your Microsoft work or school account. Personal Microsoft accounts are not supported. New here? The same button creates your account.</p>
       </div>
-      <SignInForm callbackURL={callbackURL} expiredLink={link} />
+      <SignInForm callbackURL={callbackURL} expiredLink={link} stubMode={!entraConfigured()} oauthError={one(sp.error)} />
     </>
   );
 }

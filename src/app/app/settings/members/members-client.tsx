@@ -13,7 +13,7 @@ interface Member { id: string; userId: string; role: string; createdAt: string |
 interface Invite { id: string; email: string; role: string; status: string; expiresAt: string | Date }
 interface Full { members: Member[]; invitations: Invite[] }
 
-const ROLES = ["admin", "member", "viewer"] as const;
+const ROLES = ["admin", "operator", "viewer"] as const;
 const roleLabel = (r: string) => r.charAt(0).toUpperCase() + r.slice(1);
 
 export function MembersClient({ orgId, meId, canInvite, canCancelInvite, canUpdate, canRemove }: {
@@ -27,7 +27,7 @@ export function MembersClient({ orgId, meId, canInvite, canCancelInvite, canUpda
   }, [orgId]);
 
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<(typeof ROLES)[number]>("member");
+  const [role, setRole] = useState<(typeof ROLES)[number]>("operator");
   const [inviting, setInviting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
