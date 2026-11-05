@@ -6,75 +6,77 @@
  * values in the two `:root` blocks below (from its docs/DESIGN.md). Components reference role tokens only.
  */
 :root {
-  --font-sans-family: var(--font-kit-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono-family: var(--font-kit-mono), ui-monospace, monospace;
+  --font-sans-family: var(--font-body), "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-mono-family: var(--font-mono), ui-monospace, monospace;
+  --font-display-family: var(--font-display), "Segoe UI", ui-sans-serif, sans-serif;
 
-  /* raw ramp (neutral 00..1000) */
+  /* raw ramp: concrete neutral 00..1000 */
   --n-0: #ffffff;
-  --n-50: #f7f7f7;
-  --n-100: #efefef;
-  --n-200: #e2e2e2;
-  --n-300: #cfcfcf;
-  --n-400: #a3a3a3;
-  --n-500: #767676;
-  --n-600: #5c5c5c;
-  --n-700: #404040;
-  --n-800: #272727;
-  --n-900: #181818;
+  --n-50: #f6f5f2;
+  --n-100: #eceae5;
+  --n-200: #d6d3cc;
+  --n-300: #bdb9b0;
+  --n-400: #8f9498;
+  --n-500: #6e757b;
+  --n-600: #5a626a;
+  --n-700: #3d444a;
+  --n-800: #252b30;
+  --n-900: #14181c;
   --n-1000: #000000;
-  --accent-500: #3d5a80; /* placeholder accent, <80% saturation */
-  --accent-600: #2f4766;
+  --accent-500: #1f5c4a; /* dock green */
+  --accent-600: #174838;
+  --amber-500: #e3a21a; /* inspection amber, black text only */
 
   /* role tokens: light */
-  --surface: var(--n-0);
-  --surface-raised: var(--n-50);
-  --surface-sunken: var(--n-100);
+  --surface: var(--n-50);
+  --surface-raised: var(--n-0);
+  --surface-sunken: #eaf1ee;
   --surface-inverse: var(--n-900);
   --text: var(--n-900);
   --text-subtle: var(--n-600);
   --text-muted: var(--n-500);
   --text-inverse: var(--n-0);
-  --border: var(--n-200);
+  --border: #d6d3cc;
   --border-strong: var(--n-300);
   --action: var(--accent-500);
   --action-hover: var(--accent-600);
   --action-text: #ffffff;
-  --focus: var(--accent-500);
-  --success: #2f7a4a;
-  --success-surface: #ecf6ef;
-  --warning: #8a5a00;
-  --warning-surface: #fdf5e4;
-  --danger: #b3261e;
+  --focus: var(--amber-500);
+  --success: #1e7a46;
+  --success-surface: #e6f3eb;
+  --warning: #b26a00;
+  --warning-surface: #fbf0dc;
+  --danger: #b42318;
   --danger-surface: #fcecea;
-  --hero-from: #000000;
-  --hero-to: #666666;
+  --hero-from: #14181c;
+  --hero-to: #1f5c4a;
   --shadow-color: 0 0% 0%;
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --surface: #181818;
-  --surface-raised: #1f1f1f;
-  --surface-sunken: #000000;
+  --surface: #15191c;
+  --surface-raised: #1d2327;
+  --surface-sunken: #1b2a26;
   --surface-inverse: var(--n-50);
-  --text: #f2f2f2;
-  --text-subtle: #b4b4b4;
-  --text-muted: #8f8f8f;
+  --text: #e8e6e1;
+  --text-subtle: #9aa3a9;
+  --text-muted: #838c92;
   --text-inverse: var(--n-900);
-  --border: #313131;
-  --border-strong: #404040;
-  --action: #8fa9cc;
-  --action-hover: #a9bfdc;
-  --action-text: #0b1320;
-  --focus: #8fa9cc;
-  --success: #6fcf8f;
-  --success-surface: #13261a;
-  --warning: #e7b85a;
+  --border: #2e363b;
+  --border-strong: #414a50;
+  --action: #4fae8c;
+  --action-hover: #66bf9f;
+  --action-text: #0e1412;
+  --focus: #f0b23a;
+  --success: #4fbf7f;
+  --success-surface: #12261b;
+  --warning: #e0a04a;
   --warning-surface: #2a210e;
-  --danger: #f2877e;
+  --danger: #f0766b;
   --danger-surface: #2c1513;
-  --hero-from: #ffffff;
-  --hero-to: #9b9b9b;
+  --hero-from: #e8e6e1;
+  --hero-to: #4fae8c;
   --shadow-color: 0 0% 0%;
   color-scheme: dark;
 }

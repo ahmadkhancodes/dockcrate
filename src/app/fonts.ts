@@ -1,5 +1,6 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Big_Shoulders, Atkinson_Hyperlegible_Next, IBM_Plex_Mono } from "next/font/google";
 
-// Placeholder type pair (playbook whitelist). A product swaps these two lines per its docs/DESIGN.md.
-export const sans = Geist({ subsets: ["latin"], variable: "--font-kit-sans", display: "swap" });
-export const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-kit-mono", display: "swap" });
+// DockCrate type system (docs/DESIGN.md): display, body/UI, mono. Self-hosted at build.
+export const display = Big_Shoulders({ subsets: ["latin"], weight: ["600", "800"], variable: "--font-display", display: "swap" });
+export const sans = Atkinson_Hyperlegible_Next({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--font-body", display: "swap" });
+export const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono", display: "swap" });

@@ -3,9 +3,11 @@
  * KIT_COPY.md step 2: a new product edits this file (and the tokens in globals.css) and nothing else in src/lib.
  */
 
-export type PlanId = "free" | "starter" | "pro" | "agency";
+export type PlanId = "free" | "starter" | "professional" | "business" | "fleet";
 export type Interval = "month" | "year";
-export type MeterId = "submissions" | "seats" | "recipients" | "integrations" | "storage_mb";
+/** The billing meter is managed devices; the others are plan limits. UNLIMITED marks no cap. */
+export type MeterId = "devices" | "tenants" | "catalog_apps" | "custom_apps";
+export const UNLIMITED = 1_000_000;
 
 export interface PlanPrice {
   interval: Interval;
@@ -26,11 +28,13 @@ export interface Plan {
   highlights: string[];
   cta: string;
   featured?: boolean;
-  /** Days of trial. 0 = no trial (Postslot: the Free plan is the trial). */
+  /** Education / non-profit monthly price in cents (proof of status required). */
+  educationUsd?: number;
+  /** Days of trial. 0 = no trial (DockCrate: the Free plan is the trial). */
   trialDays: number;
 }
 
-const slug = "postslot";
+const slug = "dockcrate";
 const price = (plan: PlanId, interval: Interval, usd: number): PlanPrice => ({
   interval,
   usd,
@@ -39,18 +43,18 @@ const price = (plan: PlanId, interval: Interval, usd: number): PlanPrice => ({
 
 export const product = {
   slug,
-  name: "Postslot",
-  fullName: "Postslot by BufferSol",
+  name: "DockCrate",
+  fullName: "DockCrate by BufferSol",
   company: "BufferSol Technologies",
   companyUrl: "https://buffersoltech.com",
-  host: "postslot.buffersoltech.com",
-  url: process.env.NEXT_PUBLIC_APP_URL ?? "https://postslot.buffersoltech.com",
+  host: "dockcrate.buffersoltech.com",
+  url: process.env.NEXT_PUBLIC_APP_URL ?? "https://dockcrate.buffersoltech.com",
   supportEmail: "support@buffersoltech.com",
   legalEmail: "legal@buffersoltech.com",
-  mailFrom: "Postslot by BufferSol <no-reply@postslot.buffersoltech.com>",
+  mailFrom: "DockCrate <hello@dockcrate.buffersoltech.com>",
   description:
-    "A form endpoint for static, Jamstack and AI-built sites. Every submission gets a delivery receipt, spam never counts toward your quota and over-limit submissions are held, never dropped.",
-  tagline: "Form submissions that arrive, with a receipt to prove it",
+    "MSP-first Intune app packaging and patching. Every app version is hash-checked, signer-checked, malware-scanned and test-installed in a clean VM, then published to your own Intune tenant as a Win32 app and kept updated through Pilot and Broad rings with auto-pause and one-click rollback.",
+  tagline: "Third-party apps for Intune, packaged, inspected and shipped in rings.",
   /** Legal entity details used by the legal templates. */
   legal: {
     entity: "BufferSol Technologies",
@@ -71,42 +75,53 @@ export const product = {
     {
       id: "free",
       name: "Free",
-      tagline: "For one site and a first form",
+      tagline: "Try it on a small fleet",
       prices: [],
-      limits: { submissions: 250, seats: 1, recipients: 1, integrations: 0, storage_mb: 0 },
-      highlights: ["250 submissions a month, spam never counts", "Unlimited forms and domains", "1 verified recipient", "90 day history"],
+      limits: { devices: 25, tenants: 1, catalog_apps: 15, custom_apps: 0 },
+      highlights: ["25 devices", "1 tenant", "15 catalog apps", "Rings and rollback", "Community support"],
       cta: "Start free",
       trialDays: 0,
     },
     {
       id: "starter",
       name: "Starter",
-      tagline: "For freelancers with a few client sites",
-      prices: [price("starter", "year", 2400)],
-      limits: { submissions: 5000, seats: 1, recipients: 3, integrations: 1, storage_mb: 0 },
-      highlights: ["5,000 submissions a month", "3 recipients", "Webhooks and 1 integration", "6 month history"],
+      tagline: "For a first few client tenants",
+      prices: [price("starter", "month", 2499), price("starter", "year", 24950)],
+      limits: { devices: 100, tenants: 5, catalog_apps: UNLIMITED, custom_apps: 0 },
+      highlights: ["100 devices", "5 tenants", "Full catalog", "Rings, rollback and macOS", "Audit log", "Email support"],
       cta: "Choose Starter",
       trialDays: 0,
     },
     {
-      id: "pro",
-      name: "Pro",
-      tagline: "For developers who need proof of delivery",
-      prices: [price("pro", "month", 749), price("pro", "year", 7400)],
-      limits: { submissions: 10000, seats: 3, recipients: 5, integrations: 5, storage_mb: 5120 },
-      highlights: ["10,000 submissions a month", "Custom sending domain", "90 day delivery log", "Autoresponder and file uploads", "3 seats"],
-      cta: "Choose Pro",
+      id: "professional",
+      name: "Professional",
+      tagline: "For MSPs managing many tenants",
+      prices: [price("professional", "month", 4999), price("professional", "year", 49950)],
+      limits: { devices: 1000, tenants: UNLIMITED, catalog_apps: UNLIMITED, custom_apps: 0 },
+      highlights: ["1,000 devices", "Unlimited tenants", "App Sets", "Scheduled windows", "Webhooks", "Client PDF reports"],
+      cta: "Choose Professional",
       featured: true,
+      educationUsd: 3499,
       trialDays: 0,
     },
     {
-      id: "agency",
-      name: "Agency",
-      tagline: "For studios running many client sites",
-      prices: [price("agency", "month", 1949), price("agency", "year", 19900)],
-      limits: { submissions: 20000, seats: 10, recipients: 10, integrations: 10, storage_mb: 10240 },
-      highlights: ["20,000 submissions a month", "Client workspaces", "White label emails", "10 seats", "Priority support"],
-      cta: "Choose Agency",
+      id: "business",
+      name: "Business",
+      tagline: "For larger managed fleets",
+      prices: [price("business", "month", 7499), price("business", "year", 74950)],
+      limits: { devices: 2500, tenants: UNLIMITED, catalog_apps: UNLIMITED, custom_apps: 25 },
+      highlights: ["2,500 devices", "25 Custom Apps (VM-validated)", "Defender patch queue", "Policy backup", "Priority support"],
+      cta: "Choose Business",
+      trialDays: 0,
+    },
+    {
+      id: "fleet",
+      name: "Fleet",
+      tagline: "For the largest MSP fleets",
+      prices: [price("fleet", "month", 9999), price("fleet", "year", 99990)],
+      limits: { devices: 5000, tenants: UNLIMITED, catalog_apps: UNLIMITED, custom_apps: 100 },
+      highlights: ["5,000 devices", "100 Custom Apps", "SSO-enforced RBAC", "99.9% SLA", "Custom quote above 5,000 devices"],
+      cta: "Choose Fleet",
       trialDays: 0,
     },
   ] satisfies Plan[],
