@@ -1,6 +1,7 @@
 import { product, type Plan } from "@/config/product";
 import type { Db } from "@/lib/db/types";
 import type { Deps } from "@/lib/deps";
+import { raiseAlert } from "@/lib/alerts";
 import { HttpError } from "@/lib/http";
 import type { TenantApp } from "@/lib/rings/types";
 import type { Tenant } from "@/lib/tenants";
@@ -9,6 +10,8 @@ import { effectivePlan } from "./entitlement";
 import { usageState, type UsageState } from "./usage";
 
 const DAY = 86_400_000;
+/** The "grace ending" alert goes out this many days before publishing stops. */
+export const GRACE_WARN_DAYS = 3;
 
 export interface OrgLimits {
   plan: Plan;
@@ -89,6 +92,15 @@ export async function deviceCountJob(deps: Deps, counter: DeviceCounter): Promis
     const overSince = l.overSince ? prev?.overSince ?? l.overSince : null;
     if (overSince) out.overLimit++;
     if ((prev?.overSince ?? null) !== overSince) await deps.db.collection<OrgBilling>("org_billing").put({ id: orgId, overSince });
+    if (overSince) {
+      const end = new Date(overSince).getTime() + product.graceDays * DAY;
+      const left = end - at.getTime();
+      if (left <= GRACE_WARN_DAYS * DAY) {
+        const ended = left <= 0;
+        await raiseAlert(deps, { orgId, tenantId: null, severity: "critical", kind: "device.grace_ending", dedupeKey: `grace:${orgId}:${overSince}:${ended ? "ended" : "ending"}`,
+          message: ended ? `Your managed devices are over the ${l.plan.name} limit and the ${product.graceDays} day grace period has ended. Publishing is stopped until you upgrade.` : `Your managed devices are over the ${l.plan.name} limit. Publishing stops in ${Math.max(1, Math.ceil(left / DAY))} day${left > DAY ? "s" : ""} unless you upgrade or remove devices.` });
+      }
+    }
   }
   return out;
 }

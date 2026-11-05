@@ -38,3 +38,13 @@ export const qaStages: QaStage[] = [
 
 export const vmPendingNote =
   "While our Windows test lab is being commissioned, the VM check shows as pending on any version it has not tested, and those versions publish to Pilot only.";
+
+/** Data handling statement (security page). Matches the privacy policy and DPA. */
+export const dataHandling: string[] = [
+  "We store tenant IDs, group and device identifiers returned by Microsoft Graph, app and ring metadata, and an audit log. We do not store device contents, user files or user passwords.",
+  "We never hold a customer secret: access to your tenant uses our own app credential with the application permissions your Global Admin granted, and you can revoke consent in Entra at any time.",
+  "Installers are downloaded from the vendor, hashed, scanned and uploaded straight to your Intune tenant. We keep the hash, the signer and the QA log, not a copy of your fleet.",
+  "The audit log is append only and tamper evident: each entry stores the hash of the one before it, and an owner or admin can verify the whole chain from the audit log page. This detects edited, removed or reordered entries; it cannot detect deletion of the very newest entries, so export the log regularly if you need that.",
+  "Data is hosted in the United States today (sub processors below). A UK data region is on the roadmap, not live.",
+  "On account deletion we remove tenant, ring and billing data. Audit entries keep ids only, as the privacy policy says.",
+];

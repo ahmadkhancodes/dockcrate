@@ -15,6 +15,8 @@ export interface CatalogApp {
   wingetId: string;
   platform: "windows";
   license: string;
+  /** Public catalog grouping. Missing on older rows: shown as "Other". */
+  category?: string;
   currentVersionId: string;
   createdAt: string;
   updatedAt: string;

@@ -18,6 +18,8 @@ export function GET() {
     "## Product",
     "",
     `- [Pricing](${u("/pricing")}): Plans, device limits and education price`,
+    `- [Public catalog](${u("/catalog")}): Searchable apps with version history, inspection tag and QA log (demo data until the live pipeline runs)`,
+    `- [Security](${u("/security")}): Permission table, QA pipeline, data handling, DPA download and sub processors`,
     `- [Full documentation as one file](${u("/llms-full.txt")}): All docs in markdown`,
     "",
     "## Legal",

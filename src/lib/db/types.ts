@@ -44,6 +44,10 @@ export interface AuditEntry {
   meta?: Record<string, string | number | boolean | null>;
   ip?: string | null;
   at: Date;
+  /** Hash chain (see audit-chain.ts). Absent on entries written before the chain existed. */
+  seq?: number;
+  prevHash?: string | null;
+  hash?: string;
 }
 
 export interface WebhookEndpoint {
@@ -121,6 +125,8 @@ export interface Db {
   // audit log (append-only)
   appendAudit(e: Omit<AuditEntry, "id" | "app" | "at"> & { at?: Date }): Promise<AuditEntry>;
   listAudit(orgId: string, opts?: { limit?: number; before?: Date }): Promise<AuditEntry[]>;
+  /** The whole log of an org, oldest first (for chain verification). */
+  auditChain(orgId: string): Promise<AuditEntry[]>;
 
   // outbound webhooks
   createWebhookEndpoint(e: Omit<WebhookEndpoint, "app" | "createdAt">): Promise<WebhookEndpoint>;

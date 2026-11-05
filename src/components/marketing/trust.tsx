@@ -46,3 +46,34 @@ export function QaPipeline() {
     </ol>
   );
 }
+
+const FLOW = [...qaStages.map((s) => s.name.toUpperCase()), "PILOT", "BROAD"];
+
+/** QA pipeline as an SVG: Vendor installer, four checks, then Pilot and Broad rings. Reads left to right; stacks via viewBox scaling. */
+export function QaPipelineDiagram() {
+  const w = 128, gap = 22, h = 64;
+  const total = FLOW.length * w + (FLOW.length - 1) * gap + 2;
+  return (
+    <figure>
+      <svg viewBox={`0 0 ${total} ${h + 56}`} role="img" aria-labelledby="qa-svg-t qa-svg-d" className="h-auto w-full min-w-[56rem] text-text">
+        <title id="qa-svg-t">QA pipeline</title>
+        <desc id="qa-svg-d">A vendor installer passes four checks in order: hash, signer, scan and VM. A version that fails any check is held. A version that passes goes to the Pilot ring, then to the Broad ring after the delay, unless Pilot failures pause it.</desc>
+        {FLOW.map((name, i) => {
+          const x = 1 + i * (w + gap);
+          const ring = i >= 4;
+          return (
+            <g key={name}>
+              <rect x={x} y={20} width={w} height={h} rx={6} className={ring ? "fill-surface stroke-text" : "fill-surface-raised stroke-border-strong"} strokeWidth={1.5} />
+              <text x={x + w / 2} y={20 + h / 2 - 4} textAnchor="middle" className="fill-current" fontSize={14} fontWeight={600} fontFamily="ui-monospace, monospace">{name}</text>
+              <text x={x + w / 2} y={20 + h / 2 + 14} textAnchor="middle" className="fill-text-subtle" fontSize={11}>{i < 4 ? `check ${i + 1} of 4` : i === 4 ? "0 h" : "after 48 h"}</text>
+              {i < FLOW.length - 1 ? <path d={`M${x + w + 3} ${20 + h / 2} H${x + w + gap - 3} m-6 -4 l6 4 l-6 4`} className="fill-none stroke-text-subtle" strokeWidth={1.5} /> : null}
+            </g>
+          );
+        })}
+        <text x={1 + 2 * (w + gap)} y={12} className="fill-text-subtle" fontSize={11}>Any failed check holds the version.</text>
+        <text x={1 + 4 * (w + gap)} y={h + 42} className="fill-text-subtle" fontSize={11}>Pilot failures over the threshold pause Broad.</text>
+      </svg>
+      <figcaption className="sr-only">Text version: the four checks are listed above.</figcaption>
+    </figure>
+  );
+}

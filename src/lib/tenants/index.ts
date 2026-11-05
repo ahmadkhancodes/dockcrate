@@ -7,6 +7,8 @@ import { HttpError } from "@/lib/http";
 import { uuidv7 } from "@/lib/ids";
 import { signToken, verifyToken } from "@/lib/signed";
 import { audit } from "@/lib/audit";
+import { raiseAlert } from "@/lib/alerts";
+export { raiseAlert };
 
 import { STATUS_LABEL, type TenantStatus } from "./labels";
 export { STATUS_LABEL, type TenantStatus };
@@ -35,6 +37,11 @@ export interface Alert {
   kind: string;
   message: string;
   createdAt: string;
+  /** Set when someone acknowledges the alert in the in-app centre. */
+  ackAt?: string | null;
+  ackBy?: string | null;
+  /** Repeats of the same cause raise one alert. */
+  dedupeKey?: string;
 }
 
 /** What each requested permission is for. The consent denied message names the missing one and why. */
@@ -82,11 +89,6 @@ async function save(deps: Deps, t: Tenant, patch: Partial<Tenant>): Promise<Tena
   return next;
 }
 
-export async function raiseAlert(deps: Deps, a: Omit<Alert, "id" | "createdAt">): Promise<Alert> {
-  const alert: Alert = { ...a, id: uuidv7(), createdAt: deps.now().toISOString() };
-  await deps.db.collection<Alert>("alerts").put(alert);
-  return alert;
-}
 
 /** Message for a consent error code from Microsoft, naming the permission and why we need it. */
 export function consentErrorMessage(error: string, description?: string | null): string {

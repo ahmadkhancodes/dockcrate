@@ -2,48 +2,200 @@
   "_note": "Sample catalog seed (D-12, D-17). Versions, hashes and tested dates are illustrative until catalog-sync and the verification pipeline run for real. The VM check is pending for every row until a Windows lab is attached (D-01).",
   "apps": [
     {
-      "slug": "google-chrome", "name": "Google Chrome", "publisher": "Google LLC", "wingetId": "Google.Chrome", "license": "Proprietary freeware",
-      "version": { "version": "152.0.6913", "arch": "x64", "installerType": "msi", "sha256": "b41e07d2c9a3f1180e5d6a47bb3cf2915ac96d0e8847a3f5c1d2e9b07a15ac9", "signer": { "subject": "CN=Google LLC, O=Google LLC, L=Mountain View, S=California, C=US", "thumbprint": "SAMPLE-GOOGLE-LLC" },
-        "installCmd": "msiexec /i \"googlechromestandaloneenterprise64.msi\" /qn /norestart", "uninstallCmd": "msiexec /x {SAMPLE-CHROME-PRODUCT-CODE} /qn /norestart", "setupFile": "googlechromestandaloneenterprise64.msi",
-        "detectionHint": { "msiProductCode": "{8A69D345-D564-463C-AFF1-A69D9E530F96}" }, "minOs": "1607", "testedAt": "2026-11-04",
-        "checks": { "hash": "pass", "signer": "pass", "scan": "pass", "vm": "pending" } }
+      "slug": "google-chrome",
+      "name": "Google Chrome",
+      "publisher": "Google LLC",
+      "wingetId": "Google.Chrome",
+      "license": "Proprietary freeware",
+      "category": "Browsers",
+      "version": {
+        "version": "152.0.6913",
+        "arch": "x64",
+        "installerType": "msi",
+        "sha256": "b41e07d2c9a3f1180e5d6a47bb3cf2915ac96d0e8847a3f5c1d2e9b07a15ac9",
+        "signer": {
+          "subject": "CN=Google LLC, O=Google LLC, L=Mountain View, S=California, C=US",
+          "thumbprint": "SAMPLE-GOOGLE-LLC"
+        },
+        "installCmd": "msiexec /i \"googlechromestandaloneenterprise64.msi\" /qn /norestart",
+        "uninstallCmd": "msiexec /x {SAMPLE-CHROME-PRODUCT-CODE} /qn /norestart",
+        "setupFile": "googlechromestandaloneenterprise64.msi",
+        "detectionHint": {
+          "msiProductCode": "{8A69D345-D564-463C-AFF1-A69D9E530F96}"
+        },
+        "minOs": "1607",
+        "testedAt": "2026-11-04",
+        "checks": {
+          "hash": "pass",
+          "signer": "pass",
+          "scan": "pass",
+          "vm": "pending"
+        }
+      }
     },
     {
-      "slug": "7-zip", "name": "7-Zip", "publisher": "Igor Pavlov", "wingetId": "7zip.7zip", "license": "LGPL-2.1 with unRAR restriction",
-      "version": { "version": "25.01", "arch": "x64", "installerType": "msi", "sha256": "3f9a1c0e57d28b64a09c1e3f7a6d4b82c05e91f3d7a8b2c64e1f0a93b27d5c1", "signer": { "subject": "CN=Igor Pavlov, O=Igor Pavlov, C=RU", "thumbprint": "SAMPLE-IGOR-PAVLOV" },
-        "installCmd": "msiexec /i \"7z2501-x64.msi\" /qn /norestart", "uninstallCmd": "msiexec /x {23170F69-40C1-2702-2501-000001000000} /qn /norestart", "setupFile": "7z2501-x64.msi",
-        "detectionHint": { "msiProductCode": "{23170F69-40C1-2702-2501-000001000000}" }, "minOs": "1607", "testedAt": "2026-11-03",
-        "checks": { "hash": "pass", "signer": "pass", "scan": "pass", "vm": "pending" } }
+      "slug": "7-zip",
+      "name": "7-Zip",
+      "publisher": "Igor Pavlov",
+      "wingetId": "7zip.7zip",
+      "license": "LGPL-2.1 with unRAR restriction",
+      "category": "Utilities",
+      "version": {
+        "version": "25.01",
+        "arch": "x64",
+        "installerType": "msi",
+        "sha256": "3f9a1c0e57d28b64a09c1e3f7a6d4b82c05e91f3d7a8b2c64e1f0a93b27d5c1",
+        "signer": {
+          "subject": "CN=Igor Pavlov, O=Igor Pavlov, C=RU",
+          "thumbprint": "SAMPLE-IGOR-PAVLOV"
+        },
+        "installCmd": "msiexec /i \"7z2501-x64.msi\" /qn /norestart",
+        "uninstallCmd": "msiexec /x {23170F69-40C1-2702-2501-000001000000} /qn /norestart",
+        "setupFile": "7z2501-x64.msi",
+        "detectionHint": {
+          "msiProductCode": "{23170F69-40C1-2702-2501-000001000000}"
+        },
+        "minOs": "1607",
+        "testedAt": "2026-11-03",
+        "checks": {
+          "hash": "pass",
+          "signer": "pass",
+          "scan": "pass",
+          "vm": "pending"
+        }
+      }
     },
     {
-      "slug": "zoom-workplace", "name": "Zoom Workplace", "publisher": "Zoom Communications", "wingetId": "Zoom.Zoom", "license": "Proprietary freeware",
-      "version": { "version": "6.3.1", "arch": "x64", "installerType": "msi", "sha256": "9c41d7aa3e60b158f2d4c7a9e1b30568d7f2a4c0e93b1d6578a2f4e03e03f1b", "signer": { "subject": "CN=Zoom Video Communications, Inc., O=Zoom Video Communications, Inc., C=US", "thumbprint": "SAMPLE-ZOOM" },
-        "installCmd": "msiexec /i \"ZoomInstallerFull.msi\" /qn /norestart", "uninstallCmd": "msiexec /x {SAMPLE-ZOOM-PRODUCT-CODE} /qn /norestart", "setupFile": "ZoomInstallerFull.msi",
-        "detectionHint": { "msiProductCode": "{F6E08A5A-0E2E-4C57-9B55-4F7A8C1D3B20}" }, "minOs": "1607", "testedAt": "2026-11-04",
-        "checks": { "hash": "pass", "signer": "pass", "scan": "pass", "vm": "pending" } }
+      "slug": "zoom-workplace",
+      "name": "Zoom Workplace",
+      "publisher": "Zoom Communications",
+      "wingetId": "Zoom.Zoom",
+      "license": "Proprietary freeware",
+      "category": "Communication",
+      "version": {
+        "version": "6.3.1",
+        "arch": "x64",
+        "installerType": "msi",
+        "sha256": "9c41d7aa3e60b158f2d4c7a9e1b30568d7f2a4c0e93b1d6578a2f4e03e03f1b",
+        "signer": {
+          "subject": "CN=Zoom Video Communications, Inc., O=Zoom Video Communications, Inc., C=US",
+          "thumbprint": "SAMPLE-ZOOM"
+        },
+        "installCmd": "msiexec /i \"ZoomInstallerFull.msi\" /qn /norestart",
+        "uninstallCmd": "msiexec /x {SAMPLE-ZOOM-PRODUCT-CODE} /qn /norestart",
+        "setupFile": "ZoomInstallerFull.msi",
+        "detectionHint": {
+          "msiProductCode": "{F6E08A5A-0E2E-4C57-9B55-4F7A8C1D3B20}"
+        },
+        "minOs": "1607",
+        "testedAt": "2026-11-04",
+        "checks": {
+          "hash": "pass",
+          "signer": "pass",
+          "scan": "pass",
+          "vm": "pending"
+        }
+      }
     },
     {
-      "slug": "notepad-plus-plus", "name": "Notepad++", "publisher": "Notepad++ Team", "wingetId": "Notepad++.Notepad++", "license": "GPL-3.0",
-      "version": { "version": "8.8.5", "arch": "x64", "installerType": "nullsoft", "sha256": "e2d80b61a4f97c3350e8b1d6a27c94f0e3b5d81a6c7f2094b3e8a15d77147c0", "signer": { "subject": "CN=Notepad++, O=Notepad++, C=FR", "thumbprint": "SAMPLE-NOTEPADPP" },
-        "installCmd": "\"npp.8.8.5.Installer.x64.exe\" /S", "uninstallCmd": "\"%ProgramFiles%\\Notepad++\\uninstall.exe\" /S", "setupFile": "npp.8.8.5.Installer.x64.exe",
-        "detectionHint": { "uninstallKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Notepad++", "displayVersion": "8.8.5" }, "minOs": "1607", "testedAt": "2026-11-02",
-        "checks": { "hash": "pass", "signer": "pass", "scan": "pass", "vm": "pending" } }
+      "slug": "notepad-plus-plus",
+      "name": "Notepad++",
+      "publisher": "Notepad++ Team",
+      "wingetId": "Notepad++.Notepad++",
+      "license": "GPL-3.0",
+      "category": "Developer tools",
+      "version": {
+        "version": "8.8.5",
+        "arch": "x64",
+        "installerType": "nullsoft",
+        "sha256": "e2d80b61a4f97c3350e8b1d6a27c94f0e3b5d81a6c7f2094b3e8a15d77147c0",
+        "signer": {
+          "subject": "CN=Notepad++, O=Notepad++, C=FR",
+          "thumbprint": "SAMPLE-NOTEPADPP"
+        },
+        "installCmd": "\"npp.8.8.5.Installer.x64.exe\" /S",
+        "uninstallCmd": "\"%ProgramFiles%\\Notepad++\\uninstall.exe\" /S",
+        "setupFile": "npp.8.8.5.Installer.x64.exe",
+        "detectionHint": {
+          "uninstallKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Notepad++",
+          "displayVersion": "8.8.5"
+        },
+        "minOs": "1607",
+        "testedAt": "2026-11-02",
+        "checks": {
+          "hash": "pass",
+          "signer": "pass",
+          "scan": "pass",
+          "vm": "pending"
+        }
+      }
     },
     {
-      "slug": "adobe-acrobat-reader", "name": "Adobe Acrobat Reader", "publisher": "Adobe Inc.", "wingetId": "Adobe.Acrobat.Reader.64-bit", "license": "Proprietary freeware",
-      "version": { "version": "25.001.20630", "arch": "x64", "installerType": "exe", "sha256": "08fb6a35d1c9e4720b3f8a65c7d12e94b0a3c5f7e8d2916a4b0c3e75f2c9e1a", "signer": { "subject": "CN=Adobe Inc., O=Adobe Inc., C=US", "thumbprint": "SAMPLE-ADOBE-NEW" },
-        "installCmd": "\"AcroRdrDCx642500120630_en_US.exe\" /sAll /rs /msi EULA_ACCEPT=YES", "uninstallCmd": "msiexec /x {AC76BA86-1033-FF00-7760-BC15014EA700} /qn /norestart", "setupFile": "AcroRdrDCx642500120630_en_US.exe",
-        "detectionHint": { "uninstallKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{AC76BA86-1033-FF00-7760-BC15014EA700}", "displayVersion": "25.001.20630" }, "minOs": "1607", "testedAt": "2026-11-01",
+      "slug": "adobe-acrobat-reader",
+      "name": "Adobe Acrobat Reader",
+      "publisher": "Adobe Inc.",
+      "wingetId": "Adobe.Acrobat.Reader.64-bit",
+      "license": "Proprietary freeware",
+      "category": "Documents",
+      "version": {
+        "version": "25.001.20630",
+        "arch": "x64",
+        "installerType": "exe",
+        "sha256": "08fb6a35d1c9e4720b3f8a65c7d12e94b0a3c5f7e8d2916a4b0c3e75f2c9e1a",
+        "signer": {
+          "subject": "CN=Adobe Inc., O=Adobe Inc., C=US",
+          "thumbprint": "SAMPLE-ADOBE-NEW"
+        },
+        "installCmd": "\"AcroRdrDCx642500120630_en_US.exe\" /sAll /rs /msi EULA_ACCEPT=YES",
+        "uninstallCmd": "msiexec /x {AC76BA86-1033-FF00-7760-BC15014EA700} /qn /norestart",
+        "setupFile": "AcroRdrDCx642500120630_en_US.exe",
+        "detectionHint": {
+          "uninstallKey": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{AC76BA86-1033-FF00-7760-BC15014EA700}",
+          "displayVersion": "25.001.20630"
+        },
+        "minOs": "1607",
+        "testedAt": "2026-11-01",
         "previousSignerThumbprint": "SAMPLE-ADOBE-OLD",
-        "checks": { "hash": "pass", "signer": "fail", "scan": "pass", "vm": "pending" },
-        "heldReason": "The signing certificate changed from the previous version. Held for manual review." }
+        "checks": {
+          "hash": "pass",
+          "signer": "fail",
+          "scan": "pass",
+          "vm": "pending"
+        },
+        "heldReason": "The signing certificate changed from the previous version. Held for manual review."
+      }
     },
     {
-      "slug": "vlc-media-player", "name": "VLC media player", "publisher": "VideoLAN", "wingetId": "VideoLAN.VLC", "license": "GPL-2.0",
-      "version": { "version": "3.0.21", "arch": "x64", "installerType": "msi", "sha256": "6a2c9f10b8e4d73a15c0f9e2b6d8a47c3e1f5b09d2a6c84e7f31b0d5d3b8a92", "signer": { "subject": "CN=VideoLAN, O=VideoLAN, C=FR", "thumbprint": "SAMPLE-VIDEOLAN" },
-        "installCmd": "msiexec /i \"vlc-3.0.21-win64.msi\" /qn /norestart", "uninstallCmd": "msiexec /x {SAMPLE-VLC-PRODUCT-CODE} /qn /norestart", "setupFile": "vlc-3.0.21-win64.msi",
-        "detectionHint": { "msiProductCode": "{A1D8E4C6-3B57-4F20-8C19-0D6E7B92F4A3}" }, "minOs": "1607", "testedAt": "2026-10-30",
-        "checks": { "hash": "pass", "signer": "pass", "scan": "pass", "vm": "pending" } }
+      "slug": "vlc-media-player",
+      "name": "VLC media player",
+      "publisher": "VideoLAN",
+      "wingetId": "VideoLAN.VLC",
+      "license": "GPL-2.0",
+      "category": "Media",
+      "version": {
+        "version": "3.0.21",
+        "arch": "x64",
+        "installerType": "msi",
+        "sha256": "6a2c9f10b8e4d73a15c0f9e2b6d8a47c3e1f5b09d2a6c84e7f31b0d5d3b8a92",
+        "signer": {
+          "subject": "CN=VideoLAN, O=VideoLAN, C=FR",
+          "thumbprint": "SAMPLE-VIDEOLAN"
+        },
+        "installCmd": "msiexec /i \"vlc-3.0.21-win64.msi\" /qn /norestart",
+        "uninstallCmd": "msiexec /x {SAMPLE-VLC-PRODUCT-CODE} /qn /norestart",
+        "setupFile": "vlc-3.0.21-win64.msi",
+        "detectionHint": {
+          "msiProductCode": "{A1D8E4C6-3B57-4F20-8C19-0D6E7B92F4A3}"
+        },
+        "minOs": "1607",
+        "testedAt": "2026-10-30",
+        "checks": {
+          "hash": "pass",
+          "signer": "pass",
+          "scan": "pass",
+          "vm": "pending"
+        }
+      }
     }
   ]
 }

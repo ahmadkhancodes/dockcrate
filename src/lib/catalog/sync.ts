@@ -19,6 +19,8 @@ export interface SyncOptions {
   persist: boolean;
   now?: Date;
   requireVm?: boolean;
+  /** Called when a version's signer differs from the last verified one (raises the `signer.changed` alert). */
+  onSignerChange?: (slug: string, version: string) => Promise<unknown>;
 }
 
 /**
@@ -42,6 +44,7 @@ export async function catalogSync(db: Db, o: SyncOptions): Promise<SyncResult> {
         : cur;
       const evidence = await collectEvidence(base, o.sources, m.installerUrl);
       const done = await verifyVersion(base, evidence, o.lab, now, o.requireVm ?? requireVmVerification());
+      if (done.verification.checks.signer === "fail") await o.onSignerChange?.(app.slug, done.version);
       if (o.persist) {
         const signed = { ...done, manifestSig: signVersion(o.signer, done) };
         await versions.put(signed);

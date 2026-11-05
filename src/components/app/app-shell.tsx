@@ -1,7 +1,7 @@
 "use client";
 import { hardNavigate } from "./api";
 import {
-  Buildings, ChartBar, ClipboardText, CreditCard, Gauge, Key, List, ShieldCheck, SignOut, SquaresFour, Stack, User, UsersThree, WebhooksLogo, X,
+  Bell, Buildings, ChartBar, ClipboardText, CreditCard, Gauge, Key, List, ShieldCheck, SignOut, SquaresFour, Stack, User, UsersThree, WebhooksLogo, X,
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -9,6 +9,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ThemeToggle } from "@/components/theme";
 import { cn } from "@/components/ui/cn";
 import { authClient } from "@/lib/auth/client";
+import { AlertBell } from "./alert-bell";
 import { OrgSwitcher } from "./org-switcher";
 
 type IconType = typeof User;
@@ -23,6 +24,7 @@ const MAIN: NavItem[] = [
 const SETTINGS: NavItem[] = [
   { href: "/app/settings/profile", label: "Profile", icon: User },
   { href: "/app/settings/security", label: "Security", icon: ShieldCheck },
+  { href: "/app/settings/notifications", label: "Notifications", icon: Bell },
   { href: "/app/settings/members", label: "Members", icon: UsersThree },
   { href: "/app/settings/api-keys", label: "API keys", icon: Key },
   { href: "/app/billing", label: "Billing", icon: CreditCard },
@@ -121,8 +123,9 @@ export function AppShell({ org, user, isAdmin, productName, banners, children }:
   return (
     <div className="flex min-h-dvh flex-col bg-surface lg:flex-row">
       <aside className="sticky top-0 hidden h-dvh w-full max-w-xs shrink-0 flex-col border-r border-border bg-surface-raised p-4 lg:flex lg:w-1/4 xl:w-1/5">
-        <div className="mb-6 px-3 pt-2">
+        <div className="mb-6 flex items-center justify-between px-3 pt-2">
           <Link href="/app" className="heading-6 text-text focus-visible:focus-ring">{productName}</Link>
+          <AlertBell />
         </div>
         <div className="min-h-0 flex-1">
           <SidebarBody org={org} user={user} isAdmin={isAdmin} pathname={pathname} />
@@ -131,6 +134,8 @@ export function AppShell({ org, user, isAdmin, productName, banners, children }:
 
       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-surface px-4 py-2 lg:hidden">
         <Link href="/app" className="heading-6 text-text focus-visible:focus-ring">{productName}</Link>
+        <div className="flex items-center gap-1">
+        <AlertBell />
         <button
           type="button"
           aria-label="Open menu"
@@ -141,6 +146,7 @@ export function AppShell({ org, user, isAdmin, productName, banners, children }:
         >
           <List size={24} weight="regular" aria-hidden />
         </button>
+        </div>
       </header>
 
       <div

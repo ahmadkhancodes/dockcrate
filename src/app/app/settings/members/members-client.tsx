@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
 import { Badge, EmptyState, ErrorState, Skeleton } from "@/components/ui/states";
 import { authClient } from "@/lib/auth/client";
+import { ScopeEditor } from "./scope-editor";
 
 interface Member { id: string; userId: string; role: string; createdAt: string | Date; user: { name?: string | null; email: string } }
 interface Invite { id: string; email: string; role: string; status: string; expiresAt: string | Date }
@@ -33,6 +34,7 @@ export function MembersClient({ orgId, meId, canInvite, canCancelInvite, canUpda
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [removing, setRemoving] = useState<Member | null>(null);
+  const [scoping, setScoping] = useState<Member | null>(null);
 
   async function invite(e: React.FormEvent) {
     e.preventDefault();
@@ -142,6 +144,7 @@ export function MembersClient({ orgId, meId, canInvite, canCancelInvite, canUpda
                   </Td>
                   <Td muted>{formatDate(m.createdAt)}</Td>
                   <Td align="right">
+                    {canUpdate && ["operator", "viewer"].includes(m.role) ? <Button variant="tertiary" size="sm" onClick={() => { setNotice(null); setScoping(m); }}>Tenant access</Button> : null}
                     {canRemove && !isMe && !isOwner ? <Button variant="tertiary" size="sm" onClick={() => setRemoving(m)}>Remove</Button> : null}
                   </Td>
                 </tr>
@@ -150,6 +153,8 @@ export function MembersClient({ orgId, meId, canInvite, canCancelInvite, canUpda
           </DataTable>
         )}
       </section>
+
+      {scoping ? <ScopeEditor key={scoping.userId} userId={scoping.userId} who={scoping.user.name || scoping.user.email} onClose={() => setScoping(null)} onSaved={(text) => { setScoping(null); setNotice({ ok: true, text }); }} /> : null}
 
       <section aria-labelledby="invites-h" className="flex flex-col gap-3">
         <h2 id="invites-h" className="title-2 text-text">Pending invitations</h2>

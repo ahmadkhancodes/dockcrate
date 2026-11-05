@@ -59,7 +59,7 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
     { label: "Disconnected", value: String(disconnected), note: disconnected ? "consent revoked" : "all tenants reachable" },
     { label: "Published", value: `${rows.filter((r) => r.deployedVersion).length} / ${rows.length}`, note: "apps in this tenant" },
   ];
-  const openAlerts = alerts.filter((a) => a.tenantId === tenant.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 2);
+  const openAlerts = alerts.filter((a) => a.tenantId === tenant.id && !a.ackAt).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 2);
 
   return (
     <>

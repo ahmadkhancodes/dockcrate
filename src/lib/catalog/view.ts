@@ -12,11 +12,18 @@ export interface CatalogRow {
   checks: CatalogEntry["version"]["verification"]["checks"];
   testedAt: string;
   tag: string;
+  category: string;
+  status: CatalogEntry["version"]["status"];
+  /** True until the live pipeline produced the version: seed rows carry no vendor installer URL. */
+  demo: boolean;
 }
+
+export const isDemoVersion = (v: { installerUrl?: string | null }) => !v.installerUrl;
 
 export const toRow = (e: CatalogEntry): CatalogRow => ({
   slug: e.app.slug, name: e.app.name, publisher: e.app.publisher, version: e.version.version, versionId: e.version.id,
   checks: e.version.verification.checks, testedAt: e.version.testedAt, tag: publishPlan(e.version).tag,
+  category: e.app.category ?? "Other", status: e.version.status, demo: isDemoVersion(e.version),
 });
 
 /** Adapter for the CrateLabel component, which renders a crate-shaped view model. */

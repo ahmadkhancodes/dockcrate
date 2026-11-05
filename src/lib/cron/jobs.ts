@@ -1,3 +1,4 @@
+import { alertDigestJob, raiseSignerChanged } from "@/lib/alerts";
 import { ensureCatalogSeeded } from "@/lib/catalog";
 import type { CatalogApp } from "@/lib/catalog/types";
 import { InstallDataDeviceCounter } from "@/lib/billing/devices";
@@ -15,6 +16,8 @@ import { retryDueDeliveries } from "@/lib/webhooks/outbound";
 export const cronJobs: Record<string, () => Promise<unknown>> = {
   "webhook-retries": () => retryDueDeliveries({ limit: 100 }),
   heartbeat: async () => ({ at: new Date().toISOString() }),
+  /** Daily: one email per user who chose the digest, with the info and warning alerts since the last one. */
+  "alert-digest": async () => alertDigestJob(await defaultDeps()),
   "tenant-verify": async () => tenantVerifyJob(await defaultDeps()),
   /** Nightly: count managed devices per tenant and org, start or clear the over-limit grace clock. */
   "device-count": async () => { const deps = await defaultDeps(); return deviceCountJob(deps, new InstallDataDeviceCounter(deps)); },
@@ -22,7 +25,7 @@ export const cronJobs: Record<string, () => Promise<unknown>> = {
   "catalog-sync": async () => {
     const deps = await defaultDeps();
     const signer = envManifestSigner();
-    return catalogSync(deps.db, await fakePipeline(deps.db, signer, new PendingVmLab(), deps.now()));
+    return catalogSync(deps.db, { ...(await fakePipeline(deps.db, signer, new PendingVmLab(), deps.now())), onSignerChange: (slug, version) => raiseSignerChanged(deps, slug, version) });
   },
   /** Every minute: fan new publishable versions out to tenants with auto update on, then promote or pause Pilot deployments. */
   "rings-tick": async () => {

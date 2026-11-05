@@ -57,7 +57,7 @@ export const dpa: LegalDoc = {
     {
       id: "contact",
       title: "Contact and signed copy",
-      body: [`To request a countersigned copy, email ${p.legalEmail}. Our address is ${p.legal.address}.`],
+      body: [`A print friendly copy is at /api/legal/dpa?download=1, and it includes the subprocessor list as Annex 1. To request a countersigned copy, email ${p.legalEmail}. Our address is ${p.legal.address}.`],
     },
   ],
 };

@@ -7,6 +7,10 @@ export const gettingStarted: DocPage = {
   description: `Connect an Intune tenant to ${p.name}, set up Pilot and Broad groups and publish your first app.`,
   sections: [
     {
+      heading: "Current status",
+      body: ["Honest status: the upload to a real Intune tenant has not been proven yet, the catalog shows demo data, and the VM check is pending until the Windows lab is attached. The FAQ lists what is and is not live."],
+    },
+    {
       heading: "Before you start",
       body: [
         `${p.fullName} publishes third-party apps to your own Intune tenant as Win32 apps. You need a Microsoft work account to sign in and a Global Admin to approve the connection once. New accounts start on the ${p.plans[0]?.name ?? "Free"} plan: 25 devices, 1 tenant and 15 catalog apps, with rings and rollback included.`,
