@@ -15,6 +15,8 @@ export interface RingConfig {
   failThresholdPct: number;
   intent: Extract<Intent, "required" | "available">;
   alertEmail: string | null;
+  /** Auto update value a newly published app starts with in this tenant (default on). */
+  autoUpdateDefault?: boolean;
 }
 
 export const DEFAULT_PILOT_DELAY_HOURS = 0;

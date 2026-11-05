@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { apiCtx } from "@/lib/api/ctx";
 import { authorize } from "@/lib/authz";
+import { assertCanPublish } from "@/lib/billing/limits";
+import { appSlugOfVersion } from "@/lib/catalog";
 import { json, readJson, withApi } from "@/lib/http";
 import { defaultPublishCtx } from "@/lib/publish/ctx";
 import { publishVersion } from "@/lib/publish/win32";
@@ -15,6 +17,7 @@ export const POST = withApi(async (req) => {
   const { org, membership, deps } = await apiCtx();
   const input = await readJson(req, body);
   authorize(membership, "deployment", "publish", input.tenantId);
+  await assertCanPublish(deps.db, org.org.id, await appSlugOfVersion(deps.db, input.versionId), deps.now());
   const d = await publishVersion(deps, defaultPublishCtx(), { orgId: org.org.id, ...input, actorId: org.user.id });
   return json({ deployment: { id: d.id, state: d.state, step: d.step, version: d.version } }, 201);
 });

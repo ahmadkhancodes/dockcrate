@@ -35,7 +35,9 @@ export async function api<T = Record<string, unknown>>(path: string, init: { met
     try { parsed = text ? JSON.parse(text) : {}; } catch { parsed = {}; }
     if (!res.ok) {
       const code = (parsed as { error?: string }).error ?? "error";
-      return { ok: false, status: res.status, code, message: humanError(code) };
+      const details = (parsed as { details?: unknown }).details;
+      // Plain sentences from the server (ring validation, plan limits) are shown as they are.
+      return { ok: false, status: res.status, code, message: typeof details === "string" && details.length < 240 ? details : humanError(code) };
     }
     return { ok: true, data: parsed as T };
   } catch {
