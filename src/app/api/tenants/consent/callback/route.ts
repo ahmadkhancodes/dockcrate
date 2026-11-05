@@ -1,6 +1,7 @@
 import { defaultDeps } from "@/lib/deps";
 import { handleConsentCallback } from "@/lib/tenants";
-import { withApi } from "@/lib/http";
+import { clientIp, withApi } from "@/lib/http";
+import { enforceRateLimit, RULES } from "@/lib/security/ratelimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,6 +10,8 @@ export const dynamic = "force-dynamic";
 export const GET = withApi(async (req) => {
   const q = new URL(req.url).searchParams;
   const deps = await defaultDeps();
+  // Each call can trigger a Graph token request; cap it per IP.
+  await enforceRateLimit(`consent-cb:${clientIp(req)}`, RULES.publicForm, deps.db);
   const r = await handleConsentCallback(deps, {
     state: q.get("state"), tenant: q.get("tenant"), admin_consent: q.get("admin_consent"), error: q.get("error"), error_description: q.get("error_description"),
   });

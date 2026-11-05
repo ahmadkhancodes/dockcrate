@@ -19,6 +19,10 @@
       "schedule": "0 7 * * *"
     },
     {
+      "path": "/api/cron/tenant-verify",
+      "schedule": "*/15 * * * *"
+    },
+    {
       "path": "/api/cron/catalog-sync",
       "schedule": "0 4 * * *"
     }

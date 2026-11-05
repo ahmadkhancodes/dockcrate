@@ -80,7 +80,7 @@ describe("alert routing matrix", () => {
     expect(routeAlert({ severity: "critical", tenantId: null }, base, scoped).inApp).toBe(true);
   });
   it("covers the five critical kinds", () => {
-    expect([...ALERT_KINDS].sort()).toEqual(["consent.revoked", "device.grace_ending", "ring.paused", "signer.changed", "tenant.disconnected"]);
+    expect([...ALERT_KINDS].sort()).toEqual(["consent.revoked", "device.grace_ending", "ring.paused", "signer.changed", "tenant.claim_attempt", "tenant.disconnected"]);
   });
 });
 

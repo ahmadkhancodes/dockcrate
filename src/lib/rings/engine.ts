@@ -4,7 +4,8 @@ import type { CatalogVersion } from "@/lib/catalog/types";
 import type { Deps } from "@/lib/deps";
 import { GraphConsentError, type GraphAssignment } from "@/lib/graph/types";
 import { HttpError } from "@/lib/http";
-import { publishVersion, type PublishCtx } from "@/lib/publish/win32";
+import { publishVersion, retireOlder, type PublishCtx } from "@/lib/publish/win32";
+import { assertCanPublish } from "@/lib/billing/limits";
 import { raiseAlert, type Tenant } from "@/lib/tenants";
 import type { Deployment, OrgSettings, RingConfig, TenantApp } from "./types";
 import { DEFAULT_BROAD_DELAY_HOURS, DEFAULT_FAIL_THRESHOLD_PCT, DEFAULT_PILOT_DELAY_HOURS } from "./types";
@@ -84,6 +85,7 @@ export async function ringTick(deps: Deps): Promise<TickResult> {
       if (!v || !publishPlan(v).rings.includes("broad")) { out.waitingForVm++; await put(deps, d, { failurePct: pct }); continue; }
       const assignments: GraphAssignment[] = [...d.assignments, { groupId: config.broad.groupId, intent: config.intent }];
       await graph.assignApp(d.intuneAppId, assignments);
+      await retireOlder(deps, graph, d, [config.broad.groupId]);
       await put(deps, d, { state: "promoted", assignments, broadAssignedAt: deps.now().toISOString(), failurePct: pct });
       await audit({ orgId: d.orgId, actorId: null, action: "deployment.promoted", target: d.id, meta: { tenantId: d.tenantId, app: d.appSlug, version: d.version, ring: "broad" } });
       out.promoted++;
@@ -114,17 +116,26 @@ export async function rollback(deps: Deps, input: { orgId: string; deploymentId:
   const target = input.toDeploymentId ? earlier.find((x) => x.id === input.toDeploymentId) : earlier[0];
   if (!target) throw new HttpError(409, "no_previous_version", "There is no earlier version in the last 3 to roll back to.");
 
+  // The target goes through the same gate as a publish: a held or revoked version is never re-assigned, and a
+  // Pilot only version (VM pending) never lands on the Broad group.
+  const tv = await deps.db.collection<CatalogVersion>("catalog_versions").get(target.versionId);
+  const tplan = tv ? publishPlan(tv) : null;
+  if (!tplan?.allowed) throw new HttpError(409, "rollback_target_blocked", `Version ${target.version} cannot be restored: ${tplan?.reason ?? "it is no longer in the catalog."} Pause the tenant or pick another version.`);
+  const config = await deps.db.collection<RingConfig>("ring_configs").get(cur.tenantId);
   const graph = deps.graph.forTenant(tenant.entraTenantId);
-  const groups = cur.assignments.map((a) => a.groupId);
+  const groups = cur.assignments.filter((a) => a.intent !== "uninstall").map((a) => a.groupId);
+  if (config && !tplan.rings.includes("broad") && groups.includes(config.broad.groupId))
+    throw new HttpError(409, "rollback_target_blocked", `Version ${target.version} may only reach Pilot (${tplan.reason ?? "VM check pending"}), but ${cur.version} reached Broad. Pause the tenant or pick another version.`);
   const intentOf = new Map(cur.assignments.map((a) => [a.groupId, a.intent]));
-  // N goes back as Required (or what the ring used), N+1 as Uninstall, for the rings it had reached.
+  // N goes back as Required (or what the ring used) for the rings N+1 had reached, keeping the groups N still has.
   const restore: GraphAssignment[] = groups.map((g) => ({ groupId: g, intent: intentOf.get(g) === "available" ? "available" : "required" }));
+  for (const a of target.assignments) if (a.intent !== "uninstall" && !groups.includes(a.groupId)) restore.push(a);
   const remove: GraphAssignment[] = groups.map((g) => ({ groupId: g, intent: "uninstall" }));
   await graph.assignApp(target.intuneAppId!, restore);
   await graph.assignApp(cur.intuneAppId, remove);
 
-  const from = await put(deps, cur, { state: "rolled_back", pausedReason: null });
-  const reachedBroad = !!cur.broadAssignedAt;
+  const from = await put(deps, cur, { state: "rolled_back", pausedReason: null, assignments: remove });
+  const reachedBroad = !!cur.broadAssignedAt || (!!config && restore.some((a) => a.groupId === config.broad.groupId));
   const to = await put(deps, target, { state: reachedBroad ? "promoted" : "assigned", assignments: restore, broadAssignedAt: reachedBroad ? deps.now().toISOString() : target.broadAssignedAt });
   await audit({ orgId: input.orgId, actorId: input.actorId, action: "deployment.rolled_back", target: cur.id, meta: { tenantId: cur.tenantId, app: cur.appSlug, from: cur.version, to: target.version } });
   return { from, to };
@@ -143,6 +154,8 @@ export async function fanout(deps: Deps, ctx: PublishCtx, versionId: string): Pr
     const t = await deps.db.collection<Tenant>("tenants").get(ta.tenantId);
     if (!t || t.status !== "connected" || t.paused || orgPausedIds.has(t.orgId)) { results.push({ tenantId: ta.tenantId, status: "skipped", detail: "tenant not connected or paused" }); continue; }
     try {
+      // Plan limits and the device grace apply to automatic updates exactly as to a manual publish.
+      await assertCanPublish(deps.db, t.orgId, v.appSlug, deps.now());
       await publishVersion(deps, ctx, { orgId: t.orgId, tenantId: t.id, versionId, actorId: null });
       results.push({ tenantId: t.id, status: "published" });
     } catch (e) {

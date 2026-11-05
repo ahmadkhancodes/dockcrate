@@ -53,7 +53,7 @@ export const product = {
   legalEmail: "legal@buffersoltech.com",
   mailFrom: "DockCrate <hello@dockcrate.buffersoltech.com>",
   description:
-    "MSP-first Intune app packaging and patching. Every app version is hash-checked, signer-checked, malware-scanned and test-installed in a clean VM, then published to your own Intune tenant as a Win32 app and kept updated through Pilot and Broad rings with auto-pause and one-click rollback.",
+    "MSP-first Intune app packaging and patching. No app version publishes until its hash, signer and malware scan checks pass, and a version without a clean-VM install test stays in the Pilot ring. It is published to your own Intune tenant as a Win32 app and kept updated through Pilot and Broad rings with auto-pause and one-click rollback.",
   tagline: "Third-party apps for Intune, packaged, inspected and shipped in rings.",
   /** Legal entity details used by the legal templates. */
   legal: {
@@ -66,7 +66,8 @@ export const product = {
     { name: "Vercel Inc.", purpose: "Hosting and edge network", location: "United States" },
     { name: "MongoDB Inc. (Atlas)", purpose: "Database hosting", location: "United States (AWS us-east-1)" },
     { name: "Stripe Inc.", purpose: "Payments and invoicing", location: "United States" },
-    { name: "Email delivery provider", purpose: "Transactional email until our own mail servers are live", location: "United States" },
+    { name: "Resend Inc.", purpose: "Transactional email until our own mail servers are live", location: "United States" },
+    { name: "Cloudflare Inc.", purpose: "DNS and the scheduler that triggers background jobs (no customer content)", location: "United States" },
   ],
   currency: "usd" as const,
   /** Default billing interval shown first in the pricing toggle. */
@@ -88,7 +89,7 @@ export const product = {
       tagline: "For a first few client tenants",
       prices: [price("starter", "month", 2499), price("starter", "year", 24950)],
       limits: { devices: 100, tenants: 5, catalog_apps: UNLIMITED, custom_apps: 0 },
-      highlights: ["100 devices", "5 tenants", "Full catalog", "Rings, rollback and macOS", "Audit log", "Email support"],
+      highlights: ["100 devices", "5 tenants", "Full catalog", "Rings and rollback", "macOS", "Audit log", "Email support"],
       cta: "Choose Starter",
       trialDays: 0,
     },

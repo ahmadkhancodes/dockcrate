@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const detail: Record<string, (v: string) => string> = {
   Hash: () => "Installer SHA-256 matches the manifest.",
   Signer: () => "Signer matches the previous version.",
-  Scan: () => "Scanned with two engines. No detections.",
+  Scan: () => "Scanned. No detections.",
   VM: () => "Waiting for the Windows test lab. No VM test has run.",
 };
 

@@ -50,3 +50,12 @@ Standing decisions are in docs/factory/BATCH1_PLAN.md (Mongo instead of Postgres
 - **D-36 Demo label.** A catalog version with no vendor installer URL is "Demo data" in the public catalog; the real pipeline sets the URL so the label drops by itself. Seed apps gained a `category`.
 - **D-37 DPA download.** `/api/legal/dpa?download=1` renders the same DPA text as standalone print friendly HTML with Annex 1 built from `product.subProcessors`; a test keeps it, the sub-processors page and product.ts identical.
 - **D-38 Fix.** `formatDate` moved to `components/app/format.ts`: the audit and MSP server pages imported it from a client module and crashed at render.
+
+## 5 Nov 2026 (M5 review, see docs/REVIEW.md)
+- **D-39 No account linking.** Better Auth account linking is off. Entra's `email` claim is tenant controlled (nOAuth), so a Microsoft account is only ever its own user; a second account with the same email is refused.
+- **D-40 One Microsoft tenant, one organization.** The consent callback never rebinds a row to another Microsoft tenant and refuses a Microsoft tenant already bound in another DockCrate org (audit `tenant.consent_conflict`, critical `tenant.claim_attempt` alert to the owner). An MSP and its customer cannot both connect the same tenant; support handles that case. Proof of tenant admin via an OIDC `tid` check is the planned follow up (REVIEW P1-1).
+- **D-41 Retire per ring.** When N+1 is assigned to a ring, earlier live deployments of the app in that tenant lose that ring's group (Intune does not uninstall on unassignment). With no group left a deployment is `superseded`: the tick ignores it, it stays a rollback target.
+- **D-42 Rollback is gated.** The target must pass `publishPlan` now; a Pilot only target is refused when Broad must be restored. The target keeps its remaining groups.
+- **D-43 Publish lease.** One publish call per deployment at a time (5 minute lease, 409 `publish_in_progress`); not atomic yet (REVIEW P1-2).
+- **D-44 Gates apply to automation.** Org pause blocks manual publish too; fan out goes through `assertCanPublish`; an unsigned installer fails the signer check; scoped members see only in scope audit entries; `tenant-verify` runs every 15 minutes; `/api/health` returns 503 when the database read fails.
+- **D-45 Claims.** Public copy states the gate (no publish before hash, signer and scan pass; VM pending is Pilot only) and calls the scanner and VM lab "being commissioned" until real adapters exist. Sub-processors name Resend and Cloudflare.

@@ -30,7 +30,7 @@ function annualSavings(): { min: number; max: number } | null {
 }
 
 /** Items from the brief that are v1 or v2 and not shipped yet: tagged until they are. */
-const ROADMAP = /macOS|Client PDF|Custom Apps|Defender|Policy backup|SSO|SLA/;
+const ROADMAP = /macOS|Scheduled windows|Client PDF|Custom Apps|Defender|Policy backup|SSO|SLA/;
 
 const RISK_FREE = "No credit card needed.";
 const RISK_PAID = "Cancel anytime from your account.";

@@ -30,3 +30,9 @@ export function authorize(m: Membership, resource: keyof typeof statements, acti
 export function filterTenants<T extends { id: string }>(m: Membership, tenants: T[]): T[] {
   return tenants.filter((t) => inScope(m, t.id));
 }
+
+/** Audit entries a member may read: tenant entries only for tenants in scope; org level entries (no tenant) for everyone with audit read. */
+export function auditVisible(m: Membership, e: { meta?: Record<string, unknown> | null }): boolean {
+  const t = e.meta?.tenantId;
+  return typeof t !== "string" || inScope(m, t);
+}
