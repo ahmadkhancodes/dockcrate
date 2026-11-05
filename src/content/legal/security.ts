@@ -46,7 +46,7 @@ export const security: LegalDoc = {
         {
           list: [
             "Rate limiting on public endpoints and on the API.",
-            "Every app version is hash checked, signer checked, malware scanned and test installed before publishing.",
+            "No app version is published unless its hash, signer and malware scan checks pass. While the Windows test lab is being commissioned, a version without a VM install test is limited to the Pilot ring.",
             "An audit log records changes in your workspace.",
             "Outbound webhooks are signed so you can verify them.",
             "Dependencies are updated regularly and checked for known vulnerabilities.",

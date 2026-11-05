@@ -1,6 +1,6 @@
 import type { GraphAssignment, Intent } from "@/lib/graph/types";
 
-export type DeploymentState = "uploading" | "assigned" | "promoted" | "paused" | "rolled_back" | "failed";
+export type DeploymentState = "uploading" | "assigned" | "promoted" | "paused" | "rolled_back" | "superseded" | "failed";
 export type UploadStep = "create_app" | "content_version" | "content_file" | "await_sas" | "upload" | "commit" | "await_commit" | "finalize" | "assign" | "done";
 export type Variant = "standard" | "update_only" | "esp_fixed";
 
@@ -56,6 +56,8 @@ export interface Deployment {
   failurePct: number | null;
   pausedReason: string | null;
   error: string | null;
+  /** Set while one worker advances the upload; a second publish call refuses instead of creating a second Intune app. */
+  leaseUntil?: string | null;
   createdAt: string;
   updatedAt: string;
 }

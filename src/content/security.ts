@@ -32,7 +32,7 @@ export interface QaStage {
 export const qaStages: QaStage[] = [
   { name: "Hash", rule: "The installer SHA-256 must match the manifest." },
   { name: "Signer", rule: "Same signer as the previous version, or the version is held for manual review." },
-  { name: "Scan", rule: "Scanned in house with two engines. Stale signatures hold publication." },
+  { name: "Scan", rule: "Malware scan in an isolated sandbox. A detection or a signature database older than 24 h holds publication." },
   { name: "VM", rule: "Installed, detected, launched and uninstalled in a clean Windows VM." },
 ];
 

@@ -22,7 +22,7 @@ export const howChecked: DocPage = {
     },
     {
       heading: "Scan",
-      body: ["The installer is scanned with ClamAV and Microsoft Defender, plus YARA rules. A hit quarantines the version. Two engines can miss what a larger multi-engine service would catch, which is why the Pilot ring exists."],
+      body: ["The installer is scanned for malware in an isolated sandbox, and a scanner signature database older than 24 hours holds the version. A hit holds the version. The in-house scanner is being commissioned: until it reports on a version, that version does not pass this check and cannot publish. No single scanner catches everything, which is why the Pilot ring exists."],
     },
     {
       heading: "VM",

@@ -52,6 +52,13 @@ async function database(): Promise<BetterAuthOptions["database"]> {
   return mongodbAdapter(client.db(e.MONGODB_DB ?? appName(e)), { client, transaction: false });
 }
 
+/**
+ * No implicit linking by email. Entra's `email` claim is set by each tenant's admins and is not proof of the mailbox,
+ * so trusting it would let a user from any tenant take over an existing account with the same address (nOAuth).
+ * A user is their Microsoft account (`tid` + `oid`); a second Microsoft account with the same email is refused.
+ */
+export const ACCOUNT_LINKING = { enabled: false, trustedProviders: [] as string[] };
+
 export function createAuth(db: BetterAuthOptions["database"]) {
   const e = env();
   const base = appUrl(e);
@@ -91,7 +98,7 @@ export function createAuth(db: BetterAuthOptions["database"]) {
       deleteUser: { enabled: true },
       additionalFields: { analyticsConsent: { type: "boolean", required: false, defaultValue: false, input: true } },
     },
-    account: { accountLinking: { enabled: true, trustedProviders: ["microsoft"] } },
+    account: { accountLinking: ACCOUNT_LINKING },
     databaseHooks: {
       user: {
         create: {

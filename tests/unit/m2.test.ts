@@ -431,7 +431,8 @@ describe("rings: promotion, pause, rollback", () => {
     expect(r.from.state).toBe("rolled_back");
     expect(r.to.id).toBe(first.id);
     expect(client.apps.get(second.intuneAppId!)!.assignments).toEqual([{ groupId: "g-pilot", intent: "uninstall" }]);
-    expect(client.apps.get(first.intuneAppId!)!.assignments).toEqual([{ groupId: "g-pilot", intent: "required" }]);
+    // N keeps Broad (it never left it) and gets Pilot back.
+    expect(client.apps.get(first.intuneAppId!)!.assignments).toEqual([{ groupId: "g-pilot", intent: "required" }, { groupId: "g-broad", intent: "required" }]);
     const entry = (await deps.db.listAudit(tenant.orgId)).find((a) => a.action === "deployment.rolled_back")!;
     expect(entry).toMatchObject({ actorId: "u-op", target: second.id, meta: { from: "25.02", to: "25.01", tenantId: tenant.id } });
     await expect(rollback(deps, { orgId: tenant.orgId, deploymentId: second.id, actorId: "u" })).rejects.toMatchObject({ code: "not_rollbackable" });

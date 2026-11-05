@@ -12,7 +12,7 @@ import { HttpError } from "@/lib/http";
 import { uuidv7 } from "@/lib/ids";
 import { packageIntunewin, type PackageResult, type ZipEntry } from "@/lib/intunewin";
 import { getTenant, type Tenant } from "@/lib/tenants";
-import type { Deployment, RingConfig, TenantApp, Variant } from "@/lib/rings/types";
+import type { Deployment, OrgSettings, RingConfig, TenantApp, Variant } from "@/lib/rings/types";
 import type { InstallerSource } from "./installer";
 
 export const APP_PREFIX = "DC |";
@@ -125,7 +125,9 @@ export async function advanceUpload(deps: Deps, ctx: PublishCtx, d: Deployment, 
         case "assign": {
           const assignments = [{ groupId: config.pilot.groupId, intent }];
           await graph.assignApp(cur.intuneAppId!, assignments);
-          cur = await save(deps, cur, { assignments, state: "assigned", step: "done", pilotAssignedAt: deps.now().toISOString(), error: null });
+          // The previous version of the app leaves Pilot, so a group never has two versions Required at once.
+          await retireOlder(deps, graph, cur, [config.pilot.groupId]);
+          cur = await save(deps, cur, { assignments, state: "assigned", step: "done", pilotAssignedAt: deps.now().toISOString(), error: null, leaseUntil: null });
           await audit({ orgId: cur.orgId, actorId: null, action: "deployment.published", target: cur.id, meta: { tenantId: cur.tenantId, app: cur.appSlug, version: cur.version, ring: "pilot" } });
           return cur;
         }
@@ -135,10 +137,33 @@ export async function advanceUpload(deps: Deps, ctx: PublishCtx, d: Deployment, 
     }
   } catch (e) {
     // Progress is already stored; the next publish call or job tick resumes from `cur.step`.
-    await save(deps, cur, { error: (e as Error).message.slice(0, 200) });
+    await save(deps, cur, { error: (e as Error).message.slice(0, 200), leaseUntil: null });
     throw e;
   }
 }
+
+const LIVE: Deployment["state"][] = ["assigned", "promoted", "paused"];
+
+/**
+ * Removes `groupIds` from the assignments of every earlier live deployment of the same app in the same tenant.
+ * Without this, version N stays Required on a group next to N+1: an MSI detection rule (product code + exact version)
+ * fails after the upgrade and Intune reinstalls or downgrades N, and an old Pilot deployment would still be promoted
+ * to Broad by the ring tick. A deployment left with no assignment becomes `superseded` (still a rollback target).
+ */
+export async function retireOlder(deps: Deps, graph: GraphClient, cur: Deployment, groupIds: string[]): Promise<void> {
+  const col = deps.db.collection<Deployment>("deployments");
+  const older = (await col.find({ tenantId: cur.tenantId, appSlug: cur.appSlug })).filter((x) => x.id !== cur.id && LIVE.includes(x.state) && !!x.intuneAppId);
+  for (const o of older) {
+    const next = o.assignments.filter((a) => !groupIds.includes(a.groupId));
+    if (next.length === o.assignments.length && next.length > 0) continue;
+    await graph.assignApp(o.intuneAppId!, next);
+    await col.put({ ...o, assignments: next, state: next.length === 0 ? "superseded" : o.state, updatedAt: deps.now().toISOString() });
+    await audit({ orgId: o.orgId, actorId: null, action: "deployment.superseded", target: o.id, meta: { tenantId: o.tenantId, app: o.appSlug, version: o.version, by: cur.version, groups: groupIds.join(",") } });
+  }
+}
+
+/** How long one publish call may hold a deployment before another call may resume it (longer than the 60 s function limit). */
+export const PUBLISH_LEASE_MS = 5 * 60_000;
 
 export interface PublishInput { orgId: string; tenantId: string; versionId: string; actorId: string | null; intent?: RingConfig["intent"]; variant?: Variant }
 
@@ -147,6 +172,7 @@ export async function publishVersion(deps: Deps, ctx: PublishCtx, input: Publish
   const tenant: Tenant = await getTenant(deps, input.orgId, input.tenantId);
   if (tenant.status !== "connected" || !tenant.entraTenantId) throw new HttpError(409, "tenant_not_connected");
   if (tenant.paused) throw new HttpError(409, "tenant_paused");
+  if ((await deps.db.collection<OrgSettings>("org_settings").get(tenant.orgId))?.paused) throw new HttpError(409, "org_paused", "Publishing is paused for the whole organization.");
   const config = await deps.db.collection<RingConfig>("ring_configs").get(tenant.id);
   if (!config) throw new HttpError(409, "rings_not_configured", "Pick the Pilot and Broad groups first.");
 
@@ -171,7 +197,21 @@ export async function publishVersion(deps: Deps, ctx: PublishCtx, input: Publish
       pilotAssignedAt: null, broadAssignedAt: null, failurePct: null, pausedReason: null, error: null, createdAt: now, updatedAt: now,
     };
   if (existing && existing.step === "done") return existing;
-  if (!existing) await deps.db.collection<Deployment>("deployments").put(d);
+  const nowMs = deps.now().getTime();
+  if (existing?.leaseUntil && new Date(existing.leaseUntil.split("|")[0]!).getTime() > nowMs)
+    throw new HttpError(409, "publish_in_progress", "This version is already being published to this tenant. Try again in a few minutes.");
+  // Take the lease before any Graph call, then read it back: a concurrent caller that wrote after us wins and we stop.
+  const lease = new Date(nowMs + PUBLISH_LEASE_MS).toISOString();
+  const token = uuidv7();
+  d = { ...d, leaseUntil: `${lease}|${token}` };
+  await deps.db.collection<Deployment>("deployments").put(d);
+  const rows = await deps.db.collection<Deployment>("deployments").find({ tenantId: tenant.id, idempotencyKey: key });
+  if (!existing && rows.some((x) => x.id !== d.id)) {
+    // Two first publishes raced (Mongo's unique index stops the second insert; this covers the rest): the newcomer backs off.
+    await deps.db.collection<Deployment>("deployments").delete(d.id);
+    throw new HttpError(409, "publish_in_progress", "This version is already being published to this tenant.");
+  }
+  if (rows.find((x) => x.id === d.id)?.leaseUntil !== d.leaseUntil) throw new HttpError(409, "publish_in_progress");
 
   const taId = `${tenant.id}:${v.appSlug}`;
   const tas = deps.db.collection<TenantApp>("tenant_apps");

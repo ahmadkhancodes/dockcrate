@@ -137,8 +137,21 @@ export async function handleConsentCallback(
   const entra = p.tenant?.toLowerCase() ?? "";
   if (!/^[0-9a-f-]{36}$/.test(entra) || entra === PERSONAL_MSA_TENANT || String(p.admin_consent).toLowerCase() !== "true")
     return { ok: false, status: tenant.status, tenantId: tenant.id, message: "Microsoft did not return a work or school tenant with admin consent." };
-  const dupe = (await deps.db.collection<Tenant>("tenants").find({ orgId: tenant.orgId, entraTenantId: entra })).find((x) => x.id !== tenant.id);
+  // Microsoft's redirect is not signed: anyone holding a valid state for their own row can put any tenant id in the URL,
+  // and Graph would answer for any tenant that ever consented to our app. So a row never changes Microsoft tenant, and
+  // one Microsoft tenant belongs to one DockCrate organization (rows are never deleted, so the claim persists).
+  if (tenant.entraTenantId && tenant.entraTenantId !== entra)
+    return { ok: false, status: tenant.status, tenantId: tenant.id, message: "This entry is already linked to a different Microsoft tenant. Add a new tenant to connect another one." };
+  const others = (await deps.db.collection<Tenant>("tenants").find({ entraTenantId: entra })).filter((x) => x.id !== tenant.id);
+  const dupe = others.find((x) => x.orgId === tenant.orgId);
   if (dupe) return { ok: false, status: tenant.status, tenantId: tenant.id, message: `That Microsoft tenant is already connected as "${dupe.name}".` };
+  const owner = others[0];
+  if (owner) {
+    await audit({ orgId: tenant.orgId, actorId: null, action: "tenant.consent_conflict", target: tenant.id, meta: { tenantId: tenant.id } });
+    await raiseAlert(deps, { orgId: owner.orgId, tenantId: owner.id, severity: "critical", kind: "tenant.claim_attempt", dedupeKey: `claim:${owner.id}:${tenant.orgId}`,
+      message: `Another DockCrate organization tried to connect ${owner.name}. It was refused. If you did not expect this, review the enterprise app consent in Microsoft Entra.` });
+    return { ok: false, status: tenant.status, tenantId: tenant.id, message: "That Microsoft tenant is already connected to another DockCrate organization. Contact support if you manage it." };
+  }
   const waiting = await save(deps, tenant, { entraTenantId: entra, status: "waiting_consent", lastError: null });
   const done = await verifyTenant(deps, waiting);
   return { ok: done.status === "connected", status: done.status, tenantId: done.id, message: done.status === "connected" ? null : "Consent received. Waiting for Microsoft to finish propagating it; this page updates on its own." };

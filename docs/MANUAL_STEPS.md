@@ -44,6 +44,23 @@ Set these in the Vercel project (Production and Preview), never in the repo. Lea
 | `GRAPH_DRIVER` | Optional override: `real` or `fake`. Default is `real` once `ENTRA_CLIENT_ID` and a secret or certificate are set. |
 | `CRON_SECRET` | Any random 32+ character string. Vercel Cron sends it as `Authorization: Bearer ...` to `/api/cron/*` (see `vercel.json`: `rings-tick` every minute, `device-count` nightly, `catalog-sync` nightly). Per minute cron needs Vercel Pro (step 6); on Hobby call `/api/cron/rings-tick` from the Cloudflare worker in `infra/cron-worker` instead. |
 
+## 4c. Other production env vars (Vercel project `dockcrate`, Production) and one command
+Added by the M5 review: these are read by the code but were not listed.
+| Variable | What |
+|---|---|
+| `MONGODB_URI`, `MONGODB_DB=dockcrate` | Atlas connection string for user `dockcrate-app` (readWrite on `dockcrate` only). |
+| `BETTER_AUTH_SECRET` | 32+ random characters (`openssl rand -base64 32`). Also signs consent state and links. |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Stripe test keys first; the webhook secret from the endpoint `https://dockcrate.buffersoltech.com/api/stripe/webhook`. |
+| `MAIL_PROVIDER=resend`, `RESEND_API_KEY`, `MAIL_FROM` | Mail. |
+| `ALTCHA_HMAC_KEY` | 32+ random characters. |
+| `ADMIN_EMAILS` | Founder admin emails, comma separated. |
+| `APP_FLAGS` | Leave `payments_enabled` off until step 11 is done. |
+| `REQUIRE_VM_VERIFICATION` | Leave unset (off) until the VM lab exists: VM pending versions are Pilot only (D-01). |
+- Then once, from a machine with the Atlas URI: `npm run db:indexes` (creates the unique indexes the publish idempotency and audit chain rely on).
+
+## 11. Launch gate (M5 review P1-5)
+- Real publishing needs the real downloader, scanner and winget adapters (not built; VPS phase) and the real tenant spike (step 5). Until both exist no catalog version can reach a real tenant. Keep `payments_enabled` off and sell nothing until one real version has gone Pilot to Broad in the test tenant.
+
 ## 5. A test Intune tenant for the M2 spike (needed before the M2 exit check)
 Deep link: https://developer.microsoft.com/microsoft-365/dev-program
 - Join the Microsoft 365 Developer Program (or use any trial tenant with Intune and one Windows test device), create two groups `DC-Pilot` and `DC-Broad`, and give a Global Admin account to consent.
@@ -71,4 +88,3 @@ Deep link: https://dash.cloudflare.com/ (buffersoltech.com, DNS, Records)
 - `{{dpa-pdf}}`: a signable DPA PDF to link from the DPA page.
 - `{{refund policy}}` and `{{cap}}` in the terms of service (refund wording and liability cap) also need owner decisions.
 - The legal text needs a lawyer's review before launch.
-- Note: `graceDays` in `src/config/product.ts` is 7 but D-04 says 14; the terms now say 14.

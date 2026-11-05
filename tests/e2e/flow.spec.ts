@@ -51,7 +51,7 @@ test("public pages render with metadata and no horizontal overflow at 375px", as
   for (const path of ["/", "/pricing", "/security", "/compare/pckgr", "/catalog", "/catalog/7-zip", "/docs", "/legal/privacy", "/sign-in"]) {
     const res = await page.goto(path);
     expect(res?.status(), path).toBe(200);
-    await expect(page.locator("title")).not.toBeEmpty();
+    await expect(page.locator("head title")).not.toBeEmpty();
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), path).toBeLessThanOrEqual(0);
   }
   expect((await page.goto("/nope-404"))?.status()).toBe(404);
@@ -71,7 +71,7 @@ test("landing shows the crate label, bay track, demo labels and the Microsoft fo
 
 test("catalog search filters the sample list and links to a sample QA log", async ({ page }) => {
   await page.goto("/catalog");
-  await expect(page.getByText("Sample list").first()).toBeVisible();
+  await expect(page.getByText("Demo data").first()).toBeVisible();
   await page.getByLabel("Search apps").fill("zoom");
   await expect(page.getByRole("row", { name: /Zoom Workplace/ })).toBeVisible();
   await expect(page.getByRole("row", { name: /7-Zip/ })).toHaveCount(0);

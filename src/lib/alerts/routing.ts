@@ -1,7 +1,7 @@
 import { inScope, type Membership } from "@/lib/authz";
 
 /** Critical events: each goes to the in-app alert centre and to email (brief item 9). */
-export const ALERT_KINDS = ["ring.paused", "tenant.disconnected", "signer.changed", "consent.revoked", "device.grace_ending"] as const;
+export const ALERT_KINDS = ["ring.paused", "tenant.disconnected", "signer.changed", "consent.revoked", "device.grace_ending", "tenant.claim_attempt"] as const;
 export type AlertKind = (typeof ALERT_KINDS)[number];
 export type Severity = "info" | "warning" | "critical";
 
@@ -11,6 +11,7 @@ export const KIND_LABEL: Record<string, string> = {
   "signer.changed": "Signer changed",
   "consent.revoked": "Consent revoked",
   "device.grace_ending": "Device limit grace ending",
+  "tenant.claim_attempt": "Tenant claim refused",
 };
 
 export interface AlertPrefs {

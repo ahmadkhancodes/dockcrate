@@ -63,11 +63,15 @@ export async function verifyVersion(v: CatalogVersion, input: Evidence | Evidenc
     log.push({ at, step: "hash", result: "fail", message: held });
   } else log.push({ at, step: "hash", result: "pass", message: "Installer SHA-256 matches the manifest." });
 
-  if (v.previousSignerThumbprint && v.previousSignerThumbprint !== ev.signerThumbprint) {
+  if (!ev.signerThumbprint?.trim()) {
+    checks.signer = "fail";
+    held ??= "The installer has no valid Authenticode signature. Held for manual review.";
+    log.push({ at, step: "signer", result: "fail", message: "No signer certificate could be read from the installer." });
+  } else if (v.previousSignerThumbprint && v.previousSignerThumbprint.toLowerCase() !== ev.signerThumbprint.toLowerCase()) {
     checks.signer = "fail";
     held ??= "The signing certificate changed from the previous version. Held for manual review.";
     log.push({ at, step: "signer", result: "fail", message: "Signer differs from the last verified version." });
-  } else log.push({ at, step: "signer", result: "pass", message: "Signer matches the previous version." });
+  } else log.push({ at, step: "signer", result: "pass", message: v.previousSignerThumbprint ? "Signer matches the previous version." : "Signed. First version seen, so this signer becomes the reference." });
 
   if (ev.scan.signatureAgeHours > SCAN_MAX_SIGNATURE_AGE_HOURS) {
     checks.scan = "fail";

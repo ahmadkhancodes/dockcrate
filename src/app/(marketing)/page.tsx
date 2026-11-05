@@ -103,7 +103,7 @@ export default function HomePage() {
       <Hero
         eyebrow="Works with Microsoft Intune"
         title={<>Third-party apps for Intune, packaged, inspected and shipped in <span className="text-action">rings</span></>}
-        subtitle="Multi-tenant from $24.99/mo. Every version hash-checked, scanned and test-installed before it reaches a single device."
+        subtitle="Multi-tenant from $24.99/mo. No version reaches a device until its hash, signer and malware checks pass. Pilot first, Broad later."
         primaryCta={{ href: "/sign-in", label: "Start free with Microsoft" }}
         secondaryCta={{ href: "/catalog", label: "Browse the public catalog" }}
         note={freeLine}
