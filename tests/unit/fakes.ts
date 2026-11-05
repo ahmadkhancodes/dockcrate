@@ -9,13 +9,13 @@ type Sub = {
 
 export function fakeStripe(nowSec = () => 1_800_000_000) {
   const prices = [
-    { id: "price_starter_y", lookup_key: "postslot_starter_annual", currency: "usd", unit_amount: 2400, recurring: { interval: "year" }, metadata: { app: "postslot" } },
-    { id: "price_pro_m", lookup_key: "postslot_pro_monthly", currency: "usd", unit_amount: 749, recurring: { interval: "month" }, metadata: { app: "postslot" } },
-    { id: "price_pro_y", lookup_key: "postslot_pro_annual", currency: "usd", unit_amount: 7400, recurring: { interval: "year" }, metadata: { app: "postslot" } },
-    { id: "price_agency_m", lookup_key: "postslot_agency_monthly", currency: "usd", unit_amount: 1949, recurring: { interval: "month" }, metadata: { app: "postslot" } },
-    { id: "price_agency_y", lookup_key: "postslot_agency_annual", currency: "usd", unit_amount: 19900, recurring: { interval: "year" }, metadata: { app: "postslot" } },
+    { id: "price_starter_y", lookup_key: "dockcrate_starter_annual", currency: "usd", unit_amount: 24950, recurring: { interval: "year" }, metadata: { app: "dockcrate" } },
+    { id: "price_professional_m", lookup_key: "dockcrate_professional_monthly", currency: "usd", unit_amount: 4999, recurring: { interval: "month" }, metadata: { app: "dockcrate" } },
+    { id: "price_professional_y", lookup_key: "dockcrate_professional_annual", currency: "usd", unit_amount: 49950, recurring: { interval: "year" }, metadata: { app: "dockcrate" } },
+    { id: "price_business_m", lookup_key: "dockcrate_business_monthly", currency: "usd", unit_amount: 7499, recurring: { interval: "month" }, metadata: { app: "dockcrate" } },
+    { id: "price_business_y", lookup_key: "dockcrate_business_annual", currency: "usd", unit_amount: 74950, recurring: { interval: "year" }, metadata: { app: "dockcrate" } },
     // Another app's price that must never be used (C-28): same lookup key shape, wrong metadata.
-    { id: "price_other", lookup_key: "postslot_pro_monthly_x", currency: "usd", unit_amount: 999, recurring: { interval: "month" }, metadata: { app: "otherapp" } },
+    { id: "price_other", lookup_key: "dockcrate_professional_monthly_x", currency: "usd", unit_amount: 999, recurring: { interval: "month" }, metadata: { app: "otherapp" } },
   ];
   const customers = new Map<string, { id: string; metadata: Record<string, string>; email?: string }>();
   const subs: Sub[] = [];
@@ -25,7 +25,7 @@ export function fakeStripe(nowSec = () => 1_800_000_000) {
   const addSub = (customer: string, lookupKey: string, status = "active", extra: Partial<Sub> = {}) => {
     const now = nowSec();
     const s: Sub = {
-      id: `sub_${++n}`, customer, status, metadata: { app: "postslot" }, trial_start: null, trial_end: null,
+      id: `sub_${++n}`, customer, status, metadata: { app: "dockcrate" }, trial_start: null, trial_end: null,
       cancel_at_period_end: false, items: { data: [{ current_period_end: now + 30 * 86400, price: { lookup_key: lookupKey } }] }, ...extra,
     };
     subs.push(s);
