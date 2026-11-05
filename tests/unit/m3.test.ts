@@ -313,7 +313,7 @@ describe("audit log CSV", () => {
     expect(auditCsv(all).split("\r\n")).toHaveLength(1203 + 2);
     expect(await collectAudit((o) => db.listAudit("org-a", o), { action: "deployment." })).toHaveLength(401);
     expect(await collectAudit((o) => db.listAudit("org-a", o), {}, 10)).toHaveLength(10);
-    expect(Object.keys(db).filter((k) => /audit/i.test(k)).sort()).toEqual(["appendAudit", "listAudit"]);
+    expect(Object.keys(db).filter((k) => /audit/i.test(k)).sort()).toEqual(["appendAudit", "auditChain", "listAudit"]);
   });
   it("audit() stores the entry with a null IP when there is no request", async () => {
     const entry = await audit({ orgId: "org-ip", actorId: "u1", action: "x.y" });

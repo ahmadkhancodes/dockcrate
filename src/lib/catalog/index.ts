@@ -13,7 +13,7 @@ interface SeedVersion {
   signer: { subject: string; thumbprint: string }; installCmd: string; uninstallCmd: string; setupFile: string;
   detectionHint: DetectionHint; minOs: string; testedAt: string; checks: Checks; previousSignerThumbprint?: string; heldReason?: string;
 }
-interface SeedApp { slug: string; name: string; publisher: string; wingetId: string; license: string; version: SeedVersion }
+interface SeedApp { slug: string; name: string; publisher: string; wingetId: string; license: string; category?: string; version: SeedVersion }
 
 const STEP_TEXT: Record<"hash" | "signer" | "scan" | "vm", Record<"pass" | "pending" | "fail", string>> = {
   hash: { pass: "Installer SHA-256 matches the manifest.", pending: "Hash not checked yet.", fail: "Hash mismatch." },
@@ -41,7 +41,7 @@ export async function ensureCatalogSeeded(db: Db, signer: ManifestSigner = envMa
     };
     v.manifestSig = signVersion(signer, v);
     await versions.put(v);
-    await apps.put({ id: a.slug, slug: a.slug, name: a.name, publisher: a.publisher, wingetId: a.wingetId, platform: "windows", license: a.license, currentVersionId: id, createdAt: at, updatedAt: at });
+    await apps.put({ id: a.slug, slug: a.slug, name: a.name, publisher: a.publisher, wingetId: a.wingetId, platform: "windows", license: a.license, category: a.category, currentVersionId: id, createdAt: at, updatedAt: at });
   }
 }
 
@@ -65,4 +65,10 @@ export async function getCatalogEntry(db: Db, slug: string): Promise<CatalogEntr
 export async function appSlugOfVersion(db: Db, versionId: string): Promise<string> {
   const v = await db.collection<CatalogVersion>("catalog_versions").get(versionId);
   return v?.appSlug ?? versionId.split("@")[0]!;
+}
+
+/** Every known version of an app, newest first (by creation time, then tested date). */
+export async function listVersions(db: Db, slug: string): Promise<CatalogVersion[]> {
+  await ensureCatalogSeeded(db);
+  return (await db.collection<CatalogVersion>("catalog_versions").find({ appSlug: slug })).sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.testedAt.localeCompare(a.testedAt));
 }

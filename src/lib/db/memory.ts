@@ -1,3 +1,4 @@
+import { chainEntry } from "@/lib/audit-chain";
 import { uuidv7 } from "@/lib/ids";
 import type { AuditEntry, Collection, BillingAccount, Db, Entitlement, Suppression, WebhookDelivery, WebhookEndpoint } from "./types";
 
@@ -82,9 +83,14 @@ export function createMemoryDb(app: string, config: Record<string, string> = {})
       return hits.length;
     },
     async appendAudit(e) {
-      const entry: AuditEntry = { ...e, id: uuidv7(), app, at: e.at ?? new Date() };
+      const base: AuditEntry = { ...e, id: uuidv7(), app, at: e.at ?? new Date() };
+      const last = base.orgId ? [...audit].reverse().find((a) => a.orgId === base.orgId) ?? null : null;
+      const entry = base.orgId ? await chainEntry(base, last) : base;
       audit.push(Object.freeze(clone(entry)));
       return clone(entry);
+    },
+    async auditChain(orgId) {
+      return audit.filter((a) => a.orgId === orgId).map(clone);
     },
     async listAudit(orgId, { limit = 50, before } = {}) {
       return audit

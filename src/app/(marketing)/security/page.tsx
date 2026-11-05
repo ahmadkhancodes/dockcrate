@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Section } from "@/components/ui/layout";
 import { ButtonLink } from "@/components/ui/button";
-import { PermissionTable, QaPipeline } from "@/components/marketing/trust";
+import { PermissionTable, QaPipeline, QaPipelineDiagram } from "@/components/marketing/trust";
 import { FinalCta } from "@/components/marketing/final-cta";
-import { vmPendingNote } from "@/content/security";
+import { dataHandling, vmPendingNote } from "@/content/security";
 import { product } from "@/config/product";
 
 const title = "Security";
@@ -37,11 +37,25 @@ export default function SecurityPage() {
           <p className="body-3 text-text-subtle">Every version carries an inspection tag and a QA log you can open without logging in.</p>
         </div>
         <div className="mt-12"><QaPipeline /></div>
+        <div className="mt-8 overflow-x-auto rounded-md border border-border bg-surface p-4"><QaPipelineDiagram /></div>
         <p className="body-6 mt-6 max-w-2xl text-text-subtle">{vmPendingNote}</p>
         <div className="mt-6"><ButtonLink href="/catalog/7-zip" variant="secondary">Read a sample QA log</ButtonLink></div>
       </Section>
 
-      <Section labelledBy="trust-title">
+      <Section labelledBy="data-title">
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+          <h2 id="data-title" className="heading-4 md:heading-2 text-text lg:col-span-5">How we handle your data</h2>
+          <ul className="flex flex-col lg:col-span-7">
+            {dataHandling.map((item, i) => <li key={i} className="border-t border-border py-4 body-3 text-text last:border-b">{item}</li>)}
+          </ul>
+        </div>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <ButtonLink href="/legal/dpa" variant="secondary">Read the DPA</ButtonLink>
+          <a href="/api/legal/dpa?download=1" className="inline-flex min-h-11 items-center rounded-md border border-border-strong px-4 button-sm text-text hover:bg-surface-raised focus-visible:focus-ring">Download the DPA (HTML, print friendly)</a>
+        </div>
+      </Section>
+
+      <Section tone="raised" labelledBy="trust-title">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
           <h2 id="trust-title" className="heading-4 md:heading-2 text-text lg:col-span-5">What we do and do not claim</h2>
           <ul className="flex flex-col lg:col-span-7">

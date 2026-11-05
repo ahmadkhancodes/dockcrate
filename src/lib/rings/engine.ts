@@ -4,7 +4,6 @@ import type { CatalogVersion } from "@/lib/catalog/types";
 import type { Deps } from "@/lib/deps";
 import { GraphConsentError, type GraphAssignment } from "@/lib/graph/types";
 import { HttpError } from "@/lib/http";
-import { noticeEmail } from "@/lib/mail/templates";
 import { publishVersion, type PublishCtx } from "@/lib/publish/win32";
 import { raiseAlert, type Tenant } from "@/lib/tenants";
 import type { Deployment, OrgSettings, RingConfig, TenantApp } from "./types";
@@ -75,9 +74,8 @@ export async function ringTick(deps: Deps): Promise<TickResult> {
       const pct = total > 0 ? Math.round((s.failed / total) * 1000) / 10 : 0;
       if (total > 0 && pct >= config.failThresholdPct) {
         await put(deps, d, { state: "paused", failurePct: pct, pausedReason: `${pct}% of Pilot devices failed the install (threshold ${config.failThresholdPct}%).` });
-        await raiseAlert(deps, { orgId: d.orgId, tenantId: d.tenantId, severity: "critical", kind: "ring.paused", message: `${d.appSlug} ${d.version} paused in ${tenant.name}: ${pct}% of Pilot devices failed (threshold ${config.failThresholdPct}%).` });
+        await raiseAlert(deps, { orgId: d.orgId, tenantId: d.tenantId, severity: "critical", kind: "ring.paused", dedupeKey: `ring.paused:${d.id}`, extraEmails: [config.alertEmail], message: `${d.appSlug} ${d.version} paused in ${tenant.name}: ${pct}% of Pilot devices failed (threshold ${config.failThresholdPct}%). Broad is paused. Open the dock to roll back or review the log.` });
         await audit({ orgId: d.orgId, actorId: null, action: "deployment.paused", target: d.id, meta: { tenantId: d.tenantId, app: d.appSlug, version: d.version, failurePct: pct } });
-        if (config.alertEmail) await deps.sendMail({ to: config.alertEmail, ...noticeEmail({ title: `Ring paused: ${d.appSlug} ${d.version}`, body: `${tenant.name}: ${pct}% of Pilot devices failed the install, over the ${config.failThresholdPct}% threshold. Broad is paused. Open the dock to roll back or review the log.`, actionUrl: `${deps.baseUrl}/app?tenant=${tenant.id}`, actionLabel: "Open the dock" }), category: "transactional" });
         out.paused++;
         continue;
       }
@@ -92,7 +90,7 @@ export async function ringTick(deps: Deps): Promise<TickResult> {
     } catch (e) {
       if (e instanceof GraphConsentError) {
         await deps.db.collection<Tenant>("tenants").put({ ...tenant, status: "disconnected", lastError: "Consent was revoked.", updatedAt: deps.now().toISOString() });
-        await raiseAlert(deps, { orgId: tenant.orgId, tenantId: tenant.id, severity: "critical", kind: "tenant.disconnected", message: `${tenant.name}: consent was revoked. Jobs for this tenant are stopped.` });
+        await raiseAlert(deps, { orgId: tenant.orgId, tenantId: tenant.id, severity: "critical", kind: "consent.revoked", dedupeKey: `consent.revoked:${tenant.id}:${tenant.updatedAt}`, message: `${tenant.name}: consent was revoked. Jobs for this tenant are stopped.` });
       }
       out.skipped++;
     }

@@ -1,4 +1,5 @@
 import { MongoClient, type Collection, type Db as MongoDatabase, type Document } from "mongodb";
+import { chainEntry } from "@/lib/audit-chain";
 import { uuidv7 } from "@/lib/ids";
 import { DELIVERY_TTL_DAYS, type AuditEntry, type Collection as AppCollection, type BillingAccount, type Db, type Entitlement, type Suppression, type WebhookDelivery, type WebhookEndpoint } from "./types";
 
@@ -124,9 +125,27 @@ export function createMongoDb(uri: string, dbName: string, app: string): Db {
       return r?.hits.length ?? 1;
     },
     async appendAudit(e) {
-      const entry: AuditEntry = { ...e, id: uuidv7(), app, at: e.at ?? new Date() };
-      await (await col<WithId<AuditEntry>>("audit_log")).insertOne({ _id: entry.id, ...entry });
-      return entry;
+      const base: AuditEntry = { ...e, id: uuidv7(), app, at: e.at ?? new Date() };
+      const c = await col<WithId<AuditEntry>>("audit_log");
+      if (!base.orgId) {
+        await c.insertOne({ _id: base.id, ...base });
+        return base;
+      }
+      // Chained append: the unique {app, orgId, seq} index makes a concurrent writer fail, then we re-read the head and retry.
+      for (let attempt = 0; ; attempt++) {
+        const last = await c.find({ app, orgId: base.orgId, seq: { $exists: true } }).sort({ seq: -1 }).limit(1).next();
+        const entry = await chainEntry(base, last ? strip<AuditEntry>(last) : null);
+        try {
+          await c.insertOne({ _id: entry.id, ...entry });
+          return entry;
+        } catch (err) {
+          if ((err as { code?: number }).code !== 11000 || attempt >= 8) throw err;
+        }
+      }
+    },
+    async auditChain(orgId) {
+      const docs = await (await col<WithId<AuditEntry>>("audit_log")).find({ app, orgId }).sort({ seq: 1, at: 1 }).toArray();
+      return docs.map((d) => strip<AuditEntry>(d)!);
     },
     async listAudit(orgId, { limit = 50, before } = {}) {
       const docs = await (await col<WithId<AuditEntry>>("audit_log"))
@@ -229,6 +248,7 @@ export async function ensureIndexes(uri: string, dbName: string) {
   await d.collection("rate_limits").createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
   await d.collection("usage").createIndex({ app: 1, orgId: 1, period: 1 });
   await d.collection("audit_log").createIndex({ app: 1, orgId: 1, at: -1 });
+  await d.collection("audit_log").createIndex({ app: 1, orgId: 1, seq: 1 }, { unique: true, partialFilterExpression: { seq: { $type: "number" } } });
   await d.collection("webhook_endpoints").createIndex({ app: 1, orgId: 1 });
   await d.collection("webhook_deliveries").createIndex({ app: 1, orgId: 1, createdAt: -1 });
   await d.collection("webhook_deliveries").createIndex({ app: 1, status: 1, nextAttemptAt: 1 });

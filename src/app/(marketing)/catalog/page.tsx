@@ -28,8 +28,8 @@ export default async function CatalogPage() {
         <p className="body-3 text-text-subtle md:title-1">Every version lists its inspection tag and a QA log you can read without logging in.</p>
       </div>
       <div className="mt-8 max-w-3xl">
-        <Notice tone="warning" title="Sample catalog">
-          The catalog holds {rows.length} seeded sample apps. Versions, hashes and tested dates are illustrative until the live winget sync runs, and no version has run in the Windows test lab yet, so the VM check shows as pending.
+        <Notice tone="warning" title="Demo data">
+          The catalog holds {rows.length} seeded demo apps. Versions, hashes and tested dates are illustrative until the live winget sync runs, and no version has run in the Windows test lab yet, so the VM check shows as pending.
         </Notice>
       </div>
       <div className="mt-12"><CatalogSearch rows={rows} /></div>
