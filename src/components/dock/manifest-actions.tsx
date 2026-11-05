@@ -16,12 +16,14 @@ const ERRORS: Record<string, string> = {
   not_rollbackable: "This version cannot be rolled back right now.",
   installer_download_not_available: "No reviewed installer URL exists for this version yet, so it cannot be packaged.",
   forbidden: "Your role does not allow this action.",
+  limit_reached: "Your plan limit is reached. Open Billing to upgrade.",
+  device_grace_ended: "Your devices are over the plan limit and the 14 day grace period has ended. Upgrade to publish again.",
 };
 
 /** Roll back, publish, auto update and QA log for the selected app. Every failure shows a plain sentence. */
 export function ManifestActions(props: {
   tenantId: string; slug: string; versionId: string; name: string; deploymentId: string | null; rollbackTo: { id: string; version: string } | null;
-  canPublish: boolean; canOperate: boolean; autoUpdate: boolean; hasDeployment: boolean;
+  canPublish: boolean; ringsReady: boolean; canOperate: boolean; autoUpdate: boolean; hasDeployment: boolean;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
@@ -44,6 +46,8 @@ export function ManifestActions(props: {
           <Button disabled={!props.canOperate} loading={busy === "rb"} onClick={() => run("rb", `/api/deployments/${props.deploymentId}/rollback`, { toDeploymentId: props.rollbackTo!.id }, `Rolled back to ${props.rollbackTo!.version}.`)}>
             <ArrowsClockwise size={16} aria-hidden /> Roll back to {props.rollbackTo.version}
           </Button>
+        ) : props.canPublish && !props.ringsReady ? (
+          <ButtonLink href={`/app/rings/${props.tenantId}`}><UploadSimple size={16} aria-hidden /> Set up rings to publish</ButtonLink>
         ) : props.canPublish ? (
           <Button disabled={!props.canOperate} loading={busy === "pub"} onClick={() => run("pub", "/api/deployments", { tenantId: props.tenantId, versionId: props.versionId }, "Published to Pilot.")}>
             <UploadSimple size={16} aria-hidden /> Publish to Pilot

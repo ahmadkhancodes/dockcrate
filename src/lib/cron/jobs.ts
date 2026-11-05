@@ -1,5 +1,10 @@
 import { ensureCatalogSeeded } from "@/lib/catalog";
 import type { CatalogApp } from "@/lib/catalog/types";
+import { InstallDataDeviceCounter } from "@/lib/billing/devices";
+import { deviceCountJob } from "@/lib/billing/limits";
+import { envManifestSigner } from "@/lib/catalog/manifest";
+import { catalogSync, fakePipeline } from "@/lib/catalog/sync";
+import { PendingVmLab } from "@/lib/catalog/vmlab";
 import { defaultDeps } from "@/lib/deps";
 import { defaultPublishCtx } from "@/lib/publish/ctx";
 import { fanout, ringTick } from "@/lib/rings/engine";
@@ -11,6 +16,14 @@ export const cronJobs: Record<string, () => Promise<unknown>> = {
   "webhook-retries": () => retryDueDeliveries({ limit: 100 }),
   heartbeat: async () => ({ at: new Date().toISOString() }),
   "tenant-verify": async () => tenantVerifyJob(await defaultDeps()),
+  /** Nightly: count managed devices per tenant and org, start or clear the over-limit grace clock. */
+  "device-count": async () => { const deps = await defaultDeps(); return deviceCountJob(deps, new InstallDataDeviceCounter(deps)); },
+  /** Nightly: run every catalog app through winget, download, scan and verify. Fakes only for now, so nothing is persisted. */
+  "catalog-sync": async () => {
+    const deps = await defaultDeps();
+    const signer = envManifestSigner();
+    return catalogSync(deps.db, await fakePipeline(deps.db, signer, new PendingVmLab(), deps.now()));
+  },
   /** Every minute: fan new publishable versions out to tenants with auto update on, then promote or pause Pilot deployments. */
   "rings-tick": async () => {
     const deps = await defaultDeps();

@@ -63,7 +63,7 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
 
   return (
     <>
-      <PageHeader title="Dock" description={`${org.org.name}: every app, every tenant, every bay.`} actions={<Link href="/app/tenants" className={buttonClass("secondary")}>Tenants</Link>} />
+      <PageHeader title="Dock" description={`${org.org.name}: every app, every tenant, every bay.`} actions={<><Link href="/app/msp" className={buttonClass("secondary")}>MSP view</Link>{tenant.status === "connected" ? <Link href={`/app/rings/${tenant.id}`} className={buttonClass("secondary")}>Rings</Link> : null}<Link href="/app/tenants" className={buttonClass("secondary")}>Tenants</Link></>} />
       <nav aria-label="Tenant switcher" className="mb-6 flex flex-wrap gap-2">
         {tenants.map((t) => (
           <Link key={t.id} href={`/app?tenant=${t.id}`} aria-current={t.id === tenant.id ? "page" : undefined}
@@ -78,7 +78,7 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
         </Notice></div>
       ) : null}
       {openAlerts.map((a) => <div key={a.id} className="mb-3"><Notice tone={a.severity === "critical" ? "danger" : "warning"} title={a.kind}>{a.message}</Notice></div>)}
-      {!config && tenant.status === "connected" ? <div className="mb-6"><Notice tone="info" title="Rings not set up">Pick the Pilot and Broad groups for this tenant before publishing. Ring setup arrives in the next milestone; until then POST /api/rings sets them.</Notice></div> : null}
+      {!config && tenant.status === "connected" ? <div className="mb-6"><Notice tone="info" title="Rings not set up" action={<Link href={`/app/rings/${tenant.id}`} className={buttonClass("primary")}>Set up rings</Link>}>Pick the Pilot and Broad groups for this tenant before publishing.</Notice></div> : null}
 
       <div className="grid overflow-hidden rounded-md border border-border bg-surface-raised lg:grid-cols-12">
         <div className="min-w-0 lg:col-span-8">
@@ -130,8 +130,8 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
             {selected.publishReason ? <p className="body-6 text-text-subtle">{selected.publishReason}</p> : null}
             <ManifestActions
               tenantId={tenant.id} slug={selected.slug} versionId={entry.version.id} name={selected.name} deploymentId={selected.deploymentId} rollbackTo={selected.rollbackTo}
-              canPublish={selected.canPublish && !!config} canOperate={canOperate} hasDeployment={!!selected.deployedVersion}
-              autoUpdate={tenantApps.find((a) => a.appSlug === selected.slug)?.autoUpdate ?? true}
+              canPublish={selected.canPublish} ringsReady={!!config} canOperate={canOperate} hasDeployment={!!selected.deployedVersion}
+              autoUpdate={tenantApps.find((a) => a.appSlug === selected.slug)?.autoUpdate ?? config?.autoUpdateDefault ?? true}
             />
             {selected.rollbackTo ? <p className="caption-2 text-text-subtle">Rollback re-assigns {selected.rollbackTo.version} as Required and {selected.deployedVersion} as Uninstall for the rings it reached. An audit entry is written.</p> : null}
           </aside>

@@ -31,6 +31,19 @@ Deep link: https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/Applic
 Deep link: https://vercel.com/dashboard (project `dockcrate`, Settings, Environment Variables)
 - Names: `ENTRA_CLIENT_ID`, `ENTRA_CLIENT_CERT_THUMBPRINT`, `ENTRA_CLIENT_CERT_PRIVATE_KEY_PEM`, `BETTER_AUTH_SECRET`, `CRON_SECRET`. I will set all of them through the API; this step is only needed if the connector refuses.
 
+### 4b. Every Entra and signing variable, and where each value comes from
+Set these in the Vercel project (Production and Preview), never in the repo. Leave them all unset to stay in stub mode (fake Graph, email link sign in).
+
+| Variable | Where to get it |
+|---|---|
+| `ENTRA_CLIENT_ID` | Step 1: the **Application (client) ID** on the app registration Overview page. Not a secret. Setting it turns on Microsoft sign in and the real Graph client. |
+| `ENTRA_CLIENT_SECRET` | Optional, sign in only. Entra admin center, the app, **Certificates & secrets**, **Client secrets**, **New client secret**; copy the **Value** at once (shown once). Graph calls to customer tenants use the certificate below, not this. |
+| `ENTRA_CLIENT_CERT_PRIVATE_KEY_PEM` | The private key of the certificate pair generated in step 3 (PEM, `-----BEGIN PRIVATE KEY-----`). Paste it with real line breaks or with `\n`. The public `.cer` is what step 3 uploads. |
+| `ENTRA_CLIENT_CERT_THUMBPRINT` | Entra admin center, the app, **Certificates & secrets**, **Certificates**: the **Thumbprint** column after the upload in step 3 (40 hex characters, SHA-1). A 64 character SHA-256 value also works. |
+| `MANIFEST_SIGNING_KEY` | An Ed25519 private key in PKCS#8 PEM that signs package manifests. Generate once: `openssl genpkey -algorithm ed25519`. Paste the whole PEM (`\n` allowed). Keep a copy in a password manager: a new key makes every stored manifest fail its signature check until the catalog is re-signed. Without it a real deployment refuses to publish (503). |
+| `GRAPH_DRIVER` | Optional override: `real` or `fake`. Default is `real` once `ENTRA_CLIENT_ID` and a secret or certificate are set. |
+| `CRON_SECRET` | Any random 32+ character string. Vercel Cron sends it as `Authorization: Bearer ...` to `/api/cron/*` (see `vercel.json`: `rings-tick` every minute, `device-count` nightly, `catalog-sync` nightly). Per minute cron needs Vercel Pro (step 6); on Hobby call `/api/cron/rings-tick` from the Cloudflare worker in `infra/cron-worker` instead. |
+
 ## 5. A test Intune tenant for the M2 spike (needed before the M2 exit check)
 Deep link: https://developer.microsoft.com/microsoft-365/dev-program
 - Join the Microsoft 365 Developer Program (or use any trial tenant with Intune and one Windows test device), create two groups `DC-Pilot` and `DC-Broad`, and give a Global Admin account to consent.

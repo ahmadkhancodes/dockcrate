@@ -1,5 +1,6 @@
 import { requireVmVerification } from "@/lib/env";
 import { passedCount, type CatalogVersion, type Checks, type QaEntry, type VersionStatus } from "./types";
+import { collectEvidence, type EvidenceSources } from "./pipeline";
 import type { VmLab } from "./vmlab";
 
 export type Ring = "pilot" | "broad";
@@ -45,8 +46,12 @@ export interface Evidence {
 
 export const SCAN_MAX_SIGNATURE_AGE_HOURS = 24;
 
-/** hash, signer, scan from evidence collected by the downloader and Sandbox (not built here), plus the VmLab step. */
-export async function verifyVersion(v: CatalogVersion, ev: Evidence, lab: VmLab, now = new Date(), requireVm = requireVmVerification()): Promise<CatalogVersion> {
+/**
+ * hash, signer, scan from evidence, plus the VmLab step. Pass ready made evidence, or the downloader and scanner
+ * (`WingetSource` supplies the URL and hash upstream) to collect it here. Real adapters are not built yet; fakes only.
+ */
+export async function verifyVersion(v: CatalogVersion, input: Evidence | EvidenceSources, lab: VmLab, now = new Date(), requireVm = requireVmVerification()): Promise<CatalogVersion> {
+  const ev = "observedSha256" in input ? input : await collectEvidence(v, input);
   const at = now.toISOString();
   const log: QaEntry[] = [];
   const checks: Checks = { hash: "pass", signer: "pass", scan: "pass", vm: "pending" };

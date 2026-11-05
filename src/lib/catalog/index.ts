@@ -60,3 +60,9 @@ export async function getCatalogEntry(db: Db, slug: string): Promise<CatalogEntr
   const version = app ? await db.collection<CatalogVersion>("catalog_versions").get(app.currentVersionId) : null;
   return app && version ? { app, version } : null;
 }
+
+/** App slug of a version id (`slug@version`); falls back to the id prefix when the version is unknown. */
+export async function appSlugOfVersion(db: Db, versionId: string): Promise<string> {
+  const v = await db.collection<CatalogVersion>("catalog_versions").get(versionId);
+  return v?.appSlug ?? versionId.split("@")[0]!;
+}

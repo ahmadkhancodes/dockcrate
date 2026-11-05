@@ -175,7 +175,7 @@ export async function publishVersion(deps: Deps, ctx: PublishCtx, input: Publish
 
   const taId = `${tenant.id}:${v.appSlug}`;
   const tas = deps.db.collection<TenantApp>("tenant_apps");
-  if (!(await tas.get(taId))) await tas.put({ id: taId, orgId: tenant.orgId, tenantId: tenant.id, appSlug: v.appSlug, autoUpdate: true, createdAt: now, updatedAt: now });
+  if (!(await tas.get(taId))) await tas.put({ id: taId, orgId: tenant.orgId, tenantId: tenant.id, appSlug: v.appSlug, autoUpdate: config.autoUpdateDefault ?? true, createdAt: now, updatedAt: now });
 
   d = await advanceUpload(deps, ctx, d, app, v, config, input.intent ?? config.intent, deps.graph.forTenant(tenant.entraTenantId));
   return d;
