@@ -1,3 +1,15 @@
 # Decisions
 
 Standing decisions are in docs/factory/BATCH1_PLAN.md (Mongo instead of Postgres, Better Auth, Stripe first, Mailer interface, Vercel-first, keep 3 deployments).
+
+## 5 Nov 2026 (Phase 0)
+- **D-01 Verification tier without a Windows lab.** Vercel cannot run Windows VMs. A version reaches `verified_static` (hash, signer, scan, detection proven by rule check). Until `ProxmoxVmLab` exists it publishes to Pilot only, shows 3/4 and "VM test pending", Broad keeps 48 h delay and auto pause. `REQUIRE_VM_VERIFICATION=true` makes the VM check mandatory. Copy never claims a VM test that did not run.
+- **D-02 Infra deviations from the workbook's zero third party rule**, owner approved in BATCH1_PLAN: Vercel, MongoDB Atlas, Cloudflare R2, a transactional mail provider, Vercel logs instead of self hosted GlitchTip/Prometheus/Loki. Each is behind an interface (`Mailer`, `LogSink`, `JobQueue`, `ObjectStore`). Egress allow list is enforced regardless.
+- **D-03 Node `.intunewin` implementation.** IntuneWinAppUtil is Windows only and licensed for internal use, not hosted. We implement the Intune content encryption format clean room from Graph docs (AES-256-CBC + HMAC-SHA256, `fileEncryptionInfo`), no GPL code copied. Proven against a real tenant in M2 and against the Microsoft tool on the VPS lab.
+- **D-04 Grace periods.** Over device limit: 14 days no hard stop. Payment failure: 14 days (FR-34), resolving the workbook's 7 vs 14 oddity in favour of the FR.
+- **D-05 Group creation.** The three permissions do not include `Group.ReadWrite.All`. MVP: pick existing groups plus instructions. "Create DC-Pilot/DC-Broad" is an optional separate consent via a second app registration, only if the owner asks.
+- **D-06 EAM checker** is a three question self check page, not a Graph read, because `subscribedSkus` needs a permission outside the three.
+- **D-07 Auth.** Better Auth with the Microsoft provider on the `organizations` authority, personal MSA tenant `9188040d-6c67-4c5b-b112-36a3c8b1b0b4` rejected; magic link disabled for sign in. Owner rule says Auth.js in the workbook; the batch standing decision (Better Auth) wins.
+- **D-08 Design overrides of the playbook** (recorded in DESIGN.md): dark backgrounds `#15191C/#1D2327` instead of the whitelist; Big Shoulders + Atkinson + Plex Mono instead of Geist/Manrope; weight 800 max; no hero heading gradient.
+- **D-09 Fleet annual price** is not in the workbook; use 10x monthly ($999.90/yr) from "annual = 2 months free". Education price is a separate hidden Stripe price ($34.99/mo) granted after manual approval.
+- **D-10 Catalog scope.** A reviewed `catalog/top200.json` bounds winget ingestion; unknown installer types go to `manual`, never guessed. The public catalog count shown is always the real verified count.
