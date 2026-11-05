@@ -70,16 +70,17 @@ export function SiteHeader() {
   const panelItems = [
     ...product.nav.map((n) => ({ ...n, kind: "link" as const })),
     { href: "/sign-in", label: "Sign in", kind: "link" as const },
-    { href: "/sign-in", label: "Start free", kind: "cta" as const },
+    { href: "/sign-in", label: "Start free with Microsoft", kind: "cta" as const },
   ];
 
   return (
     <header className="fixed inset-x-0 top-3 z-50 px-4 sm:px-6">
-      <div className="relative z-50 mx-auto flex w-full max-w-7xl items-center justify-between gap-4 rounded-lg border border-border bg-surface/80 py-1 pl-4 pr-1 backdrop-blur-md">
-        <Link href="/" className="inline-flex min-h-11 items-center rounded-md title-2 text-text focus-visible:focus-ring" aria-label={`${product.name} home`}>
-          {product.name}
+      <div className="relative z-50 mx-auto flex w-full max-w-7xl items-center justify-between gap-4 rounded-lg border border-border bg-surface py-1 pl-4 pr-1">
+        <Link href="/" className="inline-flex min-h-11 flex-col justify-center rounded-md text-text focus-visible:focus-ring" aria-label={`${product.fullName} home`}>
+          <span className="heading-6 leading-none">{product.name}</span>
+          <span aria-hidden className="label-caps whitespace-nowrap leading-none text-text-subtle">by BufferSol</span>
         </Link>
-        <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
+        <nav aria-label="Primary" className="hidden items-center md:flex">
           {product.nav.map((n) => (
             <Link key={n.href} href={n.href} aria-current={isCurrent(n.href) ? "page" : undefined} className={linkClass(n.href)}>
               {n.label}
@@ -87,8 +88,8 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-1">
-          <Link href="/sign-in" className={cn(buttonClass("tertiary", "md"), "hidden md:inline-flex")}>Sign in</Link>
-          <Link href="/sign-in" className={cn(buttonClass("primary", "md"), "hidden md:inline-flex")}>Start free</Link>
+          <Link href="/sign-in" className={cn(buttonClass("tertiary", "md"), "max-md:hidden")}>Sign in</Link>
+          <Link href="/sign-in" className={cn(buttonClass("primary", "md"), "max-md:hidden")}><span>Start free<span className="hidden lg:inline"> with Microsoft</span></span></Link>
           <ThemeToggle />
           <button
             ref={toggleRef}

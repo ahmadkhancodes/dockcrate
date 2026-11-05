@@ -5,7 +5,7 @@ import { Section } from "@/components/ui/layout";
 import { CompareTable } from "@/components/marketing/compare-table";
 import { Faq } from "@/components/marketing/faq";
 import { FinalCta } from "@/components/marketing/final-cta";
-import { comparisonBySlug, comparisons } from "@/content/compare";
+import { CHECKED, comparisonBySlug, comparisons } from "@/content/compare";
 import { product } from "@/config/product";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -33,29 +33,31 @@ export default async function ComparePage({ params }: Props) {
 
   return (
     <>
-      <Section labelledBy="compare-title">
+      <Section labelledBy="compare-title" className="pt-24 md:pt-32">
         <div className="flex max-w-2xl flex-col items-start gap-6">
-          <h1 id="compare-title" className="hero-gradient-text heading-3 md:heading-1">{entry.headline}</h1>
+          <h1 id="compare-title" className="heading-3 md:heading-1 text-text">{entry.headline}</h1>
           <p className="body-3 text-text-subtle md:title-1">{entry.intro}</p>
-          <ButtonLink href="/sign-in" size="lg">Start free</ButtonLink>
+          <ButtonLink href="/sign-in" size="lg">Start free with Microsoft</ButtonLink>
         </div>
         <div className="mt-12 md:mt-16">
-          <CompareTable
-            caption={`${product.name} compared with ${entry.competitor}`}
-            columns={[entry.competitor, product.name]}
-            highlightColumn={1}
-            rows={entry.rows.map((r) => ({ label: r.label, values: [...r.values] }))}
-          />
+          <CompareTable caption={`${product.fullName} compared with ${entry.competitor}`} rowHeader="Compared on" columns={entry.columns} highlightColumn={1} rows={entry.rows.map((r) => ({ label: r.label, values: [...r.values] }))} />
         </div>
-        <p className="body-6 mt-6 max-w-2xl text-text-subtle">{entry.fitNote}</p>
+        <p className="mt-4 caption-2 text-text-subtle">
+          {entry.competitor} facts: <a href={entry.source.href} rel="noopener noreferrer" className="underline underline-offset-4 hover:text-action focus-visible:focus-ring">{entry.source.label}</a>, checked {CHECKED}. Prices are USD list prices.
+        </p>
+      </Section>
+      <Section tone="raised" labelledBy="better-title">
+        <div className="grid gap-8 lg:grid-cols-12 lg:gap-16">
+          <h2 id="better-title" className="heading-4 md:heading-2 text-text lg:col-span-5">Where {entry.competitor} is better</h2>
+          <ul className="flex flex-col lg:col-span-7">
+            {entry.better.map((b) => (
+              <li key={b} className="border-t border-border py-4 body-3 text-text last:border-b">{b}</li>
+            ))}
+          </ul>
+        </div>
       </Section>
       <Faq title="Common questions" items={entry.faq} />
-      <FinalCta
-        title={`Try ${product.name} on one form`}
-        body="Point a form at your endpoint and watch the first delivery receipt arrive."
-        cta={{ href: "/sign-in", label: "Start free" }}
-        note="No credit card needed."
-      />
+      <FinalCta title="See it on one tenant before you decide." body="The free plan covers 25 devices and 1 tenant, with rings and rollback included." cta={{ href: "/sign-in", label: "Start free with Microsoft" }} note="No card." />
     </>
   );
 }

@@ -8,7 +8,8 @@
 :root {
   --font-sans-family: var(--font-body), "Segoe UI", ui-sans-serif, system-ui, sans-serif;
   --font-mono-family: var(--font-mono), ui-monospace, monospace;
-  --font-display-family: var(--font-display), "Segoe UI", ui-sans-serif, sans-serif;
+  --font-display-family: var(--font-display), sans-serif-condensed, sans-serif;
+  --font-stencil-family: var(--font-stencil), var(--font-display), sans-serif-condensed, sans-serif;
 
   /* raw ramp: concrete neutral 00..1000 */
   --n-0: #ffffff;
@@ -26,6 +27,8 @@
   --accent-500: #1f5c4a; /* dock green */
   --accent-600: #174838;
   --amber-500: #e3a21a; /* inspection amber, black text only */
+  --amber: #e3a21a;
+  --on-amber: #14181c;
 
   /* role tokens: light */
   --surface: var(--n-50);
@@ -48,8 +51,6 @@
   --warning-surface: #fbf0dc;
   --danger: #b42318;
   --danger-surface: #fcecea;
-  --hero-from: #14181c;
-  --hero-to: #1f5c4a;
   --shadow-color: 0 0% 0%;
   color-scheme: light;
 }
@@ -69,14 +70,13 @@
   --action-hover: #66bf9f;
   --action-text: #0e1412;
   --focus: #f0b23a;
+  --amber: #f0b23a;
   --success: #4fbf7f;
   --success-surface: #12261b;
   --warning: #e0a04a;
   --warning-surface: #2a210e;
   --danger: #f0766b;
   --danger-surface: #2c1513;
-  --hero-from: #e8e6e1;
-  --hero-to: #4fae8c;
   --shadow-color: 0 0% 0%;
   color-scheme: dark;
 }
@@ -86,6 +86,8 @@
 @theme inline {
   --font-sans: var(--font-sans-family);
   --font-mono: var(--font-mono-family);
+  --font-display: var(--font-display-family);
+  --font-stencil: var(--font-stencil-family);
 
   --color-*: initial;
   --color-transparent: transparent;
@@ -106,6 +108,8 @@
   --color-action-hover: var(--action-hover);
   --color-action-text: var(--action-text);
   --color-focus: var(--focus);
+  --color-amber: var(--amber);
+  --color-on-amber: var(--on-amber);
   --color-success: var(--success);
   --color-success-surface: var(--success-surface);
   --color-warning: var(--warning);
@@ -138,12 +142,12 @@
 }
 
 /* ---- Named type styles (playbook §5). Use these, never loose size+weight pairs. ---- */
-@utility heading-1 { font-size: 3.75rem; line-height: 1; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
-@utility heading-2 { font-size: 3rem; line-height: 1; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
-@utility heading-3 { font-size: 2.25rem; line-height: 2.5rem; font-weight: 600; letter-spacing: -0.015em; text-wrap: balance; }
-@utility heading-4 { font-size: 1.875rem; line-height: 2.25rem; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
-@utility heading-5 { font-size: 1.5rem; line-height: 2rem; font-weight: 600; text-wrap: balance; }
-@utility heading-6 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 600; text-wrap: balance; }
+@utility heading-1 { font-size: 3.75rem; line-height: 1; font-family: var(--font-display-family); font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; }
+@utility heading-2 { font-size: 3rem; line-height: 1; font-family: var(--font-display-family); font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; }
+@utility heading-3 { font-size: 2.25rem; line-height: 2.5rem; font-family: var(--font-display-family); font-weight: 800; letter-spacing: -0.015em; text-wrap: balance; }
+@utility heading-4 { font-size: 1.875rem; line-height: 2.25rem; font-family: var(--font-display-family); font-weight: 800; letter-spacing: -0.01em; text-wrap: balance; }
+@utility heading-5 { font-size: 1.5rem; line-height: 2rem; font-family: var(--font-display-family); font-weight: 800; text-wrap: balance; }
+@utility heading-6 { font-size: 1.25rem; line-height: 1.75rem; font-family: var(--font-display-family); font-weight: 800; text-wrap: balance; }
 @utility title-1 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; }
 @utility title-2 { font-size: 1.125rem; line-height: 1.75rem; font-weight: 500; }
 @utility title-3 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
@@ -165,13 +169,10 @@
 @utility caption-4 { font-size: 0.75rem; line-height: 1rem; font-weight: 500; }
 @utility caption-5 { font-size: 0.75rem; line-height: 1rem; font-weight: 400; }
 
-/* The only gradient allowed (playbook §6): hero heading text, left to right. */
-@utility hero-gradient-text {
-  background-image: linear-gradient(to right, var(--hero-from), var(--hero-to));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+/* Crate label face (DESIGN.md: stencil only on crate labels). */
+@utility stencil-lg { font-family: var(--font-stencil-family); font-size: 2.25rem; line-height: 2.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.01em; }
+@utility stencil-md { font-family: var(--font-stencil-family); font-size: 1.5rem; line-height: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.01em; }
+@utility label-caps { font-size: 0.6875rem; line-height: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
 
 @utility focus-ring {
   outline: 2px solid var(--focus);
@@ -189,7 +190,8 @@
   }
   :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
   ::selection { background: var(--action); color: var(--action-text); }
-  code, kbd, pre, samp { font-family: var(--font-mono-family); }
+  code, kbd, pre, samp { font-family: var(--font-mono-family); font-variant-numeric: tabular-nums; }
+  .tnum { font-variant-numeric: tabular-nums; }
 }
 
 /* Scroll reveal (rise 32px + fade, once). Reduced motion: opacity only. */

@@ -4,33 +4,45 @@ import type { DocPage } from "./types";
 export const gettingStarted: DocPage = {
   slug: "getting-started",
   title: "Getting started",
-  description: `Create a ${p.name} account and make your first request in a few minutes.`,
+  description: `Connect an Intune tenant to ${p.name}, set up Pilot and Broad groups and publish your first app.`,
   sections: [
     {
-      heading: "Create your account",
+      heading: "Before you start",
       body: [
-        `Go to ${p.url} and sign in with your email. We send a magic link, so there is no password to set. Your first sign in creates an organization that holds your data, members and billing.`,
-        `New accounts start on the ${p.plans[0]?.name ?? "Free"} plan. You can upgrade from Settings, then Billing, at any time.`,
+        `${p.fullName} publishes third-party apps to your own Intune tenant as Win32 apps. You need a Microsoft work account to sign in and a Global Admin to approve the connection once. New accounts start on the ${p.plans[0]?.name ?? "Free"} plan: 25 devices, 1 tenant and 15 catalog apps, with rings and rollback included.`,
       ],
     },
     {
-      heading: "Create an API key",
+      heading: "Connect a tenant",
       body: [
-        "Open Settings, then API keys, and create a key. The full key is shown once, so copy it into your secrets manager straight away. Keys are stored as hashes and cannot be recovered.",
+        "Choose Connect a tenant in the app. If you are a Global Admin, approving the 3 requested permissions takes one click and the tenant shows as Connected within 60 seconds.",
+        "If you are not a Global Admin, use Send consent link to admin. We email the link, and the tenant shows Waiting for admin until it is approved. If consent is later removed, the tenant shows Disconnected and the owner is emailed.",
       ],
     },
     {
-      heading: "Make your first request",
-      body: ["Send the key in the x-api-key header. This call returns the organization the key belongs to."],
-      code: {
-        lang: "bash",
-        code: `curl ${p.url}/api/v1/me \\\n  -H "x-api-key: YOUR_API_KEY"`,
-      },
+      heading: "Pick your Pilot and Broad groups",
+      body: [
+        "Rings are two Entra groups. Pilot receives each new version first. Broad receives it after a delay. Choose existing groups, or let us create DC-Pilot and DC-Broad for you.",
+        "Defaults are 0 hours for Pilot and 48 hours for Broad. A version reaches Broad only if Pilot failures stay under the threshold, which defaults to 10%. Otherwise Broad is paused and you get an alert.",
+      ],
+    },
+    {
+      heading: "Publish an app",
+      body: [
+        "Search the catalog, pick an app and choose Publish. The version is checked first (see How a version is checked), then created in your tenant as a Win32 app with detection rules and your Pilot and Broad assignments. App names carry the prefix DC | so they are easy to find in Intune.",
+        "Turn on auto update per app and per tenant to move later versions through Pilot and Broad automatically.",
+      ],
+    },
+    {
+      heading: "Roll back",
+      body: [
+        "Each app keeps its last 3 versions. Roll back re-assigns the earlier version as Required and sets the newer one to Uninstall for the affected ring. Every rollback is written to the audit log.",
+      ],
     },
     {
       heading: "Next steps",
       body: [
-        "Read the authentication guide to add passkeys and two factor sign in. Set up webhooks to receive events in your own systems. See the API reference for errors and rate limits.",
+        "Read Sign in and permissions for what each Graph permission allows. Read Billing for plans and the device meter. Webhooks and the API are for sending events and reading data in your own systems.",
       ],
     },
   ],

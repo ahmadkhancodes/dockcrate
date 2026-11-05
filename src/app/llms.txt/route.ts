@@ -17,7 +17,7 @@ export function GET() {
     "",
     "## Product",
     "",
-    `- [Pricing](${u("/pricing")}): Plans and limits`,
+    `- [Pricing](${u("/pricing")}): Plans, device limits and education price`,
     `- [Full documentation as one file](${u("/llms-full.txt")}): All docs in markdown`,
     "",
     "## Legal",

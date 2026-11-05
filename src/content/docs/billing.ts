@@ -6,7 +6,7 @@ const money = (usd: number) => `$${(usd / 100).toLocaleString("en-US", { minimum
 export const billing: DocPage = {
   slug: "billing",
   title: "Billing",
-  description: `Plans, checkout, the customer portal and billing webhooks for ${p.name}.`,
+  description: `Plans, the device meter, grace period and the customer portal for ${p.fullName}.`,
   sections: [
     {
       heading: "Plans",
@@ -16,6 +16,17 @@ export const billing: DocPage = {
           : "free";
         return `${pl.name} (${prices}): ${pl.highlights.join(", ")}.`;
       }),
+    },
+    {
+      heading: "Device meter",
+      body: [
+        `${p.fullName} bills on managed devices. Devices are counted nightly from Intune. Devices with no check in for 90 days are not counted. Each plan lists its device limit above, and a banner shows your count against the limit, for example 108 of 100.`,
+        "Going over the limit does not stop anything for 14 days. Upgrade within that window to stay on the same footing.",
+      ],
+    },
+    {
+      heading: "Education and non-profit",
+      body: [`Education and non-profit organizations pay ${money(p.plans.find((x) => x.id === "professional")?.educationUsd ?? 0)} per month for Professional, with proof of status.`],
     },
     {
       heading: "Checkout",
@@ -32,7 +43,7 @@ export const billing: DocPage = {
     {
       heading: "Failed payments",
       body: [
-        `If a payment fails, your plan stays active for ${p.graceDays} days while Stripe retries. After that the account falls back to the Free plan limits. Your data is kept.`,
+        `If a card payment fails, your plan stays active for ${p.graceDays} days while Stripe retries. After that the account falls back to the Free plan limits. Your data is kept.`,
       ],
     },
     {

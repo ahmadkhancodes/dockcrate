@@ -2,6 +2,7 @@ import { api } from "./api";
 import { authentication } from "./authentication";
 import { billing } from "./billing";
 import { gettingStarted } from "./getting-started";
+import { howChecked } from "./how-a-version-is-checked";
 import type { DocPage } from "./types";
 import { webhooks } from "./webhooks";
 
@@ -12,10 +13,10 @@ export interface DocGroup {
   docs: DocPage[];
 }
 
-export const docs: DocPage[] = [gettingStarted, authentication, billing, webhooks, api];
+export const docs: DocPage[] = [gettingStarted, authentication, howChecked, billing, webhooks, api];
 
 export const docGroups: DocGroup[] = [
-  { title: "Start here", docs: [gettingStarted, authentication] },
+  { title: "Start here", docs: [gettingStarted, authentication, howChecked] },
   { title: "Build", docs: [api, webhooks] },
   { title: "Account", docs: [billing] },
 ];

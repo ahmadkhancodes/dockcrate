@@ -3,31 +3,35 @@ import type { DocPage } from "./types";
 
 export const authentication: DocPage = {
   slug: "authentication",
-  title: "Authentication",
-  description: `Sign in to ${p.name} with magic links, passkeys and two factor, and call the API with keys.`,
+  title: "Sign in and permissions",
+  description: `How you sign in to ${p.name}, the 3 Microsoft Graph permissions it asks for, and API keys.`,
   sections: [
     {
-      heading: "Magic link",
+      heading: "Sign in",
       body: [
-        "Enter your email on the sign in page and we send a one time link. The link expires after a short time and works once. Open it on the same device where you asked for it for the smoothest experience.",
+        `${p.fullName} signs you in with a Microsoft work account through Entra. Personal Microsoft accounts are not accepted. Sign in with Microsoft is the intended primary method and is on the roadmap where it is not yet enabled on your account.`,
+        "Until then you can sign in with an email magic link. The link works once and expires after 10 minutes. You can also add a passkey or an authenticator app for two factor under Settings, then Security.",
       ],
     },
     {
-      heading: "Passkeys",
+      heading: "The 3 Graph permissions",
       body: [
-        "Add a passkey in Settings, then Security. After that you can sign in with your fingerprint, face or device PIN. Passkeys are bound to this site, so they cannot be phished. We recommend adding at least two.",
+        "Connecting a tenant asks for 3 application permissions. Here is what each one allows, and what it does not.",
+        "DeviceManagementApps.ReadWrite.All: create and update Win32 apps and their assignments in Intune, and read install status. It does not allow changes to device configuration, compliance or policies.",
+        "DeviceManagementManagedDevices.Read.All: read managed devices so we can count them for the device meter. It is read only. It does not allow wipe, retire or any other device action.",
+        "Group.Read.All: read Entra groups so you can pick your Pilot and Broad groups. It does not allow creating, changing or deleting groups or members.",
       ],
     },
     {
-      heading: "Two factor authentication",
+      heading: "Roles",
       body: [
-        "Turn on two factor in Settings, then Security. Scan the QR code with an authenticator app and enter the six digit code to confirm. Save your recovery codes somewhere safe. Each works once if you lose your device.",
+        "Each organization has owner, admin, member and viewer roles. Owners manage billing. Owners and admins manage API keys and webhooks and read the audit log. Members can read them. Viewers have read access to data only.",
       ],
     },
     {
       heading: "API keys",
       body: [
-        "Server to server requests use API keys. Create and revoke them in Settings, then API keys. Send the key in the x-api-key header on every request. Never put a key in browser code or a public repository. If a key leaks, revoke it and create a new one.",
+        "Server to server requests use API keys. Create and revoke them in Settings, then API keys. Send the key in the x-api-key header. The full key is shown once. Never put a key in browser code or a public repository. If a key leaks, revoke it and create a new one.",
       ],
       code: {
         lang: "bash",

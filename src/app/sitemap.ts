@@ -10,6 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: u("/"), lastModified: now, changeFrequency: "weekly", priority: 1 },
     { url: u("/pricing"), lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: u("/security"), lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: u("/catalog"), lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: u("/docs"), lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     ...docs.map((d) => ({ url: u(`/docs/${d.slug}`), lastModified: now, changeFrequency: "monthly" as const, priority: 0.6 })),
     ...compareEntries.map((c) => ({ url: u(`/compare/${c.slug}`), lastModified: now, changeFrequency: "monthly" as const, priority: 0.8 })),

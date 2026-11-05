@@ -4,7 +4,7 @@ import type { DocPage } from "./types";
 export const api: DocPage = {
   slug: "api",
   title: "API reference",
-  description: `The ${p.name} REST API: authentication, endpoints, errors and rate limits.`,
+  description: `The ${p.fullName} REST API for an organization: keys, endpoints, errors and rate limits.`,
   sections: [
     {
       heading: "Base URL and authentication",
@@ -19,6 +19,12 @@ export const api: DocPage = {
         lang: "json",
         code: `{\n  "orgId": "org_123"\n}`,
       },
+    },
+    {
+      heading: "Audit log",
+      body: [
+        "GET /api/audit returns the 50 most recent audit entries for your organization, newest first. Pass before with an ISO date to page back. It needs a signed in session with audit read access. Endpoints for tenants, apps and rings are planned.",
+      ],
     },
     {
       heading: "Errors",

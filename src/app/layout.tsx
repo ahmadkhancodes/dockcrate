@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { product } from "@/config/product";
 import { themeInitScript } from "@/components/theme";
-import { display, mono, sans } from "./fonts";
+import { display, mono, sans, stencil } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,14 +17,14 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#181818" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f5f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#15191c" },
   ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable} ${stencil.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
