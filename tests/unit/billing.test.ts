@@ -101,7 +101,7 @@ describe("webhook", () => {
     const e = await db.getEntitlement("org_1");
     expect(e).toMatchObject({ isPaid: true, status: "past_due", pastDueSince: NOW });
     expect(effectivePlan(e, NOW).id).toBe("professional");
-    expect(effectivePlan(e, NOW + 8 * 864e5).id).toBe("free"); // grace over
+    expect(effectivePlan(e, NOW + 15 * 864e5).id).toBe("free"); // grace over
     s.status = "canceled";
     await hook(event("customer.subscription.deleted", { customer: cus }));
     expect(await db.getEntitlement("org_1")).toMatchObject({ isPaid: false, plan: "free" });

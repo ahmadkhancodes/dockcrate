@@ -126,7 +126,7 @@ export const product = {
     },
   ] satisfies Plan[],
   /** Grace period after a failed payment (past_due keeps the plan, C-20) before limits fall to Free. */
-  graceDays: 7,
+  graceDays: 14,
   /** Remote flag defaults (overridden by APP_FLAGS env JSON and the Mongo `config` collection). */
   flags: {
     payments_enabled: "on",
@@ -134,7 +134,10 @@ export const product = {
     maintenance: "off",
   } as Record<string, string>,
   nav: [
+    { href: "/catalog", label: "Catalog" },
     { href: "/pricing", label: "Pricing" },
+    { href: "/security", label: "Security" },
+    { href: "/compare/pckgr", label: "Compare" },
     { href: "/docs", label: "Docs" },
   ],
 } as const;

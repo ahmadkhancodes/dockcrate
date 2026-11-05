@@ -14,3 +14,11 @@ Standing decisions are in docs/factory/BATCH1_PLAN.md (Mongo instead of Postgres
 - **D-09 Fleet annual price** is not in the workbook; use 10x monthly ($999.90/yr) from "annual = 2 months free". Education price is a separate hidden Stripe price ($34.99/mo) granted after manual approval.
 - **D-10 Catalog scope.** A reviewed `catalog/top200.json` bounds winget ingestion; unknown installer types go to `manual`, never guessed. The public catalog count shown is always the real verified count.
 - **D-11 Kit adoption.** PlanIds are free/starter/professional/business/fleet; meters are devices, tenants, catalog_apps, custom_apps with `UNLIMITED = 1_000_000` for uncapped tenants/catalog (no Infinity: entitlements are JSON). Fleet annual $999.90 per D-09; education price is `educationUsd` on Professional (no Stripe price in the kit catalog). Packer lives at `src/lib/intunewin` with `fflate` 0.8.2 added to root deps; `packages/` removed. `docs/**` added to ESLint ignores (design tooling scripts). Marketing copy still says Postslot-era wording in places; M1-B rewrites it.
+
+## 5 Nov 2026 (M1-B)
+- **D-12 Demo and sample honesty.** Landing demo surfaces show an illustrative 4/4 tag and say "Demo data". The /catalog sample list and sample QA logs show the VM check as pending (D-01) with sample last tested dates, labelled sample, and are noindex on the detail pages. The landing says publisher verification is pending and claims no certification.
+- **D-13 Grace period config.** `product.graceDays` set to 14 to match D-04; the billing unit test now checks 15 days.
+- **D-14 Permission honesty.** `DeviceManagementApps.ReadWrite.All` cannot be scoped to our apps in Graph; the security page says so and states we only touch apps prefixed "DC |".
+- **D-15 Roadmap tags.** Pricing highlights that depend on v1/v2 (macOS, Client PDF, Custom Apps, Defender, Policy backup, SSO, SLA) are tagged "Roadmap" by pattern in the pricing table. Sign-in remains the kit's email link until M2; copy says so.
+- **D-16 Sub processors.** Landing does not claim "no sub processors except Stripe" (plan text); it links the real list from product.ts. Cloudflare R2 is not yet in that list; add it when used.
+- Design tokens: headings now use Big Shoulders 800, Big Shoulders Stencil only on crate labels, amber tag token, hero text gradient removed, header blur removed.

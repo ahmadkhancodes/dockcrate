@@ -11,7 +11,7 @@ export const privacy: LegalDoc = {
       title: "Who we are",
       body: [
         `${p.name} is operated by ${p.legal.entity}, ${p.legal.address}. This policy explains what personal data we handle when you visit ${p.host}, create an account or use the service.`,
-        `For account and billing data we are the controller. For form submissions that your visitors send to your endpoints, you are the controller and we are your processor. The data processing addendum covers that second case.`,
+        `For account and billing data we are the controller. For data we read from your Microsoft tenant, such as device and group identifiers, you are the controller and we are your processor. The data processing addendum covers that second case.`,
       ],
     },
     {
@@ -21,14 +21,17 @@ export const privacy: LegalDoc = {
         "We collect only what we need to run the service.",
         {
           list: [
-            "Account data: your email address, name if you give one, and sign in credentials such as passkeys or two factor settings.",
-            "Organization data: workspace name, members, roles, API keys (stored hashed) and the settings you configure.",
+            "Account data: your work email address and name from your Microsoft Entra account. We accept work and school accounts only and reject personal Microsoft accounts. We do not store your Microsoft password.",
+            "Tenant data: the Entra tenant ID of each tenant you connect, and the settings you choose for it.",
+            "Packaging data: the apps, versions, deployment rings, schedules and results you configure, including rollbacks and pauses.",
+            "Microsoft Graph data: through three application permissions (DeviceManagementApps.ReadWrite.All, DeviceManagementManagedDevices.Read.All and Group.Read.All) granted in your own tenant, we publish apps, read the group list and read managed devices. We read device counts nightly for billing and keep device identifiers only as long as needed to show install status.",
+            "Audit log: who did what and when in your workspace, with IP address.",
+            "Organization data: workspace name, members, roles, webhook settings and API keys (API keys are stored hashed).",
             "Billing data: your plan and subscription status. Card details go straight to Stripe and never touch our servers.",
-            "Form submissions: the fields and files that visitors of your sites send to your endpoints, plus delivery receipts and spam verdicts. You receive this data and we store it for you.",
             "Technical data: IP address, browser type and request logs, kept briefly for security, abuse prevention and debugging.",
           ],
         },
-        "We do not sell personal data and we do not use submission content for advertising or to train models.",
+        "We never store customer secrets such as tenant passwords or client secrets. We do not sell personal data and we do not use your data for advertising or to train models. Installers that you upload are only published to your own tenant and are never redistributed to anyone else.",
       ],
     },
     {
@@ -38,8 +41,8 @@ export const privacy: LegalDoc = {
         "If you are in the European Economic Area or the United Kingdom, we rely on these legal bases under the GDPR and UK GDPR.",
         {
           list: [
-            "Contract: to create your account, deliver submissions and bill you.",
-            "Legitimate interests: to secure the service, prevent abuse and spam, and keep records that let us fix problems.",
+            "Contract: to create your account, run packaging and updates in your tenant and bill you.",
+            "Legitimate interests: to secure the service, prevent abuse, and keep records that let us fix problems.",
             "Legal obligation: to keep tax and accounting records.",
             "Consent: for optional communications, which you can withdraw at any time.",
           ],
@@ -60,7 +63,7 @@ export const privacy: LegalDoc = {
         {
           list: [
             "Account and organization data is kept while your account is open.",
-            "Submissions are kept for the history period of your plan, then deleted.",
+            "Packaging history, device status and audit log entries are kept for the history period of your plan, then deleted.",
             "After you delete your account we remove your data within 30 days, except billing records we must keep by law, which are kept for the period the law requires.",
             "Server logs are kept for up to 30 days.",
             "Backups roll off within 35 days after deletion.",

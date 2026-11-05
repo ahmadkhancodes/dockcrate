@@ -10,7 +10,7 @@ export const dpa: LegalDoc = {
       id: "scope",
       title: "Scope and roles",
       body: [
-        `This addendum applies when ${p.legal.entity} processes personal data in form submissions on your behalf. You are the controller and we are the processor. It forms part of the terms of service.`,
+        `This addendum applies when ${p.legal.entity} processes personal data on your behalf while you use the service, for example user and device details read from your own Microsoft tenant. You are the controller and we are the processor. It forms part of the terms of service.`,
       ],
     },
     {
@@ -19,10 +19,10 @@ export const dpa: LegalDoc = {
       body: [
         {
           list: [
-            "Subject matter: receiving, storing, filtering and delivering form submissions.",
+            "Subject matter: packaging, publishing and updating apps in your Intune tenant, reading device counts and keeping an audit log.",
             "Duration: while your account is open, plus the deletion period in the privacy policy.",
-            "Data subjects: people who submit your forms.",
-            "Data types: whatever fields and files your forms collect, plus IP address and user agent for spam checks.",
+            "Data subjects: your administrators and team members, and the users of devices in tenants you connect.",
+            "Data types: admin names and work email addresses, tenant IDs, device and group identifiers returned by Microsoft Graph, app, version and ring metadata, audit log entries and IP addresses.",
           ],
         },
       ],

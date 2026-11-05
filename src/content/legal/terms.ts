@@ -40,7 +40,7 @@ export const terms: LegalDoc = {
             return `${pl.name}: ${prices}.`;
           }),
         },
-        "Paid plans are billed in advance through Stripe and renew automatically each period until you cancel. Prices exclude taxes, which we add where required. If a payment fails we keep your plan for a grace period and then move the account to the Free plan.",
+        "Paid plans are billed in advance through Stripe and renew automatically each period until you cancel. Prices exclude taxes, which we add where required. If a payment fails we keep your plan for a grace period of 14 days and then move the account to the Free plan.",
       ],
     },
     {
@@ -52,6 +52,11 @@ export const terms: LegalDoc = {
       ],
     },
     {
+      id: "microsoft",
+      title: "Microsoft tenants",
+      body: ["You grant admin consent in your own tenant and can revoke it at any time in Entra. Device counts are read nightly and used for billing against your plan limits. Third party apps in the catalog belong to their publishers and are subject to their licenses."],
+    },
+    {
       id: "acceptable-use",
       title: "Acceptable use",
       body: ["You must follow our acceptable use policy. We may suspend an account that breaks it."],
@@ -60,7 +65,7 @@ export const terms: LegalDoc = {
       id: "your-data",
       title: "Your data",
       body: [
-        "You own your content and submissions. You give us a limited license to host, process and deliver it to run the service. You are responsible for having a lawful basis to collect the data your forms gather and for telling your visitors how it is used.",
+        "You own your content, including installers you upload as Custom Apps, and your tenant data. You give us a limited license to host and process it, and to publish it to your own Intune tenant, to run the service. We never redistribute your installers except as published to your tenant. You confirm you are authorised to administer every tenant you connect and have the right to package and deploy the software you upload.",
       ],
     },
     {

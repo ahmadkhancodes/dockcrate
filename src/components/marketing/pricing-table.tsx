@@ -29,12 +29,16 @@ function annualSavings(): { min: number; max: number } | null {
   return pct.length ? { min: Math.min(...pct), max: Math.max(...pct) } : null;
 }
 
+/** Items from the brief that are v1 or v2 and not shipped yet: tagged until they are. */
+const ROADMAP = /macOS|Client PDF|Custom Apps|Defender|Policy backup|SSO|SLA/;
+
 const RISK_FREE = "No credit card needed.";
 const RISK_PAID = "Cancel anytime from your account.";
 
 export function PricingTable({ id = "pricing", title }: { id?: string; title?: string }) {
   const [interval, setBilling] = useState<Interval>(product.defaultInterval);
   const saving = annualSavings();
+  const education = plans.find((p) => p.educationUsd)?.educationUsd;
   const savingText = saving ? (saving.min === saving.max ? `${saving.max}%` : `${saving.min}% to ${saving.max}%`) : null;
   const options: { id: Interval; label: string }[] = [
     { id: "month", label: "Monthly" },
@@ -47,7 +51,7 @@ export function PricingTable({ id = "pricing", title }: { id?: string; title?: s
         {title ? <h2 id={`${id}-title`} className="heading-4 md:heading-2 text-text">{title}</h2> : <span />}
         {saving ? (
           <div className="flex flex-col gap-2 md:items-end">
-            <div role="group" aria-label="Billing interval" className="inline-flex w-fit rounded-lg border border-border bg-surface-raised p-1">
+            <div role="group" aria-label="Billing interval" className="inline-flex w-fit rounded-md border border-border bg-surface-raised p-1">
               {options.map((o) => (
                 <button
                   key={o.id}
@@ -68,7 +72,7 @@ export function PricingTable({ id = "pricing", title }: { id?: string; title?: s
         ) : null}
       </div>
 
-      <ul className="mt-8 grid gap-4 md:mt-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-y-0">
+      <ul className="mt-8 grid gap-4 md:mt-12 md:grid-cols-2 xl:grid-cols-5 xl:gap-y-0">
         {plans.map((plan) => {
           const price = priceFor(plan, interval);
           const free = !price;
@@ -77,14 +81,14 @@ export function PricingTable({ id = "pricing", title }: { id?: string; title?: s
             <li
               key={plan.id}
               className={cn(
-                "grid grid-rows-[auto_auto_auto_auto_1fr] rounded-lg border bg-surface p-6 lg:row-span-5 lg:grid-rows-subgrid",
+                "grid grid-rows-[auto_auto_auto_auto_1fr] rounded-md border bg-surface p-6 xl:row-span-5 xl:grid-rows-subgrid",
                 plan.featured ? "border-action ring-1 ring-action" : "border-border",
               )}
             >
               <div className="pb-6">
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="heading-6 text-text">{plan.name}</h3>
-                  {plan.featured ? <span className="caption-3 text-action">Most popular</span> : null}
+                  {plan.featured ? <span className="caption-3 text-action">For MSPs</span> : null}
                 </div>
                 <p className="body-6 mt-1 text-text-subtle">{plan.tagline}</p>
               </div>
@@ -100,7 +104,7 @@ export function PricingTable({ id = "pricing", title }: { id?: string; title?: s
                 {plan.highlights.map((h) => (
                   <li key={h} className="flex items-start gap-2 body-6 text-text">
                     <Check size={16} weight="regular" aria-hidden className="mt-0.5 shrink-0 text-success" />
-                    <span>{h}</span>
+                    <span>{h}{ROADMAP.test(h) ? <span className="ml-2 inline-flex rounded-sm border border-border-strong px-1 caption-4 text-text-subtle">Roadmap</span> : null}</span>
                   </li>
                 ))}
               </ul>
@@ -108,6 +112,11 @@ export function PricingTable({ id = "pricing", title }: { id?: string; title?: s
           );
         })}
       </ul>
+      {education ? (
+        <p className="mt-8 max-w-2xl body-3 text-text-subtle">
+          <strong className="font-semibold text-text">Education and non profit: {money(education)} per month</strong> for the Professional plan, with proof of status. Granted after a manual check. Contact {product.supportEmail}.
+        </p>
+      ) : null}
     </div>
   );
 }

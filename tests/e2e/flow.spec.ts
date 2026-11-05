@@ -48,7 +48,7 @@ test("magic link sign-in, org, billing state, api key, cron guard", async ({ pag
 
 test("public pages render with metadata and no horizontal overflow at 375px", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
-  for (const path of ["/", "/pricing", "/docs", "/legal/privacy", "/sign-in"]) {
+  for (const path of ["/", "/pricing", "/security", "/compare/pckgr", "/catalog", "/catalog/7-zip", "/docs", "/legal/privacy", "/sign-in"]) {
     const res = await page.goto(path);
     expect(res?.status(), path).toBe(200);
     await expect(page.locator("title")).not.toBeEmpty();
@@ -56,5 +56,26 @@ test("public pages render with metadata and no horizontal overflow at 375px", as
   }
   expect((await page.goto("/nope-404"))?.status()).toBe(404);
   expect((await page.request.get("/api/health")).ok()).toBeTruthy();
-  expect(await (await page.request.get("/llms.txt")).text()).toContain("Postslot");
+  expect(await (await page.request.get("/llms.txt")).text()).toContain("DockCrate by BufferSol");
+});
+
+test("landing shows the crate label, bay track, demo labels and the Microsoft footer line", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Third-party apps for Intune");
+  await expect(page.getByRole("link", { name: "Start free with Microsoft" }).first()).toBeVisible();
+  await expect(page.getByText("Bay track")).toBeVisible();
+  await expect(page.getByText("Demo data").first()).toBeVisible();
+  await expect(page.locator("footer")).toContainText("Works with Microsoft Intune. Microsoft and Intune are trademarks of Microsoft. DockCrate by BufferSol is not endorsed by Microsoft.");
+  expect(await page.content()).not.toMatch(/postslot|web3forms|submission/i);
+});
+
+test("catalog search filters the sample list and links to a sample QA log", async ({ page }) => {
+  await page.goto("/catalog");
+  await expect(page.getByText("Sample list").first()).toBeVisible();
+  await page.getByLabel("Search apps").fill("zoom");
+  await expect(page.getByRole("row", { name: /Zoom Workplace/ })).toBeVisible();
+  await expect(page.getByRole("row", { name: /7-Zip/ })).toHaveCount(0);
+  await page.getByRole("link", { name: /Open QA log/ }).click();
+  await expect(page).toHaveURL(/\/catalog\/zoom-workplace$/);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Zoom Workplace");
 });

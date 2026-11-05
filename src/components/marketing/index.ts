@@ -1,7 +1,7 @@
 export { SiteHeader } from "./site-header";
 export { SiteFooter } from "./site-footer";
 export { Hero, type HeroProps } from "./hero";
-export { Problem, type ProblemItem } from "./problem";
+export { Problem } from "./problem";
 export { HowItWorks, type Step } from "./how-it-works";
 export { Features, type Feature, type FeatureSpan } from "./features";
 export { CompareTable, type CompareRow, type CompareValue } from "./compare-table";
@@ -9,4 +9,3 @@ export { PricingTable } from "./pricing-table";
 export { Faq, type FaqItem } from "./faq";
 export { TaglineReveal } from "./tagline-reveal";
 export { FinalCta } from "./final-cta";
-export { Proof } from "./proof";

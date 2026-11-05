@@ -50,3 +50,12 @@ Deep link: https://dash.cloudflare.com/ (buffersoltech.com, DNS, Records)
 
 ## 9. Later, VPS phase (not blocking)
 - A VPS plus Windows 11 licences for the VM test lab (turns on the VM punch), and trademark clearance for "DockCrate" in classes 9 and 42 before public launch.
+
+## 10. Legal placeholders (before launch)
+(Numbered 10 because sections 7 to 9 already exist.)
+- `{{jurisdiction}}`: the governing law jurisdiction. Owner supplies it; it flows from `legal.jurisdiction` in `src/config/product.ts`.
+- `{{registered address}}`: BufferSol Technologies registered address. Owner supplies it; it flows from `legal.address` in `src/config/product.ts`.
+- `{{dpa-pdf}}`: a signable DPA PDF to link from the DPA page.
+- `{{refund policy}}` and `{{cap}}` in the terms of service (refund wording and liability cap) also need owner decisions.
+- The legal text needs a lawyer's review before launch.
+- Note: `graceDays` in `src/config/product.ts` is 7 but D-04 says 14; the terms now say 14.

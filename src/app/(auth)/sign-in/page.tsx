@@ -18,7 +18,7 @@ export default async function SignInPage({ searchParams }: { searchParams: SP })
     <>
       <div className="flex flex-col gap-2">
         <h1 className="heading-5 text-text">Sign in to {product.name}</h1>
-        <p className="body-6 text-text-subtle">We email you a link, so there is no password to remember. New here? The same link creates your account.</p>
+        <p className="body-6 text-text-subtle">Use your work email. We send a link, so there is no password to remember. Microsoft work account sign in arrives in the next milestone. New here? The same link creates your account.</p>
       </div>
       <SignInForm callbackURL={callbackURL} expiredLink={link} />
     </>

@@ -18,13 +18,13 @@ export const acceptableUse: LegalDoc = {
         {
           list: [
             "Break the law or help others do so.",
-            "Collect data without a lawful basis or without telling the people who submit it.",
-            "Send spam, phishing or malware, or use the service to relay unsolicited bulk email.",
-            "Collect payment card numbers, government ID numbers, passwords or health records through a form unless we agree in writing.",
-            "Infringe intellectual property or privacy rights.",
-            "Probe, scan or attack the service, or bypass rate limits and quotas.",
-            "Resell the service as your own without an Agency plan or written permission.",
-            "Publish content that is hateful, threatening or sexually exploits minors.",
+            "Use the service against any Microsoft Entra tenant or Intune environment you are not authorised to administer. Customers and MSPs must hold a valid delegated or direct admin relationship with each tenant they connect.",
+            "Upload malware, or any installer or script that is designed to damage devices, steal data or evade security tools.",
+            "Package or publish software you have no right to distribute, or use Custom Apps to infringe intellectual property.",
+            "Share API keys or webhook secrets with people who are not on your team, or use them to act for someone else without permission.",
+            "Probe, scan or attack the service, or bypass rate limits, plan limits or device counts.",
+            "Resell the service as your own without written permission.",
+            "Use the service to harass others or to break the Microsoft terms that apply to your tenant.",
           ],
         },
       ],
@@ -33,13 +33,13 @@ export const acceptableUse: LegalDoc = {
       id: "enforcement",
       title: "Enforcement",
       body: [
-        "We may hold submissions, suspend forms or close accounts that break this policy. Where we can, we warn you first and give you time to fix the problem. For serious abuse we act immediately.",
+        "We may block uploads, pause publishing, suspend tenant connections or close accounts that break this policy. Where we can, we warn you first and give you time to fix the problem. For serious abuse we act immediately.",
       ],
     },
     {
       id: "report",
       title: "Report abuse",
-      body: [`Email ${p.supportEmail} with the form URL and what you saw.`],
+      body: [`Email ${p.supportEmail} with the account or tenant concerned and what you saw.`],
     },
   ],
 };
