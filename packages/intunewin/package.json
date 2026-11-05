@@ -1,0 +1,10 @@
+{
+  "name": "@dockcrate/intunewin",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Clean-room Node implementation of the Intune Win32 content encryption format (spike, M2). Copied into the app at kit copy time; no runtime dependency on other repos.",
+  "scripts": { "test": "vitest run", "typecheck": "tsc --noEmit" },
+  "dependencies": { "fflate": "0.8.2" },
+  "devDependencies": { "@types/node": "22.10.5", "typescript": "5.7.3", "vitest": "2.1.8" }
+}

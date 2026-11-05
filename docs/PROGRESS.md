@@ -5,3 +5,4 @@
 - Phase 0 done by the build session: competitor research (docs/design/refs/), DESIGN.md, SECTION_PLAN.md, ARCHITECTURE.md, ROADMAP.md, MANUAL_STEPS.md, DECISIONS.md, design mock (docs/design/mock.html + screenshots).
 - Next: orchestrator design approval and "kit-v1 ready", then copy the kit and start M1.
 - Open: Entra app registration + Partner Center verification (docs/MANUAL_STEPS.md steps 1 and 2).
+- Phase 0 approved by the orchestrator (5 Nov). Spike done on branch `spike-intunewin`: `packages/intunewin` (clean-room `.intunewin` payload: streaming zip, AES-256-CBC + HMAC-SHA256, Graph `fileEncryptionInfo`), 4 tests green. Still to prove: acceptance by a real Intune tenant (M2) and byte compatibility with IntuneWinAppUtil on the VPS lab.
