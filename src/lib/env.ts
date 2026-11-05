@@ -19,6 +19,16 @@ const schema = z.object({
   ALTCHA_HMAC_KEY: z.string().optional(),
   APP_FLAGS: z.string().optional(),
   ADMIN_EMAILS: z.string().optional(),
+  /** Multi tenant Entra app registration (docs/MANUAL_STEPS.md). Unset = stub mode (fake Graph, email link sign in). */
+  ENTRA_CLIENT_ID: z.string().optional(),
+  ENTRA_CLIENT_SECRET: z.string().optional(),
+  /** PEM private key of the certificate uploaded to the app registration (MANUAL_STEPS 3, 4) and its thumbprint (SHA-1 hex as Entra shows it, or SHA-256). */
+  ENTRA_CLIENT_CERT_PRIVATE_KEY_PEM: z.string().optional(),
+  ENTRA_CLIENT_CERT_THUMBPRINT: z.string().optional(),
+  /** Ed25519 PEM private key signing package manifests (ManifestSigner env adapter). */
+  MANIFEST_SIGNING_KEY: z.string().optional(),
+  GRAPH_DRIVER: z.enum(["real", "fake"]).optional(),
+  REQUIRE_VM_VERIFICATION: z.string().optional(),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
 });
@@ -51,3 +61,10 @@ export function envFlags(e: Pick<Env, "APP_FLAGS"> = env()): Record<string, stri
 
 export const adminEmails = (e: Env = env()) =>
   (e.ADMIN_EMAILS ?? "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+
+export const entraClientId = (e: Env = env()) => e.ENTRA_CLIENT_ID;
+export const entraConfigured = (e: Env = env()) => !!e.ENTRA_CLIENT_ID && !!(e.ENTRA_CLIENT_SECRET || e.ENTRA_CLIENT_CERT_PRIVATE_KEY_PEM);
+/** Graph driver: explicit GRAPH_DRIVER, else real only when Entra is configured (stub mode uses the fake). */
+export const graphDriver = (e: Env = env()) => e.GRAPH_DRIVER ?? (entraConfigured(e) ? "real" : "fake");
+/** D-01: when on, a version without a passed VM check is held instead of publishing to Pilot only. */
+export const requireVmVerification = (e: Env = env()) => e.REQUIRE_VM_VERIFICATION === "true";

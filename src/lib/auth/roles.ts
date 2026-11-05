@@ -1,7 +1,7 @@
 import { createAccessControl } from "better-auth/plugins/access";
 import { defaultStatements, adminAc, ownerAc } from "better-auth/plugins/organization/access";
 
-// Org roles: owner / admin / member / viewer. App statements extend Better Auth's defaults.
+// Org roles: owner / admin / operator / viewer. App statements extend Better Auth's defaults.
 export const statements = {
   ...defaultStatements,
   billing: ["read", "manage"],
@@ -9,6 +9,9 @@ export const statements = {
   webhook: ["read", "manage"],
   audit: ["read"],
   data: ["read", "write"],
+  tenant: ["read", "connect"],
+  deployment: ["read", "publish", "rollback"],
+  ring: ["read", "configure"],
 } as const;
 
 export const ac = createAccessControl(statements);
@@ -20,6 +23,9 @@ export const owner = ac.newRole({
   webhook: ["read", "manage"],
   audit: ["read"],
   data: ["read", "write"],
+  tenant: ["read", "connect"],
+  deployment: ["read", "publish", "rollback"],
+  ring: ["read", "configure"],
 });
 
 export const admin = ac.newRole({
@@ -29,22 +35,33 @@ export const admin = ac.newRole({
   webhook: ["read", "manage"],
   audit: ["read"],
   data: ["read", "write"],
+  tenant: ["read", "connect"],
+  deployment: ["read", "publish", "rollback"],
+  ring: ["read", "configure"],
 });
 
-export const member = ac.newRole({
+/** Operator (technician): publishes and rolls back, cannot connect tenants, change rings or see billing details. */
+export const operator = ac.newRole({
   billing: ["read"],
   apiKey: ["read"],
   webhook: ["read"],
+  audit: ["read"],
   data: ["read", "write"],
+  tenant: ["read"],
+  deployment: ["read", "publish", "rollback"],
+  ring: ["read"],
 });
 
 export const viewer = ac.newRole({
   data: ["read"],
+  tenant: ["read"],
+  deployment: ["read"],
+  ring: ["read"],
 });
 
-export const roles = { owner, admin, member, viewer };
+export const roles = { owner, admin, operator, viewer };
 export type OrgRole = keyof typeof roles;
-export const ROLE_ORDER: OrgRole[] = ["viewer", "member", "admin", "owner"];
+export const ROLE_ORDER: OrgRole[] = ["viewer", "operator", "admin", "owner"];
 
 /** Pure permission table used by server guards and UI (mirrors the roles above). */
 export function can(role: string | null | undefined, resource: keyof typeof statements, action: string): boolean {

@@ -1,6 +1,6 @@
 import { MongoClient, type Collection, type Db as MongoDatabase, type Document } from "mongodb";
 import { uuidv7 } from "@/lib/ids";
-import { DELIVERY_TTL_DAYS, type AuditEntry, type BillingAccount, type Db, type Entitlement, type Suppression, type WebhookDelivery, type WebhookEndpoint } from "./types";
+import { DELIVERY_TTL_DAYS, type AuditEntry, type Collection as AppCollection, type BillingAccount, type Db, type Entitlement, type Suppression, type WebhookDelivery, type WebhookEndpoint } from "./types";
 
 // Ported from trayo server/db/mongo.ts. Changes: global singleton client (Vercel), pool 10, Date TTLs,
 // stripe events recorded after success, no sync/family/anonymous. Use only from runtime = "nodejs" routes.
@@ -33,6 +33,25 @@ export function createMongoDb(uri: string, dbName: string, app: string): Db {
 
   return {
     app,
+    collection<T extends { id: string }>(name: string): AppCollection<T> {
+      const c = () => col<Document>(`dc_${name}`);
+      const out = (d: Document | null) => (d ? (strip<T>(d as never)) : null);
+      return {
+        async get(id) {
+          return out(await (await c()).findOne({ _id: id as never, app }));
+        },
+        async find(filter = {}) {
+          const rows = await (await c()).find({ ...(filter as Document), app }).toArray();
+          return rows.map((r) => out(r) as T);
+        },
+        async put(doc) {
+          await (await c()).replaceOne({ _id: doc.id as never }, { ...doc, app } as Document, { upsert: true });
+        },
+        async delete(id) {
+          await (await c()).deleteOne({ _id: id as never, app });
+        },
+      };
+    },
     async getBillingAccount(id) {
       return strip<BillingAccount>(await (await col<WithId<BillingAccount>>("billing_accounts")).findOne({ _id: id, app }));
     },
@@ -215,6 +234,13 @@ export async function ensureIndexes(uri: string, dbName: string) {
   await d.collection("webhook_deliveries").createIndex({ app: 1, status: 1, nextAttemptAt: 1 });
   await d.collection("webhook_deliveries").createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
   await d.collection("suppressions").createIndex({ app: 1, email: 1 });
+  // DockCrate domain collections (documents carry `app` and `id` = _id)
+  await d.collection("dc_tenants").createIndex({ app: 1, orgId: 1, entraTenantId: 1 }, { unique: true, partialFilterExpression: { entraTenantId: { $type: "string" } } });
+  await d.collection("dc_deployments").createIndex({ app: 1, tenantId: 1, idempotencyKey: 1 }, { unique: true });
+  await d.collection("dc_deployments").createIndex({ app: 1, state: 1 });
+  await d.collection("dc_catalog_versions").createIndex({ app: 1, appSlug: 1 });
+  await d.collection("dc_tenant_apps").createIndex({ app: 1, tenantId: 1, appSlug: 1 }, { unique: true });
+  await d.collection("dc_alerts").createIndex({ app: 1, orgId: 1, createdAt: -1 });
   // Better Auth collections
   await d.collection("user").createIndex({ email: 1 }, { unique: true });
   await d.collection("session").createIndex({ token: 1 }, { unique: true });
