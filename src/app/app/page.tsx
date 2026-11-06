@@ -82,7 +82,7 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
 
       <div className="grid overflow-hidden rounded-md border border-border bg-surface-raised lg:grid-cols-12">
         <div className="min-w-0 lg:col-span-8">
-          <ul className="grid grid-cols-2 border-b border-border md:grid-cols-4">
+          <ul aria-label="Dock summary" className="grid grid-cols-2 border-b border-border md:grid-cols-4">
             {kpis.map((k) => (
               <li key={k.label} className="flex flex-col gap-1 border-b border-r border-border p-4 md:border-b-0 md:last:border-r-0">
                 <p className="label-caps text-text-subtle">{k.label}</p>
@@ -95,10 +95,10 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
             <p className="heading-6 uppercase text-text">Apps</p>
             <p className="caption-2 text-text-subtle">{tenant.name} · Pilot {config?.pilot.delayHours ?? 0} h · Broad {config?.broad.delayHours ?? 48} h</p>
           </div>
-          <ul>
+          <ul aria-label="Apps">
             {rows.map((r) => (
               <li key={r.slug} className={`border-t border-border ${r.slug === selected?.slug ? "bg-surface-sunken" : ""}`}>
-                <Link href={`/app?tenant=${tenant.id}&app=${r.slug}`} aria-current={r.slug === selected?.slug ? "true" : undefined} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-4 py-3 focus-visible:focus-ring md:grid-cols-[1fr_auto_4rem_auto]">
+                <Link href={`/app?tenant=${tenant.id}&app=${r.slug}`} aria-current={r.slug === selected?.slug ? "true" : undefined} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-4 py-3 focus-visible:focus-ring focus-visible:[outline-offset:-2px] md:grid-cols-[1fr_auto_4rem_auto]">
                   <span className="flex min-w-0 items-center gap-3">
                     <CrateMonogram name={r.name} />
                     <span className="min-w-0">

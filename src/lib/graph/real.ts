@@ -173,6 +173,12 @@ export class RealGraphClient implements GraphClient {
     return { installed: r.installedDeviceCount ?? 0, failed: r.failedDeviceCount ?? 0, pending: r.pendingInstallDeviceCount ?? 0 };
   }
 
+  async findAppsByName(name: string) {
+    const filter = `isof('microsoft.graph.win32LobApp') and displayName eq '${name.replace(/'/g, "''")}'`;
+    const r = await this.req<{ value: { id: string }[] }>("GET", `/deviceAppManagement/mobileApps?$filter=${encodeURIComponent(filter)}&$select=id&$top=20`);
+    return r.value.map((x) => ({ id: x.id }));
+  }
+
   async deleteApp(appId: string) {
     await this.req("DELETE", `/deviceAppManagement/mobileApps/${appId}`);
   }

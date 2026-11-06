@@ -58,6 +58,8 @@ export interface Deployment {
   error: string | null;
   /** Set while one worker advances the upload; a second publish call refuses instead of creating a second Intune app. */
   leaseUntil?: string | null;
+  /** Written before `createWin32App` is called. Set with no `intuneAppId` means a crash may have left an Intune app we never recorded (publish-reconcile adopts it). */
+  createStartedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

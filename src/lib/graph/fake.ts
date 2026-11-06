@@ -122,6 +122,10 @@ export class FakeGraphClient implements GraphClient {
     this.enter("getInstallSummary");
     return this.summaries.get(appId) ?? { installed: 0, failed: 0, pending: 0 };
   }
+  async findAppsByName(name: string) {
+    this.enter("findAppsByName");
+    return [...this.apps.values()].filter((a) => a.body.displayName === name).map((a) => ({ id: a.id }));
+  }
   async deleteApp(appId: string) {
     this.enter("deleteApp");
     this.apps.delete(appId);

@@ -8,6 +8,8 @@ import { product } from "@/config/product";
 import { appName, appUrl, dbDriver, entraConfigured, env, isProd } from "@/lib/env";
 import { envCredentialSigner } from "@/lib/graph/credential";
 import { ENTRA_AUTHORITY, assertWorkAccount } from "./entra";
+import { ensureMemberPrefs } from "@/lib/alerts";
+import { defaultDeps } from "@/lib/deps";
 import { sendMail } from "@/lib/mail";
 import { inviteEmail, magicLinkEmail } from "@/lib/mail/templates";
 import { isDisposableEmail } from "@/lib/security/disposable";
@@ -58,6 +60,19 @@ async function database(): Promise<BetterAuthOptions["database"]> {
  * A user is their Microsoft account (`tid` + `oid`); a second Microsoft account with the same email is refused.
  */
 export const ACCOUNT_LINKING = { enabled: false, trustedProviders: [] as string[] };
+
+type HookMember = { organizationId: string; userId: string; role: string };
+type HookUser = { email: string };
+
+/** Alert preference rows are written when a member is added or changes role, not on first app open (REVIEW P1-12). A failure never blocks joining. */
+export function memberPrefsHooks() {
+  const write = async ({ member, user }: { member: HookMember; user: HookUser }) => {
+    try {
+      await ensureMemberPrefs(await defaultDeps(), [{ orgId: member.organizationId, userId: member.userId, email: user.email, role: member.role }]);
+    } catch { /* the row is also created on first open as a fallback */ }
+  };
+  return { afterCreateOrganization: write, afterAddMember: write, afterAcceptInvitation: write, afterUpdateMemberRole: write };
+}
 
 export function createAuth(db: BetterAuthOptions["database"]) {
   const e = env();
@@ -131,6 +146,7 @@ export function createAuth(db: BetterAuthOptions["database"]) {
         creatorRole: "owner",
         allowUserToCreateOrganization: true,
         invitationExpiresIn: 60 * 60 * 24 * 7,
+        organizationHooks: memberPrefsHooks(),
         sendInvitationEmail: async (data) => {
           const url = `${base}/accept-invite/${data.id}`;
           const m = inviteEmail({ orgName: data.organization.name, inviter: data.inviter.user.name || data.inviter.user.email, url, role: data.role });

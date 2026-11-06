@@ -51,6 +51,20 @@ export function createMongoDb(uri: string, dbName: string, app: string): Db {
         async delete(id) {
           await (await c()).deleteOne({ _id: id as never, app });
         },
+        async insertIfAbsent(doc) {
+          try {
+            await (await c()).insertOne({ ...doc, _id: doc.id as never, app } as Document);
+            return true;
+          } catch (e) {
+            if ((e as { code?: number }).code === 11000) return false;
+            throw e;
+          }
+        },
+        async claim(id, expect, patch) {
+          const filter: Document = { _id: id as never, app };
+          for (const [k, v] of Object.entries(expect)) filter[k] = v ?? null; // null also matches a missing field
+          return out(await (await c()).findOneAndUpdate(filter, { $set: patch as Document }, { returnDocument: "after" }));
+        },
       };
     },
     async getBillingAccount(id) {

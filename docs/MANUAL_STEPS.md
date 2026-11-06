@@ -17,6 +17,13 @@ Deep link: https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/Create
 - Home page URL `https://dockcrate.buffersoltech.com`, Privacy `https://dockcrate.buffersoltech.com/legal/privacy`, Terms `https://dockcrate.buffersoltech.com/legal/terms`.
 - You'll see: an Overview page with **Application (client) ID** and **Directory (tenant) ID**. Send both to the orchestrator (they are not secrets).
 
+### 1b. Consent proof sign in (REVIEW P1-1, needed before connecting any real tenant)
+In the same app registration, **Authentication**:
+- Add the redirect URIs `https://dockcrate.buffersoltech.com/api/tenants/consent/proof` and `https://dockcrate.vercel.app/api/tenants/consent/proof` (Web).
+- Under **Implicit grant and hybrid flows** tick **ID tokens**. Save.
+- Under **Token configuration**, nothing to add: the `wids` (directory roles) claim is in v2 ID tokens by default. If the proof step says "not an administrator" for a real Global Administrator, check this first.
+Without these two settings, connecting a real tenant fails at the proof step (stub mode is unaffected).
+
 ## 2. Microsoft Partner Center publisher verification (start now, weeks)
 Deep link: https://partner.microsoft.com/dashboard/account/v3/organization/identity
 - Enrol BufferSol Technologies in the Microsoft AI Cloud Partner Program (free) and note the **MPN ID**; then in the app registration go to Branding & properties and click **Add MPN ID to verify publisher**. Doc: https://learn.microsoft.com/entra/identity-platform/mark-app-as-publisher-verified
@@ -56,6 +63,7 @@ Added by the M5 review: these are read by the code but were not listed.
 | `ADMIN_EMAILS` | Founder admin emails, comma separated. |
 | `APP_FLAGS` | Leave `payments_enabled` off until step 11 is done. |
 | `REQUIRE_VM_VERIFICATION` | Leave unset (off) until the VM lab exists: VM pending versions are Pilot only (D-01). |
+- Once, after deploying the P1 closure: `MONGODB_URI=... npx tsx scripts/backfill-alert-prefs.ts` gives members who joined before the hooks existed an alert preference row (safe to repeat).
 - Then once, from a machine with the Atlas URI: `npm run db:indexes` (creates the unique indexes the publish idempotency and audit chain rely on).
 
 ## 11. Launch gate (M5 review P1-5)

@@ -23,6 +23,10 @@
       "schedule": "*/15 * * * *"
     },
     {
+      "path": "/api/cron/publish-reconcile",
+      "schedule": "*/10 * * * *"
+    },
+    {
       "path": "/api/cron/catalog-sync",
       "schedule": "0 4 * * *"
     }

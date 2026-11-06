@@ -38,6 +38,19 @@ export function createMemoryDb(app: string, config: Record<string, string> = {})
         async delete(id) {
           m.delete(id);
         },
+        // No await between the check and the write: the single JS thread makes these atomic.
+        async insertIfAbsent(doc) {
+          if (m.has(doc.id)) return false;
+          m.set(doc.id, clone(doc));
+          return true;
+        },
+        async claim(id, expect, patch) {
+          const d = m.get(id);
+          if (!d || !Object.entries(expect).every(([k, v]) => ((d as Record<string, unknown>)[k] ?? null) === (v ?? null))) return null;
+          const next = { ...d, ...clone(patch) } as T;
+          m.set(id, next);
+          return clone(next);
+        },
       };
     },
     async getBillingAccount(id) {
