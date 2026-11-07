@@ -96,6 +96,13 @@ export interface Collection<T extends { id: string }> {
   /** Insert or replace by id. */
   put(doc: T): Promise<void>;
   delete(id: string): Promise<void>;
+  /** Atomic insert: false when a document with this id exists (Mongo: duplicate key on `_id` or a unique index). */
+  insertIfAbsent(doc: T): Promise<boolean>;
+  /**
+   * Atomic compare-and-set: applies `patch` only when every field of `expect` still equals the stored value
+   * (null and a missing field are equal). Returns the updated document, or null when the condition no longer held.
+   */
+  claim(id: string, expect: Partial<T>, patch: Partial<T>): Promise<T | null>;
 }
 
 export interface Db {

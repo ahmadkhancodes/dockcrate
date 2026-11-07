@@ -55,7 +55,7 @@ function RunProgress({ initial, canRun }: { initial: AppSetRun; canRun: boolean 
         </div>
         <Badge tone={run.status === "running" ? "warning" : failed ? "danger" : "success"}>{run.status === "running" ? `${done} of ${run.results.length} tenants` : failed ? `${failed} failed` : "Completed"}</Badge>
       </div>
-      <div role="progressbar" aria-label="Tenants finished" aria-valuemin={0} aria-valuemax={run.results.length} aria-valuenow={done} className="h-2 overflow-hidden rounded-sm bg-surface-sunken">
+      <div role="progressbar" aria-label="Tenants finished" aria-valuemin={0} aria-valuemax={run.results.length} aria-valuenow={done} aria-valuetext={`${done} of ${run.results.length} tenants finished`} className="h-2 overflow-hidden rounded-sm bg-surface-sunken">
         <div className="h-full bg-action transition-[width] duration-300" style={{ width: `${run.results.length ? (done / run.results.length) * 100 : 0}%` }} />
       </div>
       <ul className="flex flex-col divide-y divide-border">
@@ -105,11 +105,11 @@ function SetCard({ set, apps, tenants, canRun, allowed, onStarted, onDeleted }: 
         <div className="flex flex-wrap gap-2"><Badge tone="info">{set.intent === "required" ? "Required" : "Available"}</Badge><Badge tone={set.autoUpdate ? "success" : "warning"}>{set.autoUpdate ? "Auto update on" : "Auto update off"}</Badge></div>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button disabled={!canRun || !allowed} onClick={() => setOpen((o) => !o)} aria-expanded={open}><Play size={16} aria-hidden /> Run on tenants</Button>
-        <Button variant="tertiary" disabled={!canRun || !allowed} onClick={remove}>Delete</Button>
+        <Button disabled={!canRun || !allowed} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls={`${set.id}-tenants`} aria-label={`Run ${set.name} on tenants`}><Play size={16} aria-hidden /> Run on tenants</Button>
+        <Button variant="tertiary" disabled={!canRun || !allowed} onClick={remove} aria-label={`Delete ${set.name}`}>Delete</Button>
       </div>
       {open ? (
-        <fieldset className="flex flex-col gap-1 rounded-md border border-border bg-surface p-3">
+        <fieldset id={`${set.id}-tenants`} className="flex flex-col gap-1 rounded-md border border-border bg-surface p-3">
           <legend className="caption-3 px-1 text-text-subtle">Tenants</legend>
           {tenants.map((t) => <Check key={t.id} id={`${set.id}-${t.id}`} checked={picked.includes(t.id)} onChange={(v) => setPicked((p) => (v ? [...p, t.id] : p.filter((x) => x !== t.id)))}>{t.name}{t.connected ? "" : " (not connected: will fail)"}</Check>)}
           <div className="flex flex-wrap items-center gap-2 pt-2">

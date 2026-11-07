@@ -62,6 +62,8 @@ export interface GraphClient {
   assignApp(appId: string, assignments: GraphAssignment[]): Promise<void>;
   getInstallSummary(appId: string): Promise<InstallSummary>;
   deleteApp(appId: string): Promise<void>;
+  /** Win32 apps whose displayName equals `name` exactly (crash recovery: finds an app we created but never recorded). */
+  findAppsByName(name: string): Promise<{ id: string }[]>;
 }
 
 /** Thrown when Graph reports the consent is gone (401/403 with AADSTS7000112/700016/65001, invalid_client). */

@@ -122,6 +122,7 @@ export function AppShell({ org, user, isAdmin, productName, banners, children }:
 
   return (
     <div className="flex min-h-dvh flex-col bg-surface lg:flex-row">
+      <a href="#main" className="sr-only z-50 rounded-md bg-surface-raised px-4 py-3 title-4 text-text focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus-visible:focus-ring">Skip to content</a>
       <aside className="sticky top-0 hidden h-dvh w-full max-w-xs shrink-0 flex-col border-r border-border bg-surface-raised p-4 lg:flex lg:w-1/4 xl:w-1/5">
         <div className="mb-6 flex items-center justify-between px-3 pt-2">
           <Link href="/app" className="heading-6 text-text focus-visible:focus-ring">{productName}</Link>
@@ -173,7 +174,7 @@ export function AppShell({ org, user, isAdmin, productName, banners, children }:
         </div>
       </div>
 
-      <main id="main" className="min-w-0 flex-1">
+      <main id="main" tabIndex={-1} className="min-w-0 flex-1 focus:outline-none">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
           {banners}
           {children}

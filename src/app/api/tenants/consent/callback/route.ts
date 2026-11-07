@@ -15,6 +15,7 @@ export const GET = withApi(async (req) => {
   const r = await handleConsentCallback(deps, {
     state: q.get("state"), tenant: q.get("tenant"), admin_consent: q.get("admin_consent"), error: q.get("error"), error_description: q.get("error_description"),
   });
+  if (r.proofUrl) return Response.redirect(r.proofUrl, 303);
   const dest = new URL(r.tenantId ? "/app/tenants" : "/app", deps.baseUrl);
   if (r.tenantId) dest.searchParams.set("tenant", r.tenantId);
   dest.searchParams.set("consent", r.ok ? "connected" : r.status === "waiting_consent" ? "waiting" : "error");

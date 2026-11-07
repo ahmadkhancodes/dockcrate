@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { access, mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -70,6 +71,16 @@ export async function advanceUpload(deps: Deps, ctx: PublishCtx, d: Deployment, 
     for (;;) {
       switch (cur.step) {
         case "create_app": {
+          if (cur.createStartedAt) {
+            // An earlier attempt may have created the app and crashed before saving its id: adopt it instead of creating a second one.
+            const adopted = await findOrphan(deps, graph, cur, intuneName(app, v));
+            if (adopted) {
+              cur = await save(deps, cur, { intuneAppId: adopted.id, step: "content_version" });
+              break;
+            }
+          }
+          // The intent is stored first, so a crash between the Graph call and the next save leaves a trail the reconciler follows.
+          cur = await save(deps, cur, { createStartedAt: deps.now().toISOString() });
           const r = await graph.createWin32App(win32Body(app, v));
           cur = await save(deps, cur, { intuneAppId: r.id, step: "content_version" });
           break;
@@ -142,6 +153,12 @@ export async function advanceUpload(deps: Deps, ctx: PublishCtx, d: Deployment, 
   }
 }
 
+/** An Intune app with this exact name that no deployment of the tenant has recorded (so it is ours from a crashed attempt). */
+async function findOrphan(deps: Deps, graph: GraphClient, d: Deployment, name: string): Promise<{ id: string } | null> {
+  const held = new Set((await deps.db.collection<Deployment>("deployments").find({ tenantId: d.tenantId })).filter((x) => x.id !== d.id).map((x) => x.intuneAppId));
+  return (await graph.findAppsByName(name)).find((a) => !held.has(a.id)) ?? null;
+}
+
 const LIVE: Deployment["state"][] = ["assigned", "promoted", "paused"];
 
 /**
@@ -188,30 +205,32 @@ export async function publishVersion(deps: Deps, ctx: PublishCtx, input: Publish
 
   const variant = input.variant ?? "standard";
   const key = `${tenant.id}:${v.id}:${variant}`;
-  const existing = (await deps.db.collection<Deployment>("deployments").find({ tenantId: tenant.id, idempotencyKey: key }))[0];
+  const col = deps.db.collection<Deployment>("deployments");
   const now = deps.now().toISOString();
-  let d: Deployment =
-    existing ?? {
-      id: uuidv7(), orgId: tenant.orgId, tenantId: tenant.id, appSlug: v.appSlug, versionId: v.id, version: v.version, variant, idempotencyKey: key,
-      state: "uploading", step: "create_app", intuneAppId: null, contentVersionId: null, fileId: null, sasUri: null, pkg: null, assignments: [],
-      pilotAssignedAt: null, broadAssignedAt: null, failurePct: null, pausedReason: null, error: null, createdAt: now, updatedAt: now,
-    };
-  if (existing && existing.step === "done") return existing;
   const nowMs = deps.now().getTime();
-  if (existing?.leaseUntil && new Date(existing.leaseUntil.split("|")[0]!).getTime() > nowMs)
-    throw new HttpError(409, "publish_in_progress", "This version is already being published to this tenant. Try again in a few minutes.");
-  // Take the lease before any Graph call, then read it back: a concurrent caller that wrote after us wins and we stop.
-  const lease = new Date(nowMs + PUBLISH_LEASE_MS).toISOString();
-  const token = uuidv7();
-  d = { ...d, leaseUntil: `${lease}|${token}` };
-  await deps.db.collection<Deployment>("deployments").put(d);
-  const rows = await deps.db.collection<Deployment>("deployments").find({ tenantId: tenant.id, idempotencyKey: key });
-  if (!existing && rows.some((x) => x.id !== d.id)) {
-    // Two first publishes raced (Mongo's unique index stops the second insert; this covers the rest): the newcomer backs off.
-    await deps.db.collection<Deployment>("deployments").delete(d.id);
-    throw new HttpError(409, "publish_in_progress", "This version is already being published to this tenant.");
+  const lease = `${new Date(nowMs + PUBLISH_LEASE_MS).toISOString()}|${uuidv7()}`;
+  const busy = () => new HttpError(409, "publish_in_progress", "This version is already being published to this tenant. Try again in a few minutes.");
+  // The id is derived from the key, so the insert itself is the atomic one-publish-per-tenant-and-version guard
+  // (Mongo: duplicate `_id`, plus the unique {tenantId, idempotencyKey} index; memory: check and write without an await).
+  const id = `dep_${createHash("sha256").update(key).digest("hex").slice(0, 32)}`;
+  const fresh: Deployment = {
+    id, orgId: tenant.orgId, tenantId: tenant.id, appSlug: v.appSlug, versionId: v.id, version: v.version, variant, idempotencyKey: key,
+    state: "uploading", step: "create_app", intuneAppId: null, contentVersionId: null, fileId: null, sasUri: null, pkg: null, assignments: [],
+    pilotAssignedAt: null, broadAssignedAt: null, failurePct: null, pausedReason: null, error: null, leaseUntil: lease, createdAt: now, updatedAt: now,
+  };
+  let d: Deployment;
+  if (await col.insertIfAbsent(fresh)) d = fresh;
+  else {
+    const existing = (await col.find({ tenantId: tenant.id, idempotencyKey: key }))[0];
+    if (!existing) throw busy();
+    if (existing.step === "done") return existing;
+    const held = existing.leaseUntil ?? null;
+    if (held && new Date(held.split("|")[0]!).getTime() > nowMs) throw busy();
+    // Compare-and-set on the exact lease value we read: of several callers resuming together, exactly one wins.
+    const won = await col.claim(existing.id, { leaseUntil: held }, { leaseUntil: lease });
+    if (!won) throw busy();
+    d = won;
   }
-  if (rows.find((x) => x.id === d.id)?.leaseUntil !== d.leaseUntil) throw new HttpError(409, "publish_in_progress");
 
   const taId = `${tenant.id}:${v.appSlug}`;
   const tas = deps.db.collection<TenantApp>("tenant_apps");

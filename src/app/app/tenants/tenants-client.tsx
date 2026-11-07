@@ -52,7 +52,7 @@ function TenantRow({ initial, canConnect }: { initial: Tenant; canConnect: boole
           <p className="title-3 text-text">{t.name}</p>
           <p className="font-mono caption-2 text-text-subtle">{t.entraTenantId ?? "No Microsoft tenant linked yet"}</p>
         </div>
-        <Badge tone={tone[status]}>{STATUS_LABEL[status]}</Badge>
+        <span aria-live="polite"><Badge tone={tone[status]}>{STATUS_LABEL[status]}</Badge></span>
       </div>
       {status === "waiting_consent" && t.consentSentTo ? <p className="body-6 text-text-subtle">Consent link sent to {t.consentSentTo}. This updates when they approve.</p> : null}
       {t.lastError && status !== "connected" ? <p className="body-6 text-text-subtle">{t.lastError}</p> : null}
@@ -97,7 +97,7 @@ export function TenantsClient({ tenants, canConnect }: { tenants: Tenant[]; canC
       {tenants.length === 0 ? (
         <EmptyState title="No tenants yet" body="Add a customer above. An admin of that Microsoft tenant approves DockCrate once, and it shows as Connected within a minute." />
       ) : (
-        <ul className="flex flex-col gap-4">{tenants.map((t) => <TenantRow key={t.id} initial={t} canConnect={canConnect} />)}</ul>
+        <ul aria-label="Tenants" className="flex flex-col gap-4">{tenants.map((t) => <TenantRow key={t.id} initial={t} canConnect={canConnect} />)}</ul>
       )}
     </div>
   );

@@ -8,6 +8,7 @@ import { catalogSync, fakePipeline } from "@/lib/catalog/sync";
 import { PendingVmLab } from "@/lib/catalog/vmlab";
 import { defaultDeps } from "@/lib/deps";
 import { defaultPublishCtx } from "@/lib/publish/ctx";
+import { publishReconcile } from "@/lib/publish/reconcile";
 import { fanout, ringTick } from "@/lib/rings/engine";
 import { tenantVerifyJob } from "@/lib/tenants";
 import { retryDueDeliveries } from "@/lib/webhooks/outbound";
@@ -18,6 +19,8 @@ export const cronJobs: Record<string, () => Promise<unknown>> = {
   heartbeat: async () => ({ at: new Date().toISOString() }),
   /** Daily: one email per user who chose the digest, with the info and warning alerts since the last one. */
   "alert-digest": async () => alertDigestJob(await defaultDeps()),
+  /** Every 10 minutes: finish or remove uploads a crash left half done (adopts an Intune app that was created but never recorded). */
+  "publish-reconcile": async () => publishReconcile(await defaultDeps(), defaultPublishCtx()),
   "tenant-verify": async () => tenantVerifyJob(await defaultDeps()),
   /** Nightly: count managed devices per tenant and org, start or clear the over-limit grace clock. */
   "device-count": async () => { const deps = await defaultDeps(); return deviceCountJob(deps, new InstallDataDeviceCounter(deps)); },

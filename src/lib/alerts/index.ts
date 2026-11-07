@@ -21,6 +21,20 @@ export async function ensurePrefs(deps: Deps, a: { orgId: string; userId: string
   return next;
 }
 
+/**
+ * Creates (or refreshes) the preference rows for members when they join, so a member who never opens the app still gets
+ * critical alert emails (`raiseAlert` reads these rows). Called by the Better Auth organization hooks and the backfill script.
+ */
+export async function ensureMemberPrefs(deps: Deps, members: { orgId: string; userId: string; email: string; role: string }[]): Promise<number> {
+  let n = 0;
+  for (const m of members) {
+    if (!m.orgId || !m.userId || !m.email) continue;
+    await ensurePrefs(deps, { ...m, email: m.email.toLowerCase() });
+    n++;
+  }
+  return n;
+}
+
 export async function savePrefs(deps: Deps, a: { orgId: string; userId: string; email: string; role: string }, patch: Partial<Pick<AlertPrefs, "inApp" | "emailOn" | "digest" | "mutedTenants">>): Promise<AlertPrefs> {
   const cur = await ensurePrefs(deps, a);
   if (patch.digest && patch.digest !== "instant" && patch.digest !== "daily") throw new HttpError(400, "invalid_input");

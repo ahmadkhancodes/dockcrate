@@ -6,6 +6,7 @@ import { noticeEmail } from "@/lib/mail/templates";
 import { HttpError } from "@/lib/http";
 import { uuidv7 } from "@/lib/ids";
 import { signToken, verifyToken } from "@/lib/signed";
+import { buildProofUrl, newNonce, verifyAdminIdToken } from "./proof";
 import { audit } from "@/lib/audit";
 import { raiseAlert } from "@/lib/alerts";
 export { raiseAlert };
@@ -102,6 +103,8 @@ export interface ConsentResult {
   status: TenantStatus | null;
   tenantId: string | null;
   message: string | null;
+  /** Set when the caller must send the browser through Entra to prove the sign-in is an admin of the tenant. */
+  proofUrl?: string;
 }
 
 /** Verifies the connection by an app-only call. Sets connected (within seconds of consent) or keeps waiting with the reason. */
@@ -137,9 +140,24 @@ export async function handleConsentCallback(
   const entra = p.tenant?.toLowerCase() ?? "";
   if (!/^[0-9a-f-]{36}$/.test(entra) || entra === PERSONAL_MSA_TENANT || String(p.admin_consent).toLowerCase() !== "true")
     return { ok: false, status: tenant.status, tenantId: tenant.id, message: "Microsoft did not return a work or school tenant with admin consent." };
-  // Microsoft's redirect is not signed: anyone holding a valid state for their own row can put any tenant id in the URL,
-  // and Graph would answer for any tenant that ever consented to our app. So a row never changes Microsoft tenant, and
-  // one Microsoft tenant belongs to one DockCrate organization (rows are never deleted, so the claim persists).
+  const refused = await checkBind(deps, tenant, entra);
+  if (refused) return refused;
+  if (deps.requireConsentProof && tenant.entraTenantId !== entra) {
+    // The redirect proves nothing: a signed-in admin of that very tenant must come back through Entra first (REVIEW P1-1).
+    const nonce = newNonce();
+    const state = signToken({ t: tenant.id, o: tenant.orgId, k: "proof", e: entra, n: nonce }, STATE_TTL, deps.now().getTime());
+    await save(deps, tenant, { lastError: null });
+    return { ok: false, status: tenant.status, tenantId: tenant.id, message: null, proofUrl: buildProofUrl({ baseUrl: deps.baseUrl, tenant: entra, state, nonce }) };
+  }
+  return bindTenant(deps, tenant, entra);
+}
+
+/**
+ * Microsoft's consent redirect is not signed: anyone holding a valid state for their own row can put any tenant id in the URL,
+ * and Graph would answer for any tenant that ever consented to our app. So a row never changes Microsoft tenant, and
+ * one Microsoft tenant belongs to one DockCrate organization (rows are never deleted, so the claim persists).
+ */
+async function checkBind(deps: Deps, tenant: Tenant, entra: string): Promise<ConsentResult | null> {
   if (tenant.entraTenantId && tenant.entraTenantId !== entra)
     return { ok: false, status: tenant.status, tenantId: tenant.id, message: "This entry is already linked to a different Microsoft tenant. Add a new tenant to connect another one." };
   const others = (await deps.db.collection<Tenant>("tenants").find({ entraTenantId: entra })).filter((x) => x.id !== tenant.id);
@@ -152,9 +170,37 @@ export async function handleConsentCallback(
       message: `Another DockCrate organization tried to connect ${owner.name}. It was refused. If you did not expect this, review the enterprise app consent in Microsoft Entra.` });
     return { ok: false, status: tenant.status, tenantId: tenant.id, message: "That Microsoft tenant is already connected to another DockCrate organization. Contact support if you manage it." };
   }
+  return null;
+}
+
+async function bindTenant(deps: Deps, tenant: Tenant, entra: string): Promise<ConsentResult> {
   const waiting = await save(deps, tenant, { entraTenantId: entra, status: "waiting_consent", lastError: null });
   const done = await verifyTenant(deps, waiting);
   return { ok: done.status === "connected", status: done.status, tenantId: done.id, message: done.status === "connected" ? null : "Consent received. Waiting for Microsoft to finish propagating it; this page updates on its own." };
+}
+
+const PROOF_REASON: Record<string, string> = {
+  not_admin: "The account you signed in with is not an administrator of that Microsoft tenant (Global, Privileged Role, Application or Cloud Application Administrator).",
+  tenant_mismatch: "You signed in to a different Microsoft tenant than the one being connected.",
+  expired: "The sign in took too long. Start again from the dashboard.",
+};
+
+/** POST /api/tenants/consent/proof (Entra's form_post). Links the tenant only when the id_token's `tid` equals the tenant being linked and its holder is an admin. */
+export async function handleConsentProof(deps: Deps, p: { state?: string | null; id_token?: string | null; error?: string | null; error_description?: string | null }): Promise<ConsentResult> {
+  const st = p.state ? verifyToken<{ t: string; o: string; k: string; e: string; n: string }>(p.state, deps.now().getTime()) : null;
+  if (!st || st.k !== "proof") return { ok: false, status: null, tenantId: null, message: "The sign in expired or is not valid. Start again from the dashboard." };
+  const tenant = await deps.db.collection<Tenant>("tenants").get(st.t);
+  if (!tenant || tenant.orgId !== st.o) return { ok: false, status: null, tenantId: null, message: "That tenant no longer exists." };
+  if (p.error) return { ok: false, status: tenant.status, tenantId: tenant.id, message: `Microsoft sign in failed: ${(p.error_description ?? p.error).slice(0, 200)}` };
+  const refused = await checkBind(deps, tenant, st.e);
+  if (refused) return refused;
+  const proof = await verifyAdminIdToken(p.id_token, { tenant: st.e, clientId: entraClientId() ?? "", nonce: st.n, now: deps.now().getTime(), fetchImpl: deps.fetch });
+  if (!proof.ok) {
+    await audit({ orgId: tenant.orgId, actorId: null, action: "tenant.consent_proof_failed", target: tenant.id, meta: { tenantId: tenant.id, reason: proof.reason } });
+    return { ok: false, status: tenant.status, tenantId: tenant.id, message: PROOF_REASON[proof.reason] ?? "Microsoft did not confirm that you administer that tenant." };
+  }
+  await audit({ orgId: tenant.orgId, actorId: null, action: "tenant.consent_proof_ok", target: tenant.id, meta: { tenantId: tenant.id } });
+  return bindTenant(deps, tenant, st.e);
 }
 
 /** Signed, expiring link an IT admin opens without a DockCrate account. Consent itself authenticates them. */
