@@ -1,6 +1,7 @@
 import { MongoClient, type Collection, type Db as MongoDatabase, type Document } from "mongodb";
 import { chainEntry } from "@/lib/audit-chain";
 import { uuidv7 } from "@/lib/ids";
+import { log } from "@/lib/logger";
 import { DELIVERY_TTL_DAYS, type AuditEntry, type Collection as AppCollection, type BillingAccount, type Db, type Entitlement, type Suppression, type WebhookDelivery, type WebhookEndpoint } from "./types";
 
 // Ported from trayo server/db/mongo.ts. Changes: global singleton client (Vercel), pool 10, Date TTLs,
@@ -24,7 +25,11 @@ type WithId<T> = T & { _id: string };
 
 export function createMongoDb(uri: string, dbName: string, app: string): Db {
   let dbp: Promise<MongoDatabase> | null = null;
-  const db = () => (dbp ??= mongoClient(uri).then((c) => c.db(dbName)));
+  const db = () => (dbp ??= mongoClient(uri).then((c) => {
+    const d = c.db(dbName);
+    void scheduleIndexes(d, `${uri}|${dbName}`); // not awaited: never delays or fails a request
+    return d;
+  }));
   const col = async <T extends Document>(name: string) => (await db()).collection<T>(name) as unknown as Collection<T>;
   const strip = <T>(d: (T & { _id?: unknown; app?: string }) | null): T | null => {
     if (!d) return null;
@@ -254,35 +259,69 @@ export function createMongoDb(uri: string, dbName: string, app: string): Db {
   };
 }
 
-/** Indexes, created once by scripts/ensure-indexes.ts (never per cold start). TTLs are on Date fields. */
-export async function ensureIndexes(uri: string, dbName: string) {
-  const d = (await mongoClient(uri)).db(dbName);
-  await d.collection("billing_accounts").createIndex({ app: 1, stripeCustomerId: 1 }, { unique: true, partialFilterExpression: { stripeCustomerId: { $type: "string" } } });
-  await d.collection("stripe_events").createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
-  await d.collection("rate_limits").createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
-  await d.collection("usage").createIndex({ app: 1, orgId: 1, period: 1 });
-  await d.collection("audit_log").createIndex({ app: 1, orgId: 1, at: -1 });
-  await d.collection("audit_log").createIndex({ app: 1, orgId: 1, seq: 1 }, { unique: true, partialFilterExpression: { seq: { $type: "number" } } });
-  await d.collection("webhook_endpoints").createIndex({ app: 1, orgId: 1 });
-  await d.collection("webhook_deliveries").createIndex({ app: 1, orgId: 1, createdAt: -1 });
-  await d.collection("webhook_deliveries").createIndex({ app: 1, status: 1, nextAttemptAt: 1 });
-  await d.collection("webhook_deliveries").createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
-  await d.collection("suppressions").createIndex({ app: 1, email: 1 });
+/** Index creation for a database handle. TTLs are on Date fields. Conflicting existing indexes (codes 85/86) are logged, not thrown. */
+export async function createAllIndexes(d: MongoDatabase) {
+  const ix = async (name: string, keys: Document, opts: Document = {}) => {
+    try {
+      await d.collection(name).createIndex(keys as never, opts);
+    } catch (e) {
+      const code = (e as { code?: number }).code;
+      if (code !== 85 && code !== 86) throw e;
+      log.warn("index conflict, left as is", { collection: name, code: String(code) });
+    }
+  };
+  await ix("billing_accounts", { app: 1, stripeCustomerId: 1 }, { unique: true, partialFilterExpression: { stripeCustomerId: { $type: "string" } } });
+  await ix("stripe_events", { expireAt: 1 }, { expireAfterSeconds: 0 });
+  await ix("rate_limits", { expireAt: 1 }, { expireAfterSeconds: 0 });
+  await ix("usage", { app: 1, orgId: 1, period: 1 });
+  await ix("audit_log", { app: 1, orgId: 1, at: -1 });
+  await ix("audit_log", { app: 1, orgId: 1, seq: 1 }, { unique: true, partialFilterExpression: { seq: { $type: "number" } } });
+  await ix("webhook_endpoints", { app: 1, orgId: 1 });
+  await ix("webhook_deliveries", { app: 1, orgId: 1, createdAt: -1 });
+  await ix("webhook_deliveries", { app: 1, status: 1, nextAttemptAt: 1 });
+  await ix("webhook_deliveries", { expireAt: 1 }, { expireAfterSeconds: 0 });
+  await ix("suppressions", { app: 1, email: 1 });
   // DockCrate domain collections (documents carry `app` and `id` = _id)
-  await d.collection("dc_tenants").createIndex({ app: 1, orgId: 1, entraTenantId: 1 }, { unique: true, partialFilterExpression: { entraTenantId: { $type: "string" } } });
-  await d.collection("dc_deployments").createIndex({ app: 1, tenantId: 1, idempotencyKey: 1 }, { unique: true });
-  await d.collection("dc_deployments").createIndex({ app: 1, state: 1 });
-  await d.collection("dc_catalog_versions").createIndex({ app: 1, appSlug: 1 });
-  await d.collection("dc_tenant_apps").createIndex({ app: 1, tenantId: 1, appSlug: 1 }, { unique: true });
-  await d.collection("dc_alerts").createIndex({ app: 1, orgId: 1, createdAt: -1 });
+  await ix("dc_tenants", { app: 1, orgId: 1, entraTenantId: 1 }, { unique: true, partialFilterExpression: { entraTenantId: { $type: "string" } } });
+  await ix("dc_deployments", { app: 1, tenantId: 1, idempotencyKey: 1 }, { unique: true });
+  await ix("dc_deployments", { app: 1, state: 1 });
+  await ix("dc_catalog_versions", { app: 1, appSlug: 1 });
+  await ix("dc_tenant_apps", { app: 1, tenantId: 1, appSlug: 1 }, { unique: true });
+  await ix("dc_alerts", { app: 1, orgId: 1, createdAt: -1 });
   // Better Auth collections
-  await d.collection("user").createIndex({ email: 1 }, { unique: true });
-  await d.collection("session").createIndex({ token: 1 }, { unique: true });
-  await d.collection("session").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-  await d.collection("verification").createIndex({ identifier: 1 });
-  await d.collection("verification").createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-  await d.collection("member").createIndex({ organizationId: 1, userId: 1 }, { unique: true });
-  await d.collection("organization").createIndex({ slug: 1 }, { unique: true });
-  await d.collection("apikey").createIndex({ key: 1 });
+  await ix("user", { email: 1 }, { unique: true });
+  await ix("session", { token: 1 }, { unique: true });
+  await ix("session", { expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await ix("verification", { identifier: 1 });
+  await ix("verification", { expiresAt: 1 }, { expireAfterSeconds: 0 });
+  await ix("member", { organizationId: 1, userId: 1 }, { unique: true });
+  await ix("organization", { slug: 1 }, { unique: true });
+  await ix("apikey", { key: 1 });
   return DELIVERY_TTL_DAYS;
+}
+
+/** Manual path (npm run db:indexes). */
+export async function ensureIndexes(uri: string, dbName: string) {
+  return createAllIndexes((await mongoClient(uri)).db(dbName));
+}
+
+declare global {
+  var __kitIndexes: Map<string, Promise<void>> | undefined;
+}
+
+/**
+ * Fire-and-forget, once per server instance and database. Never throws, never awaited by requests.
+ * Skipped during `next build`. A failure is logged (scrubbed) and retried on the next cold start.
+ */
+export function scheduleIndexes(d: MongoDatabase, key: string): Promise<void> | undefined {
+  if (process.env.NEXT_PHASE === "phase-production-build") return undefined;
+  const memo = (globalThis.__kitIndexes ??= new Map());
+  const hit = memo.get(key);
+  if (hit) return hit;
+  const p = createAllIndexes(d).then(
+    () => undefined,
+    (e) => log.warn("auto index creation failed", { code: String((e as { code?: unknown }).code ?? "unknown"), name: (e as Error)?.name }),
+  );
+  memo.set(key, p);
+  return p;
 }
