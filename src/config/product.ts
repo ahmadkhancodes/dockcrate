@@ -49,17 +49,17 @@ export const product = {
   companyUrl: "https://buffersoltech.com",
   host: "dockcrate.buffersoltech.com",
   url: process.env.NEXT_PUBLIC_APP_URL ?? "https://dockcrate.buffersoltech.com",
-  supportEmail: "support@buffersoltech.com",
-  legalEmail: "legal@buffersoltech.com",
+  supportEmail: "contact@buffersoltech.com",
+  legalEmail: "contact@buffersoltech.com",
   mailFrom: "DockCrate <hello@dockcrate.buffersoltech.com>",
   description:
     "MSP-first Intune app packaging and patching. No app version publishes until its hash, signer and malware scan checks pass, and a version without a clean-VM install test stays in the Pilot ring. It is published to your own Intune tenant as a Win32 app and kept updated through Pilot and Broad rings with auto-pause and one-click rollback.",
   tagline: "Third-party apps for Intune, packaged, inspected and shipped in rings.",
   /** Legal entity details used by the legal templates. */
   legal: {
-    entity: "BufferSol Technologies",
-    jurisdiction: "{{jurisdiction}}",
-    address: "{{registered address}}",
+    entity: "BufferSol Technologies LLC",
+    jurisdiction: "the State of New York, United States",
+    address: "447 W Broadway, 2nd Floor Suite #1964, New York, NY 10013, United States",
     effectiveDate: "2026-11-05",
   },
   subProcessors: [
