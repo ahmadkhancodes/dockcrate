@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Section } from "@/components/ui/layout";
 import { Notice } from "@/components/ui/states";
 import { CatalogSearch } from "@/components/dock/catalog-search";
+import { ogImages, twitterImages } from "@/lib/seo";
 import { product } from "@/config/product";
 import { listCatalog } from "@/lib/catalog";
 import { toRow } from "@/lib/catalog/view";
@@ -16,7 +17,8 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: "/catalog" },
-  openGraph: { title: `${title} · ${product.fullName}`, description, url: "/catalog" },
+  openGraph: { title: `${title} · ${product.fullName}`, description, url: "/catalog", images: ogImages() },
+  twitter: { card: "summary_large_image", images: twitterImages() },
 };
 
 export default async function CatalogPage() {

@@ -12,6 +12,7 @@ import { InspectionTag } from "@/components/dock/crate";
 import { toCrate } from "@/lib/catalog/view";
 import { getDb } from "@/lib/db";
 import { qaStages, vmPendingNote } from "@/content/security";
+import { ogImages, twitterImages } from "@/lib/seo";
 import { product } from "@/config/product";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!e) return {};
   const c = { slug: e.app.slug, name: e.app.name, version: e.version.version };
   const title = `${c.name} ${c.version} QA log (sample)`;
-  return { title, description: `Sample QA log for ${c.name} ${c.version}: hash, signer, scan and VM checks.`, alternates: { canonical: `/catalog/${c.slug}` }, robots: { index: false }, openGraph: { title: `${title} · ${product.fullName}`, url: `/catalog/${c.slug}` } };
+  return { title, description: `Sample QA log for ${c.name} ${c.version}: hash, signer, scan and VM checks.`, alternates: { canonical: `/catalog/${c.slug}` }, robots: { index: false }, openGraph: { title: `${title} · ${product.fullName}`, url: `/catalog/${c.slug}`, images: ogImages() }, twitter: { card: "summary_large_image", images: twitterImages() } };
 }
 
 const detail: Record<string, (v: string) => string> = {

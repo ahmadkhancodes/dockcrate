@@ -21,7 +21,7 @@ export default function DocsIndexPage() {
         {docGroups.map((g) => (
           <section key={g.title} aria-labelledby={`g-${g.title}`} className="flex flex-col gap-4">
             <h2 id={`g-${g.title}`} className="title-2 text-text">{g.title}</h2>
-            <ul className="grid gap-4 md:grid-cols-2">
+            <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {g.docs.map((d) => (
                 <li key={d.slug}>
                   <Link
