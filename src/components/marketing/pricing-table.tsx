@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Check } from "@phosphor-icons/react/dist/ssr";
-import { product, plans, type Interval, type Plan, type PlanPrice } from "@/config/product";
+import { earlyAccessCopy, product, plans, type Interval, type Plan, type PlanPrice } from "@/config/product";
 import { buttonClass } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/components/ui/cn";
@@ -35,7 +35,7 @@ const ROADMAP = /macOS|Scheduled windows|Client PDF|Custom Apps|Defender|Policy 
 const RISK_FREE = "No credit card needed.";
 const RISK_PAID = "Cancel anytime from your account.";
 
-export function PricingTable({ id = "pricing", title }: { id?: string; title?: string }) {
+export function PricingTable({ id = "pricing", title, earlyAccess = false }: { id?: string; title?: string; earlyAccess?: boolean }) {
   const [interval, setBilling] = useState<Interval>(product.defaultInterval);
   const saving = annualSavings();
   const education = plans.find((p) => p.educationUsd)?.educationUsd;
@@ -76,7 +76,7 @@ export function PricingTable({ id = "pricing", title }: { id?: string; title?: s
         {plans.map((plan) => {
           const price = priceFor(plan, interval);
           const free = !price;
-          const href = `/sign-in?plan=${plan.id}&interval=${price?.interval ?? interval}`;
+          const href = earlyAccess ? `/early-access?plan=${plan.id}` : `/sign-in?plan=${plan.id}&interval=${price?.interval ?? interval}`;
           return (
             <li
               key={plan.id}
@@ -97,7 +97,7 @@ export function PricingTable({ id = "pricing", title }: { id?: string; title?: s
                 <span className="body-6 text-text-subtle">{free ? "free" : `per ${price.interval}`}</span>
               </p>
               <div className="pb-3">
-                <Link href={href} className={cn(buttonClass(plan.featured ? "primary" : "secondary", "md"), "w-full")}>{plan.cta}</Link>
+                <Link href={href} className={cn(buttonClass(plan.featured ? "primary" : "secondary", "md"), "w-full")}>{earlyAccess ? earlyAccessCopy.pricingCta : plan.cta}</Link>
               </div>
               <p className="caption-2 pb-6 text-text-subtle">{free ? RISK_FREE : RISK_PAID}</p>
               <ul className="flex flex-col gap-2 border-t border-border pt-6">

@@ -11,7 +11,8 @@ import {
 import { PermissionTable } from "@/components/marketing/trust";
 import { BayTrack, CheckChips, CrateLabel, CrateMonogram, DemoNote, InspectionTag } from "@/components/dock/crate";
 import { DockOverview, HeroDock } from "@/components/dock/dock-preview";
-import { freePlan, plans, product } from "@/config/product";
+import { cadence, freePlan, plans, product } from "@/config/product";
+import { earlyAccessOpen, primaryCta } from "@/lib/early-access";
 import { CHECKED } from "@/content/compare";
 import { demoCrates, type Checks } from "@/content/demo";
 import { qaStages, vmPendingNote } from "@/content/security";
@@ -49,7 +50,7 @@ const steps: Step[] = [
   },
   {
     title: "Pick your rings",
-    body: "Choose a Pilot and a Broad group. Defaults: Pilot 0 h, Broad 48 h. A ring pauses itself when more than 10% of its devices fail.",
+    body: `Choose a Pilot and a Broad group. Defaults: Pilot 0 h, Broad 48 h. When more than 10% of a ring's devices fail, Broad is paused ${cadence.ringPauseWhen}.`,
     visual: (
       <div className="flex flex-col gap-4 rounded-md border border-border bg-surface-raised p-4 md:p-6">
         <BayTrack bays={["done", "active", "idle"]} />
@@ -63,7 +64,7 @@ const steps: Step[] = [
   },
   {
     title: "Publish and let it update",
-    body: "Search an app, publish, and it shows up in Intune. New versions go to Pilot first, then Broad, or pause themselves. Target: search to published in under 120 s median.",
+    body: "Search an app, publish, and it shows up in Intune. New versions go to Pilot first, then Broad, and Broad pauses when Pilot fails.",
     visual: (
       <ul className="rounded-md border border-border bg-surface-raised">
         {demoCrates.slice(0, 3).map((c) => (
@@ -89,7 +90,7 @@ const faq: FaqItem[] = [
   { q: "Another vendor with write access to all my tenants?", a: "We ask for 3 Graph permissions and the security page lists what each allows and does not allow. Every version has a public QA log, no login. Publisher verification with Microsoft Partner Center is in progress and we will show its status on the security page." },
   { q: "Will you be around in two years?", a: "DockCrate by BufferSol is a BufferSol Technologies product. Apps we publish stay in your Intune if you cancel, and you can export your data as CSV at any time." },
   { q: "Do I have Enterprise App Management?", a: "It is included in Microsoft 365 E5. It is not in E3 or Business Premium, where it is an add on. A three question checker is planned." },
-  { q: "What about winget supply chain risk?", a: "Every version passes four checks: hash, signer, scan and VM. New versions go to Pilot first, Broad waits 48 h by default, and a ring pauses itself when installs fail." },
+  { q: "What about winget supply chain risk?", a: `Every version passes four checks: hash, signer, scan and VM. New versions go to Pilot first, Broad waits 48 h by default, and Broad is paused ${cadence.ringPauseWhen} when Pilot installs fail.` },
   { q: "Why not free IntuneGet or Robopack's free tier?", a: "Both have real strengths: IntuneGet is free and open source, and Robopack has a bigger catalog. We add support, multi tenant operations for MSPs, and rings with rollback on every plan." },
   { q: "What happens to my apps if I cancel?", a: "Leave them in Intune, or remove only the apps prefixed \"DC |\". You can export your data as CSV." },
   { q: "Which Windows apps, and how many?", a: "The catalog size shown is the real verified count at launch. The MVP target is 200 verified apps. Unknown installer types go to manual review and are never guessed." },
@@ -98,17 +99,21 @@ const faq: FaqItem[] = [
 
 const demoChecks: Checks = { hash: "pass", signer: "pass", scan: "pass", vm: "pending" };
 
+const earlyNote = "Early access is by request. Tell us about your fleet and we open your tenant connection.";
+
 export default function HomePage() {
   const sevenZip = demoCrates[1]!;
+  const open = earlyAccessOpen();
+  const cta = primaryCta(open);
   return (
     <>
       <Hero
         eyebrow="Works with Microsoft Intune"
         title={<>Third-party apps for Intune, packaged, inspected and shipped in <span className="text-action">rings</span></>}
         subtitle="Multi-tenant from $24.99/mo. No version reaches a device until its hash, signer and malware checks pass. Pilot first, Broad later."
-        primaryCta={{ href: "/sign-in", label: "Start free with Microsoft" }}
+        primaryCta={cta}
         secondaryCta={{ href: "/catalog", label: "Browse the public catalog" }}
-        note={freeLine}
+        note={open ? earlyNote : freeLine}
         proof={[
           { value: "3", label: "Graph permissions, each explained" },
           { value: "4", label: "checks before a version ships" },
@@ -116,6 +121,23 @@ export default function HomePage() {
         ]}
         visual={<HeroDock />}
       />
+
+      <Section labelledBy="status-title">
+        <div className="grid gap-8 md:grid-cols-2">
+          <div className="flex flex-col gap-3 rounded-md border border-border bg-surface p-6">
+            <h2 id="status-title" className="heading-6 text-text">Available today</h2>
+            <ul className="flex flex-col gap-2 body-4 text-text-subtle">
+              <li>The public catalog, with an inspection tag and a QA log on every version.</li>
+              <li>The .intunewin packer.</li>
+              <li>The rings model: Pilot, Broad, auto-pause and rollback.</li>
+            </ul>
+          </div>
+          <div className="flex flex-col gap-3 rounded-md border border-border bg-surface p-6">
+            <h2 className="heading-6 text-text">{open ? "Coming with early access" : "Connect your tenant"}</h2>
+            <p className="body-4 text-text-subtle">{open ? "Publishing into your own Intune tenant, with the three Graph permissions listed on the security page. Early access users are connected first." : "Publishing into your own Intune tenant, with the three Graph permissions listed on the security page."}</p>
+          </div>
+        </div>
+      </Section>
 
       <Section tone="raised" labelledBy="dock-title">
         <div className="flex max-w-2xl flex-col gap-4">
@@ -158,7 +180,7 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-3"><InspectionTag checks={demoChecks} /><CheckChips checks={demoChecks} /></div>
               <p className="body-6 text-text-subtle">{vmPendingNote}</p>
             </div>
-            <p className="body-2 text-text">Every version has a public QA log. No login. <Link href="/catalog/7-zip" className="inline-flex min-h-11 items-center gap-1 underline underline-offset-4 hover:text-action focus-visible:focus-ring">Read a sample QA log <ArrowRight size={16} aria-hidden /></Link></p>
+            <p className="body-2 text-text">Every version has a public QA log. No login. <Link href="/catalog/7-zip" className="inline-flex min-h-11 items-center gap-1 underline underline-offset-4 hover:text-action focus-visible:focus-ring">Read an example QA log <ArrowRight size={16} aria-hidden /></Link></p>
           </div>
         </div>
       </Section>
@@ -175,7 +197,7 @@ export default function HomePage() {
         <p className="mt-4 flex flex-wrap gap-x-6">
           <Link href="/security" className="inline-flex min-h-11 items-center gap-1 button-sm underline underline-offset-4 hover:text-action focus-visible:focus-ring">Security page <ArrowRight size={16} aria-hidden /></Link>
           <Link href="/legal/dpa" className="inline-flex min-h-11 items-center button-sm underline underline-offset-4 hover:text-action focus-visible:focus-ring">Data processing agreement</Link>
-          <Link href="/catalog/7-zip" className="inline-flex min-h-11 items-center button-sm underline underline-offset-4 hover:text-action focus-visible:focus-ring">Sample QA log</Link>
+          <Link href="/catalog/7-zip" className="inline-flex min-h-11 items-center button-sm underline underline-offset-4 hover:text-action focus-visible:focus-ring">Example QA log</Link>
         </p>
       </Section>
 
@@ -228,8 +250,8 @@ export default function HomePage() {
 
       <FinalCta
         title="Your dock is empty. Start with the 5 apps your devices already have."
-        cta={{ href: "/sign-in", label: "Start free with Microsoft" }}
-        note={freeLine}
+        cta={cta}
+        note={open ? earlyNote : freeLine}
       />
 
       <script

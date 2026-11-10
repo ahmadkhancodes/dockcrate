@@ -1,4 +1,4 @@
-import { product as p } from "@/config/product";
+import { cadence, product as p } from "@/config/product";
 import type { DocPage } from "./types";
 
 export const rings: DocPage = {
@@ -16,7 +16,7 @@ export const rings: DocPage = {
     {
       heading: "Auto-pause",
       body: [
-        "Every minute we read install results for Pilot devices. If the failure rate reaches the threshold, the deployment is paused: Broad is not assigned, an alert is raised on both channels and an audit entry is written. You can roll back or review the log from the dock.",
+        `${cadence.ringReadSentence} If the failure rate reaches the threshold, the deployment is paused ${cadence.ringPauseWhen}: Broad is not assigned, an alert is raised on both channels and an audit entry is written. You can roll back or review the log from the dock.`,
         "A version also reaches Broad only when it has passed all four checks, including the VM test. Until the Windows lab is running, versions publish to Pilot only.",
       ],
     },

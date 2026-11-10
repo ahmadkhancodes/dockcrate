@@ -21,6 +21,8 @@ const schema = z.object({
   ADMIN_EMAILS: z.string().optional(),
   /** Multi tenant Entra app registration (docs/MANUAL_STEPS.md). Unset = stub mode (fake Graph, email link sign in). */
   ENTRA_CLIENT_ID: z.string().optional(),
+  /** "1" keeps the early-access gate closed even when Entra is configured. */
+  EARLY_ACCESS: z.string().optional(),
   ENTRA_CLIENT_SECRET: z.string().optional(),
   /** PEM private key of the certificate uploaded to the app registration (MANUAL_STEPS 3, 4) and its thumbprint (SHA-1 hex as Entra shows it, or SHA-256). */
   ENTRA_CLIENT_CERT_PRIVATE_KEY_PEM: z.string().optional(),

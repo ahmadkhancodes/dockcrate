@@ -3,32 +3,12 @@
   "framework": "nextjs",
   "crons": [
     {
-      "path": "/api/cron/webhook-retries",
-      "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/rings-tick",
-      "schedule": "* * * * *"
-    },
-    {
-      "path": "/api/cron/device-count",
+      "path": "/api/cron/daily",
       "schedule": "30 2 * * *"
     },
     {
       "path": "/api/cron/alert-digest",
       "schedule": "0 7 * * *"
-    },
-    {
-      "path": "/api/cron/tenant-verify",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/cron/publish-reconcile",
-      "schedule": "*/10 * * * *"
-    },
-    {
-      "path": "/api/cron/catalog-sync",
-      "schedule": "0 4 * * *"
     }
   ]
 }

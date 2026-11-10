@@ -153,3 +153,33 @@ export const planForLookupKey = (key: string | null | undefined): { plan: Plan; 
   for (const plan of plans) for (const p of plan.prices) if (p.lookupKey === key) return { plan, price: p };
   return null;
 };
+
+/**
+ * Background cadence. ONE constant: production runs on Vercel Hobby, where the scheduler fires at most once a day
+ * (two cron entries) and functions stop at 60 s. Flip to "frequent" only when a faster scheduler (Cloudflare Worker
+ * cron or a VPS worker) calls /api/cron/<job> every minute; every public page reads its wording from here.
+ */
+export const CADENCE_MODE: "daily" | "frequent" = "daily";
+const CADENCE_COPY = {
+  daily: {
+    ringCheck: "once a day",
+    ringReadSentence: "Once a day we read install results for Pilot devices.",
+    ringPauseWhen: "at the next daily check",
+    webhookRetry: "The first attempt is immediate. A failed delivery is retried by the daily run, up to 8 attempts, each after its backoff has passed (30 seconds, 2 minutes, 10 minutes, 30 minutes, 1 hour, 3 hours, 6 hours, 12 hours).",
+  },
+  frequent: {
+    ringCheck: "every minute",
+    ringReadSentence: "Every minute we read install results for Pilot devices.",
+    ringPauseWhen: "within a minute",
+    webhookRetry: "Failed deliveries are retried with backoff at 30 seconds, 2 minutes, 10 minutes, 30 minutes, 1 hour, 3 hours, 6 hours and 12 hours. That is up to 8 attempts.",
+  },
+} as const;
+export const cadence = { mode: CADENCE_MODE, ...CADENCE_COPY[CADENCE_MODE] };
+
+/** Early-access wording shared by the landing page, pricing, sign-in and the form. */
+export const earlyAccessCopy = {
+  cta: "Get early access",
+  pricingCta: "Join early access",
+  signInLine: "Microsoft work-account sign-in opens with early access. Use an email link meanwhile.",
+  realToday: "Available today: the public catalog with inspection tags and QA logs, the .intunewin packer and the rings model. Coming with early access: publishing into your own Intune tenant.",
+};

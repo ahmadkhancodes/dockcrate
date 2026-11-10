@@ -24,8 +24,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const e = await getCatalogEntry(await getDb(), slug);
   if (!e) return {};
   const c = { slug: e.app.slug, name: e.app.name, version: e.version.version };
-  const title = `${c.name} ${c.version} QA log (sample)`;
-  return { title, description: `Sample QA log for ${c.name} ${c.version}: hash, signer, scan and VM checks.`, alternates: { canonical: `/catalog/${c.slug}` }, robots: { index: false }, openGraph: { title: `${title} · ${product.fullName}`, url: `/catalog/${c.slug}`, images: ogImages() }, twitter: { card: "summary_large_image", images: twitterImages() } };
+  const title = `${c.name} ${c.version} QA log`;
+  return { title, description: `QA log for ${c.name} ${c.version}: hash, signer, scan and VM checks.`, alternates: { canonical: `/catalog/${c.slug}` }, robots: { index: false }, openGraph: { title: `${title} · ${product.fullName}`, url: `/catalog/${c.slug}`, images: ogImages() }, twitter: { card: "summary_large_image", images: twitterImages() } };
 }
 
 const detail: Record<string, (v: string) => string> = {
@@ -53,7 +53,7 @@ export default async function CratePage({ params }: Props) {
       <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-6"><CrateLabel crate={c} /></div>
         <div className="flex flex-col gap-4 lg:col-span-6">
-          <p className="font-mono caption-2 text-text-subtle">Last tested {v.testedAt} (sample)</p>
+          <p className="font-mono caption-2 text-text-subtle">Last tested {v.testedAt} , illustrative</p>
           <ol className="flex flex-col">
             {qaStages.map((s, i) => {
               const state = c.checks[keys[i]!];

@@ -69,3 +69,6 @@ Standing decisions are in docs/factory/BATCH1_PLAN.md (Mongo instead of Postgres
 - **D-51 Focus and control tokens.** `--focus` light is dark amber (#9a5b00), `--text-muted` and `--warning` darkened, and a new `--control-border` token carries input edges. Contrast is asserted over the real tokens in `tests/unit/a11y.test.ts`.
 
 - **D-52 Auto indexes.** `scheduleIndexes` (mongo.ts) runs `createAllIndexes` once per instance after the first connection, never awaited, never during build; index option conflicts (85/86) and other errors are logged and retried on the next cold start.
+
+## D-ads-1 (10 Nov 2026): honest cadence and early access
+Production is Vercel Hobby (daily cron, 60 s functions, no worker). Copy about background timing reads `cadence` in `src/config/product.ts`; flip `CADENCE_MODE` to "frequent" once a faster scheduler calls the jobs. Early access is open when `ENTRA_CLIENT_ID` is unset or `EARLY_ACCESS=1` (`src/lib/early-access.ts`). Leads live in the Db collection `leads` (Mongo `dc_leads`), one per email.

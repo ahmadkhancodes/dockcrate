@@ -19,7 +19,7 @@ import { catalogSync, fakePipeline } from "@/lib/catalog/sync";
 import type { CatalogApp, CatalogVersion } from "@/lib/catalog/types";
 import { verifyVersion } from "@/lib/catalog/verify";
 import { PendingVmLab } from "@/lib/catalog/vmlab";
-import { cronJobs } from "@/lib/cron/jobs";
+import { DAILY_SEQUENCE, cronJobs } from "@/lib/cron/jobs";
 import { mspOverview, parseMspFilter } from "@/lib/msp/overview";
 import { BufferInstallerSource } from "@/lib/publish/installer";
 import type { PublishCtx } from "@/lib/publish/win32";
@@ -449,10 +449,13 @@ describe("MSP overview", () => {
 });
 
 describe("cron configuration", () => {
-  it("vercel.json schedules rings-tick every minute plus the nightly jobs, and each job exists", () => {
+  it("vercel.json fits Vercel Hobby: two daily entries, and the daily run covers every background job", () => {
     const crons = vercel.crons as { path: string; schedule: string }[];
-    expect(crons.find((c) => c.path === "/api/cron/rings-tick")?.schedule).toBe("* * * * *");
-    for (const c of crons) expect(cronJobs[c.path.replace("/api/cron/", "")], c.path).toBeTypeOf("function");
-    for (const p of ["/api/cron/device-count", "/api/cron/catalog-sync"]) expect(crons.some((c) => c.path === p)).toBe(true);
+    expect(crons.length).toBeLessThanOrEqual(2);
+    for (const c of crons) {
+      expect(c.schedule, c.path).toMatch(/^\d+ \d+ \* \* \*$/);
+      expect(cronJobs[c.path.replace("/api/cron/", "")], c.path).toBeTypeOf("function");
+    }
+    for (const j of ["rings-tick", "device-count", "catalog-sync", "webhook-retries", "tenant-verify", "publish-reconcile"]) expect(DAILY_SEQUENCE, j).toContain(j);
   });
 });

@@ -15,7 +15,7 @@ export const connectATenant: DocPage = {
     {
       heading: "Connect",
       body: [
-        "Open Tenants, choose Connect a tenant and name it. If you are a Global Admin, approve the consent screen. The tenant shows Connected within about a minute, after we run a test call against it.",
+        "Open Tenants, choose Connect a tenant and name it. If you are a Global Admin, approve the consent screen. The tenant shows Connected as soon as Microsoft sends you back, after we run a test call against it.",
         "If you are not a Global Admin, choose Send consent link and enter the admin's email. The link works for 7 days. The tenant shows Waiting for admin until it is approved.",
         "Until Microsoft Partner Center publisher verification completes, the consent screen shows the app as unverified. That is expected and listed on the security page.",
       ],

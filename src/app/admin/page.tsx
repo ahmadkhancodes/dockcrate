@@ -1,6 +1,7 @@
 import { DataTable, Td } from "@/components/app/data-table";
 import { PageHeader } from "@/components/app/page-header";
 import { fmt } from "@/components/app/labels";
+import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/states";
 import { adminOverview } from "@/lib/admin";
 import { getFlags } from "@/lib/flags";
@@ -14,7 +15,7 @@ export default async function AdminPage() {
   ];
   return (
     <>
-      <PageHeader title="Admin overview" description="Totals across every organization. Visible to founder accounts only." />
+      <PageHeader title="Admin overview" description="Totals across every organization. Visible to founder accounts only." actions={<ButtonLink href="/admin/leads" variant="secondary">Early-access leads</ButtonLink>} />
       <div className="flex flex-col gap-8">
         <dl className="grid gap-4 sm:grid-cols-3">
           {stats.map((s) => (

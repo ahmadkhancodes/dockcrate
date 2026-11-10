@@ -7,6 +7,7 @@ import { FinalCta } from "@/components/marketing/final-cta";
 import { dataHandling, vmPendingNote } from "@/content/security";
 import { ogImages, twitterImages } from "@/lib/seo";
 import { product } from "@/config/product";
+import { earlyAccessOpen, primaryCta } from "@/lib/early-access";
 
 const title = "Security";
 const description = "The three Microsoft Graph permissions DockCrate by BufferSol asks for, what each allows and does not allow, and the four checks every version passes.";
@@ -22,6 +23,8 @@ export const metadata: Metadata = {
 const linkClass = "underline underline-offset-4 hover:text-action focus-visible:focus-ring";
 
 export default function SecurityPage() {
+  const open = earlyAccessOpen();
+  const cta = primaryCta(open);
   return (
     <>
       <Section labelledBy="security-title" className="pt-24 md:pt-32">
@@ -41,7 +44,7 @@ export default function SecurityPage() {
         <div className="mt-12"><QaPipeline /></div>
         <div className="mt-8 overflow-x-auto rounded-md border border-border bg-surface p-4"><QaPipelineDiagram /></div>
         <p className="body-6 mt-6 max-w-2xl text-text-subtle">{vmPendingNote}</p>
-        <div className="mt-6"><ButtonLink href="/catalog/7-zip" variant="secondary">Read a sample QA log</ButtonLink></div>
+        <div className="mt-6"><ButtonLink href="/catalog/7-zip" variant="secondary">Read an example QA log</ButtonLink></div>
       </Section>
 
       <Section labelledBy="data-title">
@@ -73,7 +76,7 @@ export default function SecurityPage() {
           </ul>
         </div>
       </Section>
-      <FinalCta title="Connect one tenant and read the audit log yourself." cta={{ href: "/sign-in", label: "Start free with Microsoft" }} note="Free plan, no card." />
+      <FinalCta title="Connect one tenant and read the audit log yourself." cta={cta} note={open ? "Early access is by request." : "Free plan, no card."} />
     </>
   );
 }

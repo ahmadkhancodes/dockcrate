@@ -12,7 +12,7 @@ type Phase = "idle" | "sending" | "sent";
 const WORK_ONLY = "DockCrate by BufferSol needs a work or school account. Personal Microsoft accounts (outlook.com, hotmail.com, live.com) cannot sign in.";
 const isAccountError = (e?: string) => !!e && /work|account_not|unable_to_get_user_info|invalid_issuer|tenant/i.test(e);
 
-export function SignInForm({ callbackURL, expiredLink, stubMode, oauthError }: { callbackURL: string; expiredLink?: boolean; stubMode?: boolean; oauthError?: string }) {
+export function SignInForm({ callbackURL, expiredLink, earlyAccess, oauthError }: { callbackURL: string; expiredLink?: boolean; earlyAccess?: boolean; oauthError?: string }) {
   const [msBusy, setMsBusy] = useState(false);
   async function microsoft() {
     setMsBusy(true);
@@ -86,16 +86,14 @@ export function SignInForm({ callbackURL, expiredLink, stubMode, oauthError }: {
     <div className="flex flex-col gap-3">
       {oauthError && !expiredLink ? <Notice tone="warning" title="Sign in did not complete">{isAccountError(oauthError) ? WORK_ONLY : "Microsoft sign in failed. Try again, and use a work or school account."}</Notice> : null}
       <Button type="button" onClick={microsoft} loading={msBusy}>Sign in with Microsoft</Button>
-      {error && !stubMode ? <p role="alert" className="caption-2 text-danger">{error}</p> : null}
+      {error && !earlyAccess ? <p role="alert" className="caption-2 text-danger">{error}</p> : null}
     </div>
   );
 
-  if (!stubMode) return microsoftBlock;
+  if (!earlyAccess) return microsoftBlock;
 
   return (
     <div className="flex flex-col gap-6">
-      {microsoftBlock}
-      <Notice tone="info" title="Stub mode">Microsoft sign in is not configured in this environment, so the email link below is available for local testing only.</Notice>
       {expiredLink ? <Notice tone="warning" title="That link has expired">Links work once for 10 minutes. Request a new one below.</Notice> : null}
       <form onSubmit={submit} noValidate className="flex flex-col gap-4">
         <Field label="Email" htmlFor="email" error={error}>
@@ -116,6 +114,7 @@ export function SignInForm({ callbackURL, expiredLink, stubMode, oauthError }: {
         <Fingerprint size={20} weight="regular" aria-hidden />
         Sign in with a passkey
       </Button>
+      <p className="caption-2 text-text-subtle">Want your own Intune tenant connected first? <a href="/early-access" className="underline underline-offset-4 hover:text-action focus-visible:focus-ring">Get early access</a>.</p>
     </div>
   );
 }

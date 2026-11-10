@@ -288,6 +288,8 @@ export async function createAllIndexes(d: MongoDatabase) {
   await ix("dc_catalog_versions", { app: 1, appSlug: 1 });
   await ix("dc_tenant_apps", { app: 1, tenantId: 1, appSlug: 1 }, { unique: true });
   await ix("dc_alerts", { app: 1, orgId: 1, createdAt: -1 });
+  await ix("dc_leads", { app: 1, createdAt: -1 });
+  await ix("dc_leads", { app: 1, email: 1 }, { unique: true });
   // Better Auth collections
   await ix("user", { email: 1 }, { unique: true });
   await ix("session", { token: 1 }, { unique: true });
