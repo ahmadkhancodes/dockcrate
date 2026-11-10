@@ -11,6 +11,7 @@ import { ENTRA_AUTHORITY, assertWorkAccount } from "./entra";
 import { ensureMemberPrefs } from "@/lib/alerts";
 import { defaultDeps } from "@/lib/deps";
 import { sendMail } from "@/lib/mail";
+import { log } from "@/lib/logger";
 import { inviteEmail, magicLinkEmail } from "@/lib/mail/templates";
 import { isDisposableEmail } from "@/lib/security/disposable";
 import { ac, roles } from "./roles";
@@ -62,6 +63,10 @@ async function database(): Promise<BetterAuthOptions["database"]> {
 export const ACCOUNT_LINKING = { enabled: false, trustedProviders: [] as string[] };
 
 type HookMember = { organizationId: string; userId: string; role: string };
+async function safeSend(msg: Parameters<typeof sendMail>[0], kind: string) {
+  try { await sendMail(msg); } catch (e) { log.warn("mail_failed", { kind, message: (e as Error)?.message }); }
+}
+
 type HookUser = { email: string };
 
 /** Alert preference rows are written when a member is added or changes role, not on first app open (REVIEW P1-12). A failure never blocks joining. */
@@ -134,7 +139,7 @@ export function createAuth(db: BetterAuthOptions["database"]) {
               disableSignUp: false,
               sendMagicLink: async ({ email, url }) => {
                 const m = magicLinkEmail(url);
-                await sendMail({ to: email, ...m, category: "transactional" });
+                await safeSend({ to: email, ...m, category: "transactional" }, "magic_link");
               },
             }),
           ]),
@@ -150,7 +155,8 @@ export function createAuth(db: BetterAuthOptions["database"]) {
         sendInvitationEmail: async (data) => {
           const url = `${base}/accept-invite/${data.id}`;
           const m = inviteEmail({ orgName: data.organization.name, inviter: data.inviter.user.name || data.inviter.user.email, url, role: data.role });
-          await sendMail({ to: data.email, ...m, category: "transactional" });
+          // The invitation row exists; if the provider rejects, the inviter can resend. Never surface provider errors.
+          await safeSend({ to: data.email, ...m, category: "transactional" }, "invitation");
         },
       }),
       apiKey({

@@ -82,6 +82,7 @@ export async function handleStripeWebhook(rawBody: string, signature: string | n
     event.type.startsWith("invoice.") ||
     event.type === "checkout.session.completed" ||
     event.type === "charge.refunded";
+  if (!relevant) log.info("stripe_event_ignored", { type: event.type });
   if (relevant) {
     await db.setEntitlement(orgId, await computeEntitlement(stripe, app, customerId, prev?.status === "lifetime" ? prev : null, now));
     await deps.onChange?.(orgId, event.type);

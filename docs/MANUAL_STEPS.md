@@ -96,3 +96,6 @@ Deep link: https://dash.cloudflare.com/ (buffersoltech.com, DNS, Records)
 - `{{dpa-pdf}}`: a signable DPA PDF to link from the DPA page.
 - `{{refund policy}}` and `{{cap}}` in the terms of service (refund wording and liability cap) also need owner decisions.
 - The legal text needs a lawyer's review before launch.
+
+## Launch hardening (10 Nov 2026)
+No new owner steps. Still blocking real customers: step 10 (jurisdiction and registered address in the legal text) and step 11 (real winget/downloader/scanner pipeline and real tenant spike before enabling `payments_enabled`).
