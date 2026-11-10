@@ -5,6 +5,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { PermissionTable, QaPipeline, QaPipelineDiagram } from "@/components/marketing/trust";
 import { FinalCta } from "@/components/marketing/final-cta";
 import { dataHandling, vmPendingNote } from "@/content/security";
+import { ogImages, twitterImages } from "@/lib/seo";
 import { product } from "@/config/product";
 
 const title = "Security";
@@ -14,7 +15,8 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: "/security" },
-  openGraph: { title: `${title} · ${product.fullName}`, description, url: "/security" },
+  openGraph: { title: `${title} · ${product.fullName}`, description, url: "/security", images: ogImages() },
+  twitter: { card: "summary_large_image", images: twitterImages() },
 };
 
 const linkClass = "underline underline-offset-4 hover:text-action focus-visible:focus-ring";

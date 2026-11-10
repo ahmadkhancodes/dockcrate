@@ -23,10 +23,20 @@ const STEP_TEXT: Record<"hash" | "signer" | "scan" | "vm", Record<"pass" | "pend
 };
 
 /** Idempotent: loads the 6 sample apps from src/content/catalog-seed.json when the catalog collection is empty. */
-export async function ensureCatalogSeeded(db: Db, signer: ManifestSigner = envManifestSigner(), now = new Date()): Promise<void> {
+export async function ensureCatalogSeeded(db: Db, explicitSigner?: ManifestSigner, now = new Date()): Promise<void> {
+  // Listing the catalog never needs the signing key: without one, seed rows are stored unsigned and signed
+  // later, the first time a caller that has a signer (publish, cron) passes through here.
+  let signer: ManifestSigner | null = explicitSigner ?? null;
+  if (!signer) { try { signer = envManifestSigner(); } catch { signer = null; } }
   const apps = db.collection<CatalogApp>("catalog");
-  if ((await apps.find()).length > 0) return;
   const versions = db.collection<CatalogVersion>("catalog_versions");
+  if ((await apps.find()).length > 0) {
+    if (signer) {
+      const seedIds = new Set((seed as { apps: SeedApp[] }).apps.map((a) => `${a.slug}@${a.version.version}`));
+      for (const v of await versions.find()) if (!v.manifestSig && seedIds.has(v.id)) await versions.put({ ...v, manifestSig: signVersion(signer, v) });
+    }
+    return;
+  }
   const at = now.toISOString();
   for (const a of (seed as { apps: SeedApp[] }).apps) {
     const s = a.version;
@@ -39,7 +49,7 @@ export async function ensureCatalogSeeded(db: Db, signer: ManifestSigner = envMa
       status: statusFromChecks(s.checks, requireVmVerification()), testedAt: s.testedAt,
       verification: { checks: s.checks, qaLog: log, heldReason: s.heldReason ?? null }, manifestSig: null, createdAt: at,
     };
-    v.manifestSig = signVersion(signer, v);
+    if (signer) v.manifestSig = signVersion(signer, v);
     await versions.put(v);
     await apps.put({ id: a.slug, slug: a.slug, name: a.name, publisher: a.publisher, wingetId: a.wingetId, platform: "windows", license: a.license, category: a.category, currentVersionId: id, createdAt: at, updatedAt: at });
   }

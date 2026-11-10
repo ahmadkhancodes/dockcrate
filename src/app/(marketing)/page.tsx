@@ -1,3 +1,4 @@
+import { ogImages, twitterImages } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
@@ -22,7 +23,8 @@ export const metadata: Metadata = {
   title: { absolute: `${title} | ${product.fullName}` },
   description,
   alternates: { canonical: "/" },
-  openGraph: { title: `${title} | ${product.fullName}`, description, url: "/" },
+  openGraph: { title: `${title} | ${product.fullName}`, description, url: "/", images: ogImages() },
+  twitter: { card: "summary_large_image", images: twitterImages() },
 };
 
 const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: cents % 100 === 0 ? 0 : 2 })}`;

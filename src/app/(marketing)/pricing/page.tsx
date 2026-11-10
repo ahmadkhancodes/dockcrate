@@ -3,6 +3,7 @@ import { Section } from "@/components/ui/layout";
 import { PricingTable } from "@/components/marketing/pricing-table";
 import { Faq } from "@/components/marketing/faq";
 import { FinalCta } from "@/components/marketing/final-cta";
+import { ogImages, twitterImages } from "@/lib/seo";
 import { product } from "@/config/product";
 
 const title = "Pricing";
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: "/pricing" },
-  openGraph: { title: `${title} · ${product.fullName}`, description, url: "/pricing" },
+  openGraph: { title: `${title} · ${product.fullName}`, description, url: "/pricing", images: ogImages() },
+  twitter: { card: "summary_large_image", images: twitterImages() },
 };
 
 const billingFaq = [
