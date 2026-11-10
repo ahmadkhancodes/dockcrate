@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { product } from "@/config/product";
+import { earlyAccessCopy, product } from "@/config/product";
 import { ThemeToggle } from "@/components/theme";
 import { buttonClass } from "@/components/ui/button";
 import { cn } from "@/components/ui/cn";
@@ -10,7 +10,7 @@ import { cn } from "@/components/ui/cn";
 const STAGGER_MS = 60;
 
 /** Floating bar, off the top edge. Mobile: full-height panel, staggered links (60ms, 24px rise, <= 400ms total). */
-export function SiteHeader() {
+export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
   const pathname = usePathname();
   // The menu counts as open only on the page it was opened on, so navigating closes it without an effect.
   const [openFor, setOpenFor] = useState<string | null>(null);
@@ -70,7 +70,9 @@ export function SiteHeader() {
   const panelItems = [
     ...product.nav.map((n) => ({ ...n, kind: "link" as const })),
     { href: "/sign-in", label: "Sign in", kind: "link" as const },
-    { href: "/sign-in", label: "Start free with Microsoft", kind: "cta" as const },
+    earlyAccess
+      ? { href: "/early-access", label: earlyAccessCopy.cta, kind: "cta" as const }
+      : { href: "/sign-in", label: "Start free with Microsoft", kind: "cta" as const },
   ];
 
   return (
@@ -89,7 +91,11 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-1">
           <Link href="/sign-in" className={cn(buttonClass("tertiary", "md"), "max-md:hidden")}>Sign in</Link>
-          <Link href="/sign-in" className={cn(buttonClass("primary", "md"), "max-md:hidden")}><span>Start free<span className="hidden lg:inline"> with Microsoft</span></span></Link>
+          {earlyAccess ? (
+            <Link href="/early-access" className={cn(buttonClass("primary", "md"), "max-md:hidden")}>{earlyAccessCopy.cta}</Link>
+          ) : (
+            <Link href="/sign-in" className={cn(buttonClass("primary", "md"), "max-md:hidden")}><span>Start free<span className="hidden lg:inline"> with Microsoft</span></span></Link>
+          )}
           <ThemeToggle />
           <button
             ref={toggleRef}

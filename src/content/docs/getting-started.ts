@@ -8,7 +8,7 @@ export const gettingStarted: DocPage = {
   sections: [
     {
       heading: "Current status",
-      body: ["Honest status: the upload to a real Intune tenant has not been proven yet, the catalog shows demo data, and the VM check is pending until the Windows lab is attached. The FAQ lists what is and is not live."],
+      body: ["Available today: the public catalog with inspection tags and QA logs, the .intunewin packer and the rings model. Coming with early access: publishing into your own Intune tenant. The catalog is labelled as demo data until the live pipeline runs, and the VM check is pending until the Windows lab is attached. The FAQ lists what is and is not live."],
     },
     {
       heading: "Before you start",
@@ -27,7 +27,7 @@ export const gettingStarted: DocPage = {
       heading: "Pick your Pilot and Broad groups",
       body: [
         "Rings are two Entra groups. Pilot receives each new version first. Broad receives it after a delay. Choose existing groups, or let us create DC-Pilot and DC-Broad for you.",
-        "Defaults are 0 hours for Pilot and 48 hours for Broad. A version reaches Broad only if Pilot failures stay under the threshold, which defaults to 10%. Otherwise Broad is paused and you get an alert.",
+        "Defaults are 0 hours for Pilot and 48 hours for Broad. A version reaches Broad only if Pilot failures stay under the threshold, which defaults to 10%. Otherwise Broad is paused at the next daily check and you get an alert.",
       ],
     },
     {

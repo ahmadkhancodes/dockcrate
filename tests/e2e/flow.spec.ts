@@ -48,7 +48,7 @@ test("magic link sign-in, org, billing state, api key, cron guard", async ({ pag
 
 test("public pages render with metadata and no horizontal overflow at 375px", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
-  for (const path of ["/", "/pricing", "/security", "/compare/pckgr", "/catalog", "/catalog/7-zip", "/docs", "/legal/privacy", "/sign-in"]) {
+  for (const path of ["/", "/pricing", "/early-access", "/security", "/compare/pckgr", "/catalog", "/catalog/7-zip", "/docs", "/legal/privacy", "/sign-in"]) {
     const res = await page.goto(path);
     expect(res?.status(), path).toBe(200);
     await expect(page.locator("head title")).not.toBeEmpty();
@@ -62,7 +62,7 @@ test("public pages render with metadata and no horizontal overflow at 375px", as
 test("landing shows the crate label, bay track, demo labels and the Microsoft footer line", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Third-party apps for Intune");
-  await expect(page.getByRole("link", { name: "Start free with Microsoft" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Get early access" }).first()).toBeVisible();
   await expect(page.getByText("Bay track")).toBeVisible();
   await expect(page.getByText("Demo data").first()).toBeVisible();
   await expect(page.locator("footer")).toContainText("Works with Microsoft Intune. Microsoft and Intune are trademarks of Microsoft. DockCrate by BufferSol is not endorsed by Microsoft.");

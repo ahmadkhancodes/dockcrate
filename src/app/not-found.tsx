@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button";
 import { Section } from "@/components/ui/layout";
 import { SiteHeader } from "@/components/marketing/site-header";
+import { earlyAccessOpen } from "@/lib/early-access";
 import { SiteFooter } from "@/components/marketing/site-footer";
 
 export const metadata: Metadata = { title: "Page not found", robots: { index: false } };
@@ -9,7 +10,7 @@ export const metadata: Metadata = { title: "Page not found", robots: { index: fa
 export default function NotFound() {
   return (
     <>
-      <SiteHeader />
+      <SiteHeader earlyAccess={earlyAccessOpen()} />
       <main id="main" className="pt-20">
         <Section labelledBy="nf-title">
           <div className="flex min-h-96 max-w-2xl flex-col items-start justify-center gap-6">

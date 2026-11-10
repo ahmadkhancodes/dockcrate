@@ -5,6 +5,7 @@ import { Faq } from "@/components/marketing/faq";
 import { FinalCta } from "@/components/marketing/final-cta";
 import { ogImages, twitterImages } from "@/lib/seo";
 import { product } from "@/config/product";
+import { earlyAccessOpen, primaryCta } from "@/lib/early-access";
 
 const title = "Pricing";
 const description = "Free, Starter, Professional, Business and Fleet plans, priced by managed device. Rings and rollback on every plan. The free plan is the trial, no card.";
@@ -27,15 +28,17 @@ const billingFaq = [
 ];
 
 export default function PricingPage() {
+  const open = earlyAccessOpen();
+  const cta = primaryCta(open);
   return (
     <>
       <Section labelledBy="pricing-title" className="pt-24 md:pt-32">
         <h1 id="pricing-title" className="heading-3 md:heading-1 mb-12 max-w-3xl text-text">Pricing by managed device. Rings and rollback on every plan.</h1>
-        <PricingTable />
+        <PricingTable earlyAccess={open} />
         <p className="mt-8 caption-2 text-text-subtle">Prices in US dollars. Items tagged Roadmap are planned and not shipped yet.</p>
       </Section>
       <Faq title="Billing questions" items={billingFaq} />
-      <FinalCta title="Start on the free plan and add tenants when you need them." cta={{ href: "/sign-in", label: "Start free with Microsoft" }} note="The free plan is the trial. No card." />
+      <FinalCta title="Start on the free plan and add tenants when you need them." cta={cta} note={open ? "Early access is by request." : "The free plan is the trial. No card."} />
     </>
   );
 }
