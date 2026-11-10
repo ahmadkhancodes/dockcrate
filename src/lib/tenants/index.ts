@@ -5,6 +5,7 @@ import { GraphConsentError } from "@/lib/graph/types";
 import { noticeEmail } from "@/lib/mail/templates";
 import { HttpError } from "@/lib/http";
 import { uuidv7 } from "@/lib/ids";
+import { log } from "@/lib/logger";
 import { signToken, verifyToken } from "@/lib/signed";
 import { buildProofUrl, newNonce, verifyAdminIdToken } from "./proof";
 import { audit } from "@/lib/audit";
@@ -225,7 +226,13 @@ export async function sendConsentLink(deps: Deps, t: Tenant, adminEmail: string,
     actionUrl: url,
     actionLabel: "Review and approve",
   });
-  await deps.sendMail({ to: adminEmail, ...mail, category: "transactional" });
+  try {
+    await deps.sendMail({ to: adminEmail, ...mail, category: "transactional" });
+  } catch (e) {
+    // Provider rejected (bad address, rate limit, outage): a clean 502, never the provider's message.
+    log.warn("consent_link_mail_failed", { tenantId: t.id, message: (e as Error)?.message });
+    throw new HttpError(502, "mail_unavailable");
+  }
   const next = await save(deps, t, { status: t.status === "connected" ? "connected" : "waiting_consent", consentSentTo: adminEmail.toLowerCase() });
   await audit({ orgId: t.orgId, actorId, action: "tenant.consent_link_sent", target: t.id, meta: { tenantId: t.id } });
   return next;

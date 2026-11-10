@@ -19,3 +19,5 @@
 - Still open: P1-5 (launch gate: real downloader/scanner/winget, real tenant spike, MANUAL_STEPS 11), P1-14 (legal placeholders, owner), P2 list, Lighthouse and axe on a live deploy, rings page keyboard walk with a connected tenant, Mongo-driver test of `claim` against a real Atlas (memory driver only so far).
 
 - 10 Nov 2026 Indexes are now created automatically once per server instance on the first successful Mongo connection (fire and forget, skipped in `next build` and for the memory driver, conflicts and errors only logged; `npm run db:indexes` still works). Tests in tests/unit/auto-indexes.test.ts. **Not deployed.**
+
+- 10 Nov 2026 Launch hardening, **not deployed**: P1-5 and P1-14 remain open (owner/external, see REVIEW.md). Fixed consent link mail 500 on Resend rejection (502 `mail_unavailable`), swallowed invite and magic link mail failures, log unknown Stripe events; webhook idempotency, out of order and retry paths re-verified with tests (tests/unit/launch-hardening.test.ts).
