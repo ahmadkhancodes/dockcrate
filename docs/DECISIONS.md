@@ -68,3 +68,4 @@ Standing decisions are in docs/factory/BATCH1_PLAN.md (Mongo instead of Postgres
 - **D-50 Alert rows at join time.** Preference rows are written by Better Auth organization hooks; first open stays as a fallback.
 - **D-51 Focus and control tokens.** `--focus` light is dark amber (#9a5b00), `--text-muted` and `--warning` darkened, and a new `--control-border` token carries input edges. Contrast is asserted over the real tokens in `tests/unit/a11y.test.ts`.
 
+- **D-52 Auto indexes.** `scheduleIndexes` (mongo.ts) runs `createAllIndexes` once per instance after the first connection, never awaited, never during build; index option conflicts (85/86) and other errors are logged and retried on the next cold start.
