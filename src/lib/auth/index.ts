@@ -1,5 +1,6 @@
 import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { magicLink, organization, twoFactor } from "better-auth/plugins";
 import { memoryAdapter } from "better-auth/adapters/memory";
 import { passkey } from "@better-auth/passkey";
@@ -14,6 +15,8 @@ import { sendMail } from "@/lib/mail";
 import { log } from "@/lib/logger";
 import { inviteEmail, magicLinkEmail } from "@/lib/mail/templates";
 import { isDisposableEmail } from "@/lib/security/disposable";
+import { rateLimit, RULES } from "@/lib/security/ratelimit";
+import { getDb } from "@/lib/db";
 import { ac, roles } from "./roles";
 
 // Better Auth: magic link, passkeys, TOTP, orgs + roles, API keys (hashed, prefix shown).
@@ -79,6 +82,24 @@ export function memberPrefsHooks() {
   return { afterCreateOrganization: write, afterAddMember: write, afterAcceptInvitation: write, afterUpdateMemberRole: write };
 }
 
+/**
+ * Sign-in mail brake (SECURITY-REVIEW S-3): Better Auth only limits per IP, so many IPs (or a spoofed
+ * x-forwarded-for off Vercel) could mail-bomb one address. Every address gets at most RULES.authEmail links per
+ * 10 minutes and every IP RULES.authIp, whether or not an account exists, so the answer reveals nothing.
+ */
+export const signInMailBrake = createAuthMiddleware(async (ctx) => {
+  if (ctx.path !== "/sign-in/magic-link") return;
+  const email = typeof ctx.body?.email === "string" ? ctx.body.email.trim().toLowerCase().slice(0, 320) : "";
+  const h = ctx.request?.headers ?? ctx.headers;
+  const ip = (h?.get("x-forwarded-for")?.split(",")[0]?.trim() || h?.get("x-real-ip") || "unknown").slice(0, 64);
+  const db = await getDb();
+  const [byEmail, byIp] = await Promise.all([
+    email ? rateLimit(`signin:email:${email}`, RULES.authEmail, db) : Promise.resolve({ ok: true }),
+    rateLimit(`signin:ip:${ip}`, RULES.authIp, db),
+  ]);
+  if (!byEmail.ok || !byIp.ok) throw new APIError("TOO_MANY_REQUESTS", { message: "Too many sign-in emails. Wait a few minutes and try again.", code: "rate_limited" });
+});
+
 export function createAuth(db: BetterAuthOptions["database"]) {
   const e = env();
   const base = appUrl(e);
@@ -96,6 +117,7 @@ export function createAuth(db: BetterAuthOptions["database"]) {
       cookieCache: { enabled: true, maxAge: 300 },
     },
     rateLimit: { enabled: true, window: 60, max: 60, storage: "database" },
+    hooks: { before: signInMailBrake },
     emailAndPassword: { enabled: false },
     // Microsoft Entra work accounts only (D-07): `organizations` authority, personal MSA tenant rejected twice
     // (by Better Auth's issuer check and by assertWorkAccount, which gives the clear message).

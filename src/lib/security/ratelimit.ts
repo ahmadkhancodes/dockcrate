@@ -12,6 +12,8 @@ export const RULES = {
   account: { limit: 5, windowMs: 60 * 60_000 },
   publicForm: { limit: 30, windowMs: 60_000 },
   api: { limit: 600, windowMs: 60_000 },
+  /** Calls that make an outbound request per hit (webhook test pings, Stripe refresh): SECURITY-REVIEW S-6. */
+  outbound: { limit: 10, windowMs: 60_000 },
 } satisfies Record<string, Rule>;
 
 export async function rateLimit(key: string, rule: Rule, db?: Db, now = Date.now()) {

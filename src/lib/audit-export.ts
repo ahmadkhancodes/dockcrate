@@ -34,7 +34,8 @@ export function filterAudit(entries: AuditEntry[], f: AuditFilter): AuditEntry[]
 /** RFC 4180 quoting, plus a leading apostrophe on cells a spreadsheet would run as a formula. */
 export function csvCell(v: unknown): string {
   let s = v === null || v === undefined ? "" : String(v);
-  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  // Also leading blanks before a formula character, full width variants and "|" (DDE), which some spreadsheets still run (S-7).
+  if (/^[\s\u00a0\u3000]*[=+\-@|%\uff1d\uff0b\uff0d\uff20]/.test(s) || /^[\t\r\n]/.test(s)) s = `'${s}`;
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 

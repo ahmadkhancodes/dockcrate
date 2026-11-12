@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 import { DELIVERY_TTL_DAYS, type Db, type WebhookDelivery, type WebhookEndpoint } from "@/lib/db/types";
 import { hmacSha256Hex, randomToken, uuidv7 } from "@/lib/ids";
 import { product } from "@/config/product";
+import { isSafeOutboundUrl, pinnedPost } from "@/lib/security/ssrf";
 
 // Outbound webhooks: HMAC-SHA256 signed (Stripe-style header), retries with exponential backoff, delivery log.
 // Header: `X-Webhook-Signature: t=<unix>,v1=<hex hmac of "t.body">`, plus X-Webhook-Id / X-Webhook-Event.
@@ -54,29 +55,30 @@ export async function attemptDelivery(
   opts: { db: Db; fetchFn?: typeof fetch; now?: Date },
 ): Promise<WebhookDelivery> {
   const now = opts.now ?? new Date();
-  const fetchFn = opts.fetchFn ?? fetch;
   const attempts = d.attempts + 1;
   let code: number | null = null;
   let error: string | null = null;
+  const headers = {
+    "content-type": "application/json",
+    "user-agent": `${product.name}-Webhooks/1.0`,
+    "x-webhook-id": d.id,
+    "x-webhook-event": d.event,
+    "x-webhook-signature": await signPayload(ep.secret, d.payload, Math.floor(now.getTime() / 1000)),
+  };
   try {
-    const ctrl = AbortSignal.timeout(10_000);
-    const res = await fetchFn(ep.url, {
-      method: "POST",
-      signal: ctrl,
-      redirect: "manual",
-      headers: {
-        "content-type": "application/json",
-        "user-agent": `${product.name}-Webhooks/1.0`,
-        "x-webhook-id": d.id,
-        "x-webhook-event": d.event,
-        "x-webhook-signature": await signPayload(ep.secret, d.payload, Math.floor(now.getTime() / 1000)),
-      },
-      body: d.payload,
-    });
-    code = res.status;
-    if (!res.ok) error = `http_${res.status}`;
+    if (opts.fetchFn) {
+      // Tests inject a fetch; the URL guard still applies.
+      if (!isSafeWebhookUrl(ep.url)) throw Object.assign(new Error("blocked_address"), { code: "EBLOCKED" });
+      const res = await opts.fetchFn(ep.url, { method: "POST", signal: AbortSignal.timeout(10_000), redirect: "manual", headers, body: d.payload });
+      code = res.status;
+    } else {
+      // Real deliveries: the resolved address is checked on the socket itself (DNS rebinding safe), no redirects, body discarded.
+      code = (await pinnedPost(ep.url, { headers, body: d.payload, timeoutMs: 10_000, allowHttp: allowHttpWebhooks() })).status;
+    }
+    if (code < 200 || code >= 300) error = `http_${code}`;
   } catch (e) {
-    error = (e as Error).name === "TimeoutError" ? "timeout" : "network_error";
+    const err = e as NodeJS.ErrnoException;
+    error = err.code === "EBLOCKED" ? "blocked_address" : err.name === "TimeoutError" ? "timeout" : "network_error";
   }
   const ok = !error;
   const patch: Partial<WebhookDelivery> = {
@@ -109,14 +111,9 @@ export async function retryDueDeliveries(opts: { db?: Db; fetchFn?: typeof fetch
   return { processed: due.length, succeeded: ok };
 }
 
-/** Block private/loopback targets (SSRF) for user-supplied webhook URLs. */
+const allowHttpWebhooks = () => process.env.NODE_ENV !== "production";
+
+/** Block private/loopback targets (SSRF) for user-supplied webhook URLs. Deliveries check the resolved address again (security/ssrf.ts). */
 export function isSafeWebhookUrl(raw: string): boolean {
-  let u: URL;
-  try { u = new URL(raw); } catch { return false; }
-  if (u.protocol !== "https:" && !(process.env.NODE_ENV !== "production" && u.protocol === "http:")) return false;
-  const h = u.hostname.toLowerCase();
-  if (h === "localhost" || h.endsWith(".localhost") || h.endsWith(".internal") || h.endsWith(".local")) return false;
-  if (/^(127\.|10\.|192\.168\.|169\.254\.|0\.)/.test(h) || /^172\.(1[6-9]|2\d|3[01])\./.test(h)) return false;
-  if (h.startsWith("[") || h === "::1") return false;
-  return true;
+  return isSafeOutboundUrl(raw, { allowHttp: allowHttpWebhooks() });
 }
