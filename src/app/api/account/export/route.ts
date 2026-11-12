@@ -2,6 +2,8 @@ import { headers } from "next/headers";
 import { getAuth } from "@/lib/auth";
 import { requireUser } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
+import { scopeOrgExport } from "@/lib/account-export";
+import { getMembership } from "@/lib/auth/scope";
 import { withApi } from "@/lib/http";
 import { enforceRateLimit, RULES } from "@/lib/security/ratelimit";
 
@@ -21,7 +23,13 @@ export const GET = withApi(async () => {
     exportedAt: new Date().toISOString(),
     user,
     sessions: (sessions as { id: string; createdAt: Date; userAgent?: string | null; ipAddress?: string | null }[]).map((s) => ({ id: s.id, createdAt: s.createdAt, userAgent: s.userAgent, ipAddress: s.ipAddress })),
-    organizations: await Promise.all(orgs.map(async (o) => ({ ...o, data: await db.exportOrgData(o.id) }))),
+    // Only what this member's role and tenant scope let them see in the app (S-4).
+    organizations: await Promise.all(orgs.map(async (o) => {
+      const full = (await auth.api.getFullOrganization({ headers: h, query: { organizationId: o.id } }).catch(() => null)) as { members?: { userId: string; role: string }[] } | null;
+      const role = full?.members?.find((m) => m.userId === user.id)?.role.split(",")[0] ?? "";
+      const membership = await getMembership(db, o.id, user.id, role);
+      return { ...o, role, data: scopeOrgExport(await db.exportOrgData(o.id), membership) };
+    })),
   };
   return new Response(JSON.stringify(data, null, 2), {
     headers: {

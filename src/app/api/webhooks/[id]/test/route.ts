@@ -4,6 +4,7 @@ import { HttpError, json, withApi } from "@/lib/http";
 import { DELIVERY_TTL_DAYS } from "@/lib/db/types";
 import { uuidv7 } from "@/lib/ids";
 import { attemptDelivery } from "@/lib/webhooks/outbound";
+import { enforceRateLimit, RULES } from "@/lib/security/ratelimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,6 +14,8 @@ export const POST = withApi<{ params: Promise<{ id: string }> }>(async (_req, { 
   requirePermission(ctx, "webhook", "manage");
   const { id } = await params;
   const db = await getDb();
+  // Each call is one outbound POST: without a cap this endpoint is a free request cannon (S-6).
+  await enforceRateLimit(`webhook-test:${ctx.org.id}`, RULES.outbound, db);
   const ep = await db.getWebhookEndpoint(ctx.org.id, id);
   if (!ep) throw new HttpError(404, "not_found");
   const now = new Date();
