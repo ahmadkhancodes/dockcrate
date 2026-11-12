@@ -34,7 +34,7 @@ export default function PricingPage() {
     <>
       <Section labelledBy="pricing-title" className="pt-12 md:pt-20">
         <div className="mb-12 grid border-b-2 border-text pb-8 gap-6 lg:grid-cols-12 lg:items-end lg:gap-8">
-          <h1 id="pricing-title" className="heading-3 md:heading-1 text-text lg:col-span-8">Priced by managed device, <br className="max-md:hidden" />with rings and rollback on every plan</h1>
+          <h1 id="pricing-title" className="heading-3 md:heading-1 max-w-[680px] text-text lg:col-span-8">Priced by managed device,{" "}<br className="max-md:hidden" />with rings and rollback{" "}<br className="max-md:hidden" />on every plan</h1>
           <dl className="flex flex-col border-2 border-text bg-surface-raised lg:col-span-4">
             <div aria-hidden className="hazard h-2 border-b-2 border-text" />
             {[["Free plan", "25 devices, no card"], ["Multi tenant from", "Starter, 5 tenants"], ["Device tiers", "Same as Pckgr"]].map(([k, v]) => (

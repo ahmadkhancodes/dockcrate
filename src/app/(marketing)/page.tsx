@@ -18,7 +18,7 @@ import { demoCrates } from "@/content/demo";
 import { qaStages, vmPendingNote } from "@/content/security";
 
 const title = "Intune app packaging and patching for MSPs";
-const description = "Third-party apps for Intune, packaged, inspected and shipped in rings. Multi-tenant from $24.99/mo. Free plan, no card.";
+const description = "Third party apps for Intune, packaged, inspected and shipped in rings. Multi tenant from $24.99/mo. Free plan, no card.";
 
 export const metadata: Metadata = {
   title: { absolute: `${title} | ${product.fullName}` },
@@ -115,10 +115,9 @@ export default function HomePage() {
     <>
       <Hero
         eyebrow="Works with Microsoft Intune · for MSPs and lean IT teams"
-        title={<>Patch third party apps <br className="max-md:hidden" />across every Intune tenant</>}
+        title={<>Patch third party apps{" "}<br className="max-md:hidden" />across every{" "}<br className="max-md:hidden" />Intune tenant</>}
         subtitle="Every version is hash, signer and malware checked, then shipped to Pilot first and Broad 48 h later, with one click rollback. Multi tenant from $24.99/mo."
         primaryCta={cta}
-        secondaryCta={{ href: "/catalog", label: "Browse the public catalog" }}
         note={open ? earlyNote : freeLine}
         proof={[
           { value: "$24.99/mo", label: "Starter, 5 tenants" },

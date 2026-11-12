@@ -96,7 +96,7 @@ describe("early-access flag", () => {
       expect(html).not.toContain("Sign in with Microsoft");
       expect(html).toContain("Email me a sign-in link");
     }
-    expect(page).toContain("Microsoft work-account sign-in opens with early access. Use an email link meanwhile.");
+    expect(page).toContain("Signing in with a Microsoft work account opens with early access. Use an email link meanwhile.");
   });
 
   it("sign-in with Entra configured is unchanged", async () => {

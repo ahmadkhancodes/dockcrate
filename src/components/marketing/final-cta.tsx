@@ -13,7 +13,7 @@ export function FinalCta({ title, body, cta, note }: { title: ReactNode; body?: 
           {body ? <p className="body-3 max-w-2xl text-border">{body}</p> : null}
         </div>
         <div className="flex flex-col items-start gap-3 lg:col-span-4 lg:items-end">
-          <SessionButtonLink cta={cta} size="lg" variant="inverse"><ArrowRight size={18} aria-hidden /></SessionButtonLink>
+          <SessionButtonLink cta={cta} size="md" variant="inverse"><ArrowRight size={16} aria-hidden /></SessionButtonLink>
           {note ? <p className="caption-2 text-border lg:text-right">{note}</p> : null}
         </div>
       </div>

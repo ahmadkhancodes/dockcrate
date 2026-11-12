@@ -10,8 +10,10 @@ import { APP_HOME, OPEN_APP_LABEL } from "./session-labels";
 import { Wordmark } from "@/components/ui/wordmark";
 
 const STAGGER_MS = 60;
+/** The last link starts no later than this, so the whole sequence stays within 400ms of the panel opening. */
+const STAGGER_CAP_MS = 400 - STAGGER_MS;
 
-/** Floating bar, off the top edge. Mobile: full-height panel, staggered links (60ms, 24px rise, <= 400ms total). */
+/** Compact floating bar 12px off the top edge, translucent concrete over a blur, sized to its content from md up. Mobile: full-height panel, staggered links (60ms, 24px rise, <= 400ms total). */
 export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
   const pathname = usePathname();
   const signedIn = useSessionState() === "in";
@@ -81,12 +83,12 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
   ];
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b-2 border-text bg-surface">
-      <div className="relative z-50 mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+    <header className="pointer-events-none fixed inset-x-0 top-3 z-50 px-3">
+      <div className="pointer-events-auto relative z-50 mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-4 rounded-lg border-2 border-text bg-surface-raised/80 pl-4 pr-2 backdrop-blur-md md:w-fit md:gap-8">
         <Link href="/" className="inline-flex min-h-11 items-center rounded-sm focus-visible:focus-ring" aria-label={`${product.fullName} home`}>
           <Wordmark />
         </Link>
-        <nav aria-label="Primary" className="hidden items-center md:flex lg:mr-auto lg:ml-8">
+        <nav aria-label="Primary" className="hidden items-center md:flex">
           {product.nav.map((n) => (
             <Link key={n.href} href={n.href} aria-current={isCurrent(n.href) ? "page" : undefined} className={linkClass(n.href)}>
               {n.label}
@@ -109,11 +111,11 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => (open ? close() : setOpenFor(pathname))}
-            className="inline-flex size-11 items-center justify-center rounded-md text-text transition-colors duration-300 ease-out-kit hover:bg-surface focus-visible:focus-ring md:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-sm text-text transition-colors duration-300 ease-out-kit hover:bg-surface focus-visible:focus-ring md:hidden"
           >
             <span aria-hidden className="relative block size-6">
-              <span className={cn("absolute left-1 right-1 top-2 h-0.5 rounded-sm bg-current transition-transform duration-300 ease-out-kit", open && "translate-y-1 rotate-45")} />
-              <span className={cn("absolute bottom-2 left-1 right-1 h-0.5 rounded-sm bg-current transition-transform duration-300 ease-out-kit", open && "-translate-y-1 -rotate-45")} />
+              <span className={cn("absolute left-1 right-1 top-2 h-0.5 rounded-sm bg-current transition-transform duration-500 ease-out-kit", open && "translate-y-1 rotate-45")} />
+              <span className={cn("absolute bottom-2 left-1 right-1 h-0.5 rounded-sm bg-current transition-transform duration-500 ease-out-kit", open && "-translate-y-1 -rotate-45")} />
             </span>
           </button>
         </div>
@@ -127,7 +129,7 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
         aria-label="Menu"
         inert={!open}
         className={cn(
-          "fixed inset-0 z-40 flex flex-col bg-surface-raised px-4 pt-20 transition-[opacity,visibility] duration-200 ease-out-kit md:hidden",
+          "pointer-events-auto fixed inset-0 z-40 flex flex-col bg-surface-raised/95 px-4 pt-24 backdrop-blur-xl transition-[opacity,visibility] duration-300 ease-out-kit md:hidden",
           open ? "visible opacity-100" : "invisible opacity-0",
         )}
       >
@@ -137,9 +139,9 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
               key={item.label}
               href={item.href}
               onClick={() => setOpenFor(null)}
-              style={{ transitionDelay: open ? `${i * STAGGER_MS}ms` : "0ms" }}
+              style={{ transitionDelay: open ? `${Math.min(i * STAGGER_MS, STAGGER_CAP_MS)}ms` : "0ms" }}
               className={cn(
-                "transition-[opacity,transform] duration-200 ease-out-kit focus-visible:focus-ring",
+                "transition-[opacity,transform] duration-500 ease-out-kit focus-visible:focus-ring",
                 open ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
                 item.kind === "cta"
                   ? cn(buttonClass("primary", "lg"), "mt-8")

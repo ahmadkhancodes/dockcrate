@@ -198,11 +198,12 @@
 .mark-draw { position: relative; isolation: isolate; }
 .mark-draw::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--mark); transform-origin: left center; animation: mark-draw 700ms var(--ease-out-kit) 500ms both; }
 @keyframes mark-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-.kit-word { opacity: 0.6; transition: opacity 500ms var(--ease-out-kit); }
+/* B11: words wait at 30% of the ink and come up one at a time (tagline-reveal.tsx). */
+.kit-word { opacity: 0.3; transition: opacity 500ms var(--ease-out-kit); }
 .kit-word[data-on="true"] { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .kit-reveal { transform: none; transition: opacity 300ms var(--ease-out-kit); }
-  .kit-word { opacity: 1; transition: none; }
+  .kit-word { opacity: 1 !important; transition: none !important; }
   .mark-draw::before { animation: none; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

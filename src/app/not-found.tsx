@@ -11,7 +11,7 @@ export default function NotFound() {
   return (
     <>
       <SiteHeader earlyAccess={earlyAccessOpen()} />
-      <main id="main" className="bg-surface pt-16">
+      <main id="main" className="bg-surface pt-20">
         <div aria-hidden className="hazard h-3 border-b-2 border-text" />
         <Section labelledBy="nf-title">
           <div className="flex min-h-96 max-w-2xl flex-col items-start justify-center gap-6">

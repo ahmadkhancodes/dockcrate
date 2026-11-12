@@ -65,7 +65,10 @@ describe("colour tokens", () => {
 
 describe("banned AI tells", () => {
   it("has no background gradients, glassmorphism or vague filler in the source", () => {
-    expect(all + css).not.toMatch(/bg-gradient|linear-gradient|radial-gradient|backdrop-blur/);
+    expect(all + css).not.toMatch(/bg-gradient|linear-gradient|radial-gradient/);
+    // The only blur is the floating marketing nav (library B7: translucent bar over a background blur, D-63).
+    const blurred = tsx.filter((f) => /backdrop-blur/.test(readFileSync(f, "utf8"))).map((f) => f.replace(/\\/g, "/"));
+    expect(blurred).toEqual(["src/components/marketing/site-header.tsx"]);
     expect(tsx.filter((f) => /marketing|\(marketing\)/.test(f)).map((f) => readFileSync(f, "utf8")).join("\n")).not.toMatch(/streamline|seamless|supercharge|everything you need/i);
   });
 });
