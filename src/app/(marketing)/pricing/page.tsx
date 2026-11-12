@@ -33,11 +33,12 @@ export default function PricingPage() {
   return (
     <>
       <Section labelledBy="pricing-title" className="pt-12 md:pt-20">
-        <div className="mb-12 grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-8">
+        <div className="mb-12 grid border-b-2 border-text pb-8 gap-6 lg:grid-cols-12 lg:items-end lg:gap-8">
           <h1 id="pricing-title" className="heading-3 md:heading-1 text-text lg:col-span-8">Priced by managed device, <br className="max-md:hidden" />with rings and rollback on every plan</h1>
-          <dl className="flex flex-col border-t border-text lg:col-span-4">
+          <dl className="flex flex-col border-2 border-text bg-surface-raised lg:col-span-4">
+            <div aria-hidden className="hazard h-2 border-b-2 border-text" />
             {[["Free plan", "25 devices, no card"], ["Multi tenant from", "Starter, 5 tenants"], ["Device tiers", "Same as Pckgr"]].map(([k, v]) => (
-              <div key={k} className="flex items-baseline justify-between gap-4 border-b border-border py-2">
+              <div key={k} className="flex items-baseline justify-between gap-4 border-b border-border px-3 py-2 last:border-b-0">
                 <dt className="caption-2 text-text-subtle">{k}</dt>
                 <dd className="font-mono caption-1 text-text">{v}</dd>
               </div>

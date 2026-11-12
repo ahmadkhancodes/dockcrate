@@ -11,7 +11,7 @@ const afterSignIn = [
   "Publish from the catalog. New versions follow the rings on their own.",
 ];
 
-/** Auth screens: the form on white paper on the left, what happens next on the canvas on the right (desktop only). */
+/** Auth screens: the form on the light concrete panel on the left, what happens next on the canvas on the right (desktop only). */
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="grid min-h-dvh bg-surface-raised lg:grid-cols-12">
@@ -29,7 +29,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </Link>
         </footer>
       </div>
-      <aside aria-label="What happens after you sign in" className="hidden flex-col justify-center gap-8 border-l border-border bg-surface px-12 py-16 lg:col-span-5 lg:flex">
+      <aside aria-label="What happens after you sign in" className="hidden flex-col justify-center gap-8 border-l-2 border-text bg-surface px-12 py-16 lg:col-span-5 lg:flex">
         <div className="flex max-w-md flex-col gap-4">
           <p className="label-caps text-text-muted">After you sign in</p>
           <ol className="flex flex-col border-t border-text">

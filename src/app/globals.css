@@ -1,55 +1,57 @@
 @import "tailwindcss";
 
 /*
- * DockCrate by BufferSol tokens: the "change sheet" system (docs/design-brief.md section 6). Light only (D-52).
- * Raw ramp first, then role tokens. Components reference role tokens only.
+ * DockCrate by BufferSol tokens: the "yard" system (docs/design-brief.md section 6). Light only (D-52).
+ * Cool concrete surfaces, graphite ink, one teal for action and healthy state. Raw ramp first, then role tokens.
+ * Components reference role tokens only.
  */
 :root {
   --font-sans-family: var(--font-body), "Segoe UI", ui-sans-serif, system-ui, sans-serif;
   --font-mono-family: var(--font-mono), ui-monospace, "Cascadia Mono", monospace;
   --font-display-family: var(--font-display), var(--font-body), ui-sans-serif, sans-serif;
 
-  /* raw ramp: cool graphite neutral 0..1000 */
-  --n-0: #ffffff;
-  --n-50: #f4f5f6;
-  --n-100: #eceef0;
-  --n-200: #dde0e4;
-  --n-300: #b8bec5;
-  --n-400: #8b929a;
-  --n-500: #6b737c;
-  --n-600: #4b535c;
-  --n-700: #323942;
-  --n-800: #22272d;
-  --n-900: #15181c;
-  --n-1000: #000000;
-  --lime-300: #d7f25c; /* signal lime: the highlighter mark, graphite text only */
-  --blue-600: #2c55d9; /* focus ring only */
+  /* raw ramp: concrete to graphite */
+  --c-50: #f0f2f2; /* panel concrete: tables, forms, the change sheet */
+  --c-100: #e2e5e6; /* poured concrete: page */
+  --c-200: #d3d8da; /* sunken: table heads, selected rows */
+  --c-300: #b9c0c3; /* hairline */
+  --c-400: #8a9397; /* strong rule, control edge */
+  --c-600: #434c51;
+  --c-700: #353d42;
+  --c-800: #283035;
+  --c-900: #1b2125; /* graphite ink */
+  --teal-100: #c9e6e2; /* teal wash: selection, the one row that needs a human */
+  --teal-600: #0a625d; /* the accent: actions and healthy state */
+  --teal-700: #08524e;
+  --teal-800: #063f3c;
 
   /* role tokens */
-  --surface: var(--n-50);
-  --surface-raised: var(--n-0);
-  --surface-sunken: var(--n-100);
-  --surface-inverse: var(--n-900);
-  --text: var(--n-900);
-  --text-subtle: var(--n-600);
-  --text-muted: #5b636c;
-  --text-inverse: var(--n-0);
-  --border: var(--n-200);
-  --border-strong: var(--n-300);
-  --action: var(--n-900);
-  --action-hover: var(--n-700);
+  --surface: var(--c-100);
+  --surface-raised: var(--c-50);
+  --surface-sunken: var(--c-200);
+  --surface-inverse: var(--c-900);
+  --text: var(--c-900);
+  --text-subtle: var(--c-600);
+  --text-muted: #4d565b;
+  --text-inverse: #f0f2f2;
+  --text-inverse-subtle: var(--c-300);
+  --border: var(--c-300);
+  --border-strong: var(--c-400);
+  --action: var(--teal-600);
+  --action-hover: var(--teal-700);
   --action-text: #ffffff;
-  --mark: var(--lime-300);
-  --on-mark: var(--n-900);
-  --focus: var(--blue-600);
-  --control-border: #7b838c; /* input and checkbox edges, 3:1 or better (WCAG 1.4.11) */
-  --success: #12703a;
-  --success-surface: #e4f3e9;
-  --warning: #8a5300;
-  --warning-surface: #fbf0da;
-  --danger: #b42318;
-  --danger-surface: #fcecea;
-  --shadow-color: 213 14% 10%;
+  --accent: var(--teal-600);
+  --mark: var(--teal-100);
+  --on-mark: var(--c-900);
+  --focus: var(--teal-800);
+  --control-border: #6c767b; /* input and checkbox edges, 3:1 or better on every surface (WCAG 1.4.11) */
+  --success: var(--teal-600);
+  --success-surface: #d5ebe8;
+  --warning: #7f4c00;
+  --warning-surface: #f2e6cf;
+  --danger: #a51f15;
+  --danger-surface: #f3dfdc;
+  --shadow-color: 200 16% 12%;
   color-scheme: light;
 }
 
@@ -71,6 +73,7 @@
   --color-text-subtle: var(--text-subtle);
   --color-text-muted: var(--text-muted);
   --color-text-inverse: var(--text-inverse);
+  --color-text-inverse-subtle: var(--text-inverse-subtle);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-action: var(--action);
@@ -78,6 +81,7 @@
   --color-action-text: var(--action-text);
   --color-focus: var(--focus);
   --color-control-border: var(--control-border);
+  --color-accent: var(--accent);
   --color-mark: var(--mark);
   --color-on-mark: var(--on-mark);
   --color-success: var(--success);
@@ -106,16 +110,17 @@
   --spacing-20: 80px;
   --spacing-24: 96px;
 
-  /* Radius by object: chips 2, controls 4, panels 6, dialogs 8. No pills. */
-  --radius-sm: 2px;
-  --radius: 4px;
-  --radius-md: 4px;
-  --radius-lg: 6px;
+  /* Radius by object: crate labels and chips 0, controls 3, panels 4, dialogs 8. Squared, industrial. No pills. */
+  --radius-none: 0px;
+  --radius-sm: 0px;
+  --radius: 3px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
   --radius-xl: 8px;
 
   /* Elevation: flat by default. The product sheet sits on the page; menus and dialogs float. */
-  --shadow-sheet: 0 1px 0 rgb(21 24 28 / 0.04), 0 24px 48px -32px rgb(21 24 28 / 0.28);
-  --shadow-float: 0 12px 32px rgb(21 24 28 / 0.14);
+  --shadow-sheet: 0 2px 0 rgb(27 33 37 / 0.9);
+  --shadow-float: 0 12px 32px rgb(27 33 37 / 0.16);
 
   --ease-out-kit: cubic-bezier(0.22, 1, 0.36, 1);
   --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -123,12 +128,13 @@
 }
 
 /* ---- Named type styles (playbook §5). Use these, never loose size+weight pairs. ---- */
-@utility heading-1 { font-size: 3.75rem; line-height: 1; font-family: var(--font-display-family); font-stretch: 112%; font-weight: 600; letter-spacing: -0.03em; text-wrap: balance; }
-@utility heading-2 { font-size: 3rem; line-height: 1; font-family: var(--font-display-family); font-stretch: 112%; font-weight: 600; letter-spacing: -0.025em; text-wrap: balance; }
-@utility heading-3 { font-size: 2.25rem; line-height: 2.5rem; font-family: var(--font-display-family); font-stretch: 112%; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
-@utility heading-4 { font-size: 1.875rem; line-height: 2.25rem; font-family: var(--font-display-family); font-stretch: 112%; font-weight: 600; letter-spacing: -0.015em; text-wrap: balance; }
-@utility heading-5 { font-size: 1.5rem; line-height: 2rem; font-family: var(--font-display-family); font-stretch: 112%; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
-@utility heading-6 { font-size: 1.25rem; line-height: 1.75rem; font-family: var(--font-display-family); font-stretch: 112%; font-weight: 600; letter-spacing: -0.005em; text-wrap: balance; }
+/* heading-1 is the only stencil line on a page: stamped like a crate side. Every other heading is Plex Sans. */
+@utility heading-1 { font-size: 3.75rem; line-height: 1; font-family: var(--font-display-family); font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+@utility heading-2 { font-size: 3rem; line-height: 1.05; font-weight: 600; letter-spacing: -0.03em; text-wrap: balance; }
+@utility heading-3 { font-size: 2.25rem; line-height: 2.5rem; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
+@utility heading-4 { font-size: 1.875rem; line-height: 2.25rem; font-weight: 600; letter-spacing: -0.015em; text-wrap: balance; }
+@utility heading-5 { font-size: 1.5rem; line-height: 2rem; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+@utility heading-6 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 600; letter-spacing: -0.005em; text-wrap: balance; }
 @utility title-1 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; }
 @utility title-2 { font-size: 1.125rem; line-height: 1.75rem; font-weight: 500; }
 @utility title-3 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
@@ -150,11 +156,20 @@
 @utility caption-4 { font-size: 0.75rem; line-height: 1rem; font-weight: 500; }
 @utility caption-5 { font-size: 0.75rem; line-height: 1rem; font-weight: 400; }
 
-/* Column heads, ticket fields and small identifiers: mono caps, the change sheet's labelling voice. */
+/* Column heads, crate label fields and small identifiers: mono caps, the yard's labelling voice. */
 @utility label-caps { font-family: var(--font-mono-family); font-size: 0.75rem; line-height: 1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
 /* Big figures (prices, counts): display face, tabular. */
-@utility figure-lg { font-family: var(--font-display-family); font-stretch: 112%; font-size: 2.25rem; line-height: 2.5rem; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-@utility figure-md { font-family: var(--font-display-family); font-stretch: 112%; font-size: 1.5rem; line-height: 2rem; font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+@utility figure-lg { font-family: var(--font-mono-family); font-size: 2.25rem; line-height: 2.5rem; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+@utility figure-md { font-family: var(--font-mono-family); font-size: 1.5rem; line-height: 2rem; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+/* Stencil display for a short stamped word (wordmark, crate number). Use sparingly. */
+@utility stencil { font-family: var(--font-display-family); font-weight: 600; letter-spacing: 0.02em; }
+/* Safety stripe: graphite bars at 45 degrees on concrete, an SVG tile (no gradients). Edges of live zones only. */
+@utility hazard {
+  background-color: var(--surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M-3 3l6-6M0 12L12 0M9 15l6-6' stroke='%231b2125' stroke-width='4.2'/%3E%3C/svg%3E");
+  background-size: 12px 12px;
+}
 
 @utility focus-ring {
   outline: 2px solid var(--focus);
@@ -179,11 +194,11 @@
 /* Scroll reveal (rise 32px + fade, once). Reduced motion: opacity only. */
 .kit-reveal { opacity: 0; transform: translateY(32px); transition: opacity 700ms var(--ease-out-kit), transform 700ms var(--ease-out-kit); }
 .kit-reveal[data-visible="true"] { opacity: 1; transform: none; }
-/* The lime highlighter mark, drawn in once from the left (transform only). Reduced motion: shown at once. */
+/* The teal wash, drawn in once from the left (transform only). Reduced motion: shown at once. */
 .mark-draw { position: relative; isolation: isolate; }
 .mark-draw::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--mark); transform-origin: left center; animation: mark-draw 700ms var(--ease-out-kit) 500ms both; }
 @keyframes mark-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-.kit-word { opacity: 0.3; transition: opacity 500ms var(--ease-out-kit); }
+.kit-word { opacity: 0.6; transition: opacity 500ms var(--ease-out-kit); }
 .kit-word[data-on="true"] { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .kit-reveal { transform: none; transition: opacity 300ms var(--ease-out-kit); }

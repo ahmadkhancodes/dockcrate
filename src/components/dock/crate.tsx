@@ -5,7 +5,7 @@ import type { BayState, CheckState, Checks, DemoCrate, Shipment } from "@/conten
 
 /**
  * Release evidence parts in the "change sheet" style (docs/design-brief.md section 6):
- * hairline rules, mono identifiers, status as icon plus word, the lime mark only for what needs a human.
+ * hairline rules, mono identifiers, status as icon plus word, the teal wash only for what needs a human.
  */
 
 const checkList: { key: keyof Checks; label: string }[] = [
@@ -56,7 +56,7 @@ export function InspectionTag({ checks, className }: { checks: Checks; className
 export function CrateLabel({ crate, size = "lg", className }: { crate: DemoCrate; size?: "lg" | "md"; className?: string }) {
   const fields: [string, string][] = [["SHA-256", crate.sha], ["Publisher", crate.publisher], ["Installer", crate.installer], ["Arch", `Windows ${crate.arch}`]];
   return (
-    <div className={cn("flex flex-col rounded-lg border border-border-strong bg-surface-raised", className)}>
+    <div className={cn("flex flex-col rounded-lg border-2 border-text bg-surface-raised", className)}>
       <div className={cn("flex flex-wrap items-start justify-between gap-3 border-b border-border", size === "lg" ? "p-4 md:p-6" : "p-4")}>
         <div className="flex min-w-0 flex-col gap-1">
           <p className="label-caps text-text-subtle">Release</p>
@@ -82,8 +82,8 @@ export function CrateLabel({ crate, size = "lg", className }: { crate: DemoCrate
 }
 
 const segment: Record<BayState, string> = {
-  done: "bg-text",
-  active: "bg-text",
+  done: "bg-accent",
+  active: "bg-accent",
   paused: "bg-warning",
   idle: "bg-border",
 };
@@ -112,7 +112,7 @@ const chipTone: Record<Shipment, { cls: string; icon: ReactNode }> = {
   held: { cls: "text-danger", icon: <Warning size={14} weight="bold" aria-hidden /> },
 };
 
-/** Ring status as icon plus word. A paused ring wears the lime mark: it is the one thing that needs a human. */
+/** Ring status as icon plus word. A paused ring wears the teal wash: it is the one thing that needs a human. */
 export function StatusChip({ status, label }: { status: Shipment; label: string }) {
   const t = chipTone[status];
   return (

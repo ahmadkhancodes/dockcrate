@@ -64,7 +64,7 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
   const linkClass = (href: string) =>
     cn(
       "relative inline-flex min-h-11 items-center rounded-sm px-3 body-5 transition-colors duration-300 ease-out-kit hover:text-text focus-visible:focus-ring",
-      isCurrent(href) ? "text-text after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:bg-mark" : "text-text-subtle",
+      isCurrent(href) ? "text-text after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:bg-accent" : "text-text-subtle",
     );
 
   const panelItems = [
@@ -76,7 +76,7 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
   ];
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-surface-raised">
+    <header className="fixed inset-x-0 top-0 z-50 border-b-2 border-text bg-surface">
       <div className="relative z-50 mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="inline-flex min-h-11 items-center rounded-sm focus-visible:focus-ring" aria-label={`${product.fullName} home`}>
           <Wordmark />

@@ -1,6 +1,10 @@
-# Design brief: DockCrate by BufferSol (redesign, 12 Nov 2026)
+# Design brief: DockCrate by BufferSol ("yard" identity, 12 Nov 2026)
 
-Replaces the Phase 0 "loading dock" look in docs/DESIGN.md (cream paper, dock green, amber tags, stencil type). The founder judged that look as typical AI output. This brief is the gate for every UI change (docs/factory/DESIGN_PLAYBOOK.md section 1). Light mode only (D-52).
+Replaces the "change sheet" look (white paper, graphite buttons, signal lime mark, Archivo expanded) of earlier on 12 Nov 2026. Reason: seven BufferSol sibling products had drifted into one house look (warm or white paper, black buttons, a serif or neutral grotesk). Each product must look like its own company. DockCrate's fixed direction: IT operations. Cool concrete grey surfaces, graphite ink, one teal accent for state, dense table-first layout, a stencil display face used sparingly, safety-stripe and crate-label motifs. Siblings to stay away from: Postslot (terracotta, cream, serif), Straightpin (newsprint, yellow highlighter), Inboxwire (ink black, lime), Stepclimb (blue-grey drawing paper, navy, safety orange), Wirebook (mint ledger, forest green), Hotrail (cobalt on white, huge numerals). This brief is the gate for every UI change (docs/factory/DESIGN_PLAYBOOK.md section 1). Light mode only (D-52).
+
+### What changed and what stayed (yard redesign)
+- Changed: palette (concrete and graphite with teal, no white page, no black buttons, no lime), type (Saira Stencil for H1 only + IBM Plex Sans + IBM Plex Mono, replacing Archivo, Public Sans and JetBrains Mono), radius (squared: 0, 3, 4, 8), structure (2px graphite rules frame every product object; tables first), motifs (safety stripe, crate label plate), e-mail, OG image, favicons, printable legal page.
+- Stayed: the real-product hero (the change sheet table, now under a graphite crate-label header and a safety stripe), section order, all copy and claims, light only, motion rules, 44px targets.
 
 ## 1. Competitor and taste audit (Playwright, 12 Nov 2026)
 
@@ -55,56 +59,69 @@ Layout type: **A, classic hero plus sections**, hero copy on the left and the ch
 11. FAQ: heading on the left, questions on the right (two column at 1440).
 12. Final CTA: same action as the hero.
 
-## 6. Visual system ("change sheet")
-Concept: a release is a change ticket. Every surface reads like a well kept change sheet: white paper, hairline rules, mono identifiers, one highlighter mark for the thing that needs a human.
+## 6. Visual system ("yard")
+Concept: a release is a crate moving through a loading yard. Concrete floor, graphite steel, stencilled crate sides, safety stripes at the edge of live zones, and one teal lamp that says "this is moving / this is healthy / press here". Everything important sits in a dense table framed by a 2px graphite rule.
 
-Differs from the three closest rivals on palette (white and graphite, not navy or purple), type (expanded grotesk plus Public Sans, not Inter or Poppins), layout (full width flat sheet, not tilted screenshots or mascots) and imagery (legible real UI). Differs from our old look on every axis: no cream, no green, no stencil, no dashed crates.
+Differs from rivals on palette (concrete and teal, not navy or purple), type (stencil plus Plex, not Inter or Poppins), layout (flat dense tables, not tilted screenshots) and imagery (legible real UI). Differs from every BufferSol sibling: no cream, paper white, newsprint, mint, blue-grey, lime, terracotta, cobalt, navy or orange.
 
-### Palette (role tokens in `src/app/globals.css`, light only)
-| Role | Value | Use, contrast |
+### Palette (role tokens in `src/app/globals.css`, plain hex copy in `src/lib/brand.ts` for mail, OG and favicons)
+| Role | Value | Use, contrast (WCAG) |
 |---|---|---|
-| `surface` | `#F4F5F6` cool canvas | App background, marketing alternate bands |
-| `surface-raised` | `#FFFFFF` | Paper: panels, tables, marketing default |
-| `surface-sunken` | `#ECEEF0` | Selected rows, table heads |
-| `surface-inverse` | `#15181C` graphite | The single dark band, tooltips |
-| `text` | `#15181C` | 17.8:1 on white |
-| `text-subtle` | `#4B535C` | 7.8:1 on white |
-| `text-muted` | `#5B636C` | 5.6:1 on canvas |
-| `border` / `border-strong` | `#DDE0E4` / `#B8BEC5` | Hairlines all round or none |
-| `action` / `action-hover` | `#15181C` / `#323942` | Primary buttons are graphite with white text. Links are ink, underlined |
-| `mark` / `on-mark` | `#D7F25C` signal lime / `#15181C` | The highlighter (graphite on lime 14.2:1). One use per view: the row or word that needs attention, the active ring, selection. Never text colour, never a button fill |
-| `focus` | `#2C55D9` | Focus ring only, 2px with 2px offset, 6.2:1 on white. The only blue in the product |
-| `success` / `warning` / `danger` | `#12703A` / `#8A5300` / `#B42318` with pale surfaces | State only, always icon plus word |
+| `surface` | `#E2E5E6` poured concrete | Page background and base sections |
+| `surface-raised` | `#F0F2F2` panel concrete | Tables, forms, sheets, the alternate band. Never pure white |
+| `surface-sunken` | `#D3D8DA` | Table heads, selected tabs |
+| `surface-inverse` | `#1B2125` graphite | Crate label headers, the single dark band |
+| `text` | `#1B2125` | 12.9:1 on concrete, 14.5:1 on panel, 11.3:1 on sunken |
+| `text-subtle` | `#434C51` | 6.9:1 on concrete, 6.1:1 on sunken |
+| `text-muted` | `#4D565B` | 5.9:1 on concrete, 5.2:1 on sunken |
+| `text-inverse` / `text-inverse-subtle` | `#F0F2F2` / `#B9C0C3` | On graphite: 14.5:1 / 8.8:1 |
+| `border` / `border-strong` | `#B9C0C3` / `#8A9397` | Hairlines; product objects use a 2px `text` rule instead |
+| `action` = `accent` = `success` | `#0A625D` teal | Primary buttons (white text 7.2:1), active nav bar, healthy state text (5.7:1 on concrete, 5.0:1 on sunken), ring progress |
+| `action-hover` | `#08524E` | White text 9.0:1 |
+| `mark` | `#C9E6E2` teal wash | The one row that needs a human, selection, featured plan (graphite text 12.3:1). Used at 40% on rows |
+| `focus` | `#063F3C` | 2px ring, 2px offset, 9.3:1 on concrete |
+| `warning` / `danger` | `#7F4C00` / `#A51F15` with pale surfaces | State only, always icon plus word, at least 5:1 on every surface |
+| `control-border` | `#6C767B` | Input edges, 3.2:1 or better (1.4.11) |
 
-Override recorded: the playbook says "one accent". Our accent is the lime mark; graphite carries actions. The focus blue is a functional colour, not brand.
+One accent: teal. Graphite is ink, not a button colour. Secondary buttons are panel concrete with a 1px graphite edge.
 
 ### Type (next/font, self hosted)
-- Display: **Archivo** variable at width 115 (expanded), weights 600 and 700. Headings and big figures. Wide letters read like a stamped header on a work order and nothing in the category uses them.
-- Text: **Public Sans** 400/500/600. The US government's interface face: plain, very legible in dense tables, neutral without being Inter.
-- Mono: **JetBrains Mono** 400/500 with tabular figures for every version, hash, count, time and price figure. Technicians know it from their editors.
-- Named styles only (heading-1..6, title, body, button, caption, `label-mono` for column heads). No italics, no weight above 700. Inter, Geist, Roboto, Arial remain banned.
+- Display: **Saira Stencil** 600. Only `heading-1` (one per page), the wordmark and the tenant name on crate label headers (`stencil` utility). Reads like a spray-stencilled crate side.
+- Text: **IBM Plex Sans** 400/500/600 for every other heading and all interface text. Engineered, slightly technical, very legible in dense tables.
+- Mono: **IBM Plex Mono** 400/500, tabular figures, for versions, hashes, counts, times, prices (`figure-lg`/`figure-md` are mono) and `label-caps` column heads.
+- Named styles only. No italics, nothing above 600 except the stencil. Inter, Geist, Roboto, Arial remain banned.
 
-### Grid, radius, borders, elevation
-- 12 column grid in a 1200px container; the hero heading spans 9 columns, the change sheet spans 12. Section padding varies by role: hero 64/96, argument sections 96, ruled lists 64, the dark band 80, FAQ 96.
-- Radius by object, not one number: tags and chips 2px, buttons and inputs 4px, panels and tables 6px, dialogs 8px. No pills.
-- Borders: 1px hairlines all round; rows divided by rules. No shadows except menus and dialogs (`0 12px 32px rgb(21 24 28 / .14)`).
+### Grid, radius, rules, elevation
+- 12 column grid in a 1280px container. Hero: H1 over 8 columns with the crate spec plate in 4, a 2px graphite rule, then copy and CTA, then the change sheet at 12.
+- Radius by object: crate labels and chips 0, buttons and inputs 3px, panels and tables 4px, dialogs 8px. No pills.
+- Rules: product objects (change sheet, dock, rate sheet, crate spec, manifest label) are framed by a 2px graphite rule; inside them 1px hairlines. Page headers end on a 2px graphite rule.
+- No soft shadows; menus and dialogs only.
 
-### Imagery and icons
-- Real product components with demo data, always labelled "Demo data". No illustrations, no mascots, no stock, no emoji.
-- Phosphor icons, regular weight, 16 or 20px, only where they carry meaning (status, actions). No icon tiles.
+### Motifs
+- **Crate label plate**: graphite or 2px-ruled header strip with a mono caps field name ("CRATE SPEC", "APPS IN <TENANT>") and a stencilled name. Used for the hero spec, the change sheet, the dock table, pricing facts, the 404 tag.
+- **Safety stripe** (`hazard` utility): 45 degree graphite bars on concrete, an SVG tile (no gradients). Only at the edge of a live zone: under a crate label header, at the corner of the spec plate, on the 404 page, the OG card. Never as decoration on its own.
+- **Teal row bar**: a 4px inset teal bar plus the teal wash marks the row that needs attention (paused ring, selected app, featured plan).
 
-### Motion
-- One curve `cubic-bezier(0.22, 1, 0.36, 1)`; 200 to 300 ms colour, 600 ms reveal. Hero: the paused row's lime mark draws in once (scaleX from the left). Tagline reveal word by word. Everything becomes plain opacity under `prefers-reduced-motion`.
+### Pricing
+A rate sheet, not cards: one plan per row (Plan, Price, Included in two ruled columns, Start), the featured plan marked with the teal row bar. Reads like a price list on a loading bay wall.
 
 ### App UI
-- Shell: a 232px white rail with a mono org header, text navigation with a lime bar on the current item, and a 56px top bar per page with the title and one primary action on the right.
-- Tables: 40px rows, sticky head on sunken grey, mono right aligned numbers, status as icon plus word. 12 to 14 rows visible at 1440x900.
-- Empty states: a ruled example row in grey ("7-Zip 25.01 · Pilot · Broad in 48 h") plus one action.
-- Loading: skeleton rows shaped like the table. Errors: what failed and the next step, inline.
-- 44px minimum targets, pointer cursor on everything clickable, visible focus.
+- Shell: a 240px panel-concrete rail, stencil wordmark, teal 4px bar on the current item. Page header ends on a 2px graphite rule.
+- Dock: KPI strip framed in graphite with mono caps labels; the app table under a graphite crate label header and a safety stripe; selected row gets the teal bar; the manifest is a 2px-ruled crate label.
+- Panels: sunken header row, 2px graphite divider, panel body.
+- Empty states, loading skeletons, errors, 44px targets and pointer cursors unchanged.
+
+### Imagery, icons, motion
+- Real product components with demo data, labelled "Demo data". No illustrations, mascots, stock or emoji. Phosphor icons only where they carry meaning.
+- One curve `cubic-bezier(0.22, 1, 0.36, 1)`. The flagged row's teal wash draws in once. Tagline reveal word by word. Plain opacity under reduced motion.
+
+### E-mail, OG, favicon, legal print
+- E-mail: concrete background, panel card with a 2px graphite frame and a teal top band, teal button, Plex with system fallback.
+- OG/Twitter card: concrete, safety stripe band, crate mark, a graphite-framed crate label holding the tagline, teal foot band.
+- Favicon and Apple icon: the braced crate in graphite over a teal dock line on concrete.
 
 ## 7. Bans checked on every page
 Centred hero over a glow; purple, indigo or default blue accent; one system font everywhere; three identical icon cards; "Everything you need"; emoji or stock art; glassmorphism; one radius everywhere; pill badges; identical section rhythm; invented numbers; "streamline", "seamless", "supercharge".
 
 ## 8. Self critique log
-Scores per round are in docs/design-qa.md; final screenshots in docs/qa/design/.
+Scores per round are in docs/design-qa.md ("Yard identity" section, three rounds); final screenshots in docs/qa/design/.

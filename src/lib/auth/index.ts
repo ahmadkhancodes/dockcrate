@@ -164,6 +164,7 @@ export function createAuth(db: BetterAuthOptions["database"]) {
         defaultPrefix: `${product.slug.slice(0, 4)}_`,
         enableMetadata: true,
         requireName: true,
+        maximumNameLength: 60, // matches the 60 character limit of the API keys form
         rateLimit: { enabled: true, timeWindow: 60_000, maxRequests: 600 },
       }),
       nextCookies(),
