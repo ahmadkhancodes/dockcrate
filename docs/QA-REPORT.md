@@ -32,3 +32,7 @@ Scope: every P0 journey that can be driven in the shipped configuration (stub mo
 | QA-12 | Low | Pricing cards say "Cancel anytime from your account" while the only path today is "Join early access". Reword while early access is the only entry. |
 | QA-13 | Low | The early-access form has no client-side validation; an empty submit makes a round trip (and the ALTCHA proof) before showing the error. Works, slightly slow. |
 | QA-14 | Info | Better Auth limits magic links to 5 per minute per IP; an office behind one NAT signing in together could hit "Too many attempts". Message is shown correctly. |
+
+## Hardening round (12 Nov 2026)
+Added `tests/unit/hardening.test.ts` (forged, duplicate and out of order Stripe events, per-key rate limits, log scrubbing, CSV formula and unicode safety, CSP pins, no native third-party form posts, health shape without leaks, built-bundle secret scan) and `tests/e2e/qa/hardening.spec.ts` (health, signed-out and guessed-id export refusal, forged webhook, no CSP console errors on the dock). Changes are listed as H-1..H-6 and U-1..U-2 in docs/REVIEW.md. Still open: QA-9..QA-14 as above.
+Test fixes in this round: the sign-out spec used `goBack()` then `reload()`, which raced the redirect and failed on `main` too (`net::ERR_ABORTED`); it now makes a fresh visit to `/app` and still asserts the sign-in page. The API keys spec failed once in a loaded full run (a console or request problem, not reproduced in six solo and file runs); watch it.

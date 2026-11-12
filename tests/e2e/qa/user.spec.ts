@@ -197,7 +197,7 @@ test("sign out ends the session; back button and direct visits do not reveal the
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/(sign-in)?$|\/sign-in/);
   await page.goBack();
-  await page.reload();
+  await page.goto("/app"); // a bare reload races the redirect that goBack triggers; a fresh visit must still not reveal the app
   await expect(page).toHaveURL(/\/sign-in/);
   await page.goto("/app/settings/api-keys");
   await expect(page).toHaveURL(/\/sign-in/);

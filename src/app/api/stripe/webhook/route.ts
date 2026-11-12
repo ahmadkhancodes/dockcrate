@@ -3,7 +3,8 @@ import { handleStripeWebhook } from "@/lib/billing/webhook";
 import { getStripe } from "@/lib/billing/stripe";
 import { getDb } from "@/lib/db";
 import { env } from "@/lib/env";
-import { json } from "@/lib/http";
+import { clientIp, json } from "@/lib/http";
+import { rateLimit } from "@/lib/security/ratelimit";
 import { log } from "@/lib/logger";
 
 export const runtime = "nodejs";
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
   if (!stripe || !secret) return json({ error: "billing_unavailable" }, 503);
   try {
     const db = await getDb();
-    return await handleStripeWebhook(await req.text(), req.headers.get("stripe-signature"), {
+    const res = await handleStripeWebhook(await req.text(), req.headers.get("stripe-signature"), {
       stripe,
       db,
       secret,
@@ -25,6 +26,11 @@ export async function POST(req: Request) {
         await emitEvent(orgId, "billing.updated", { stripeEvent: type, plan: ent?.plan, status: ent?.status }, { db }).catch(() => []);
       },
     });
+    // Forged or garbled calls: throttle per IP (Stripe's own retries never get a 4xx, so they are not counted).
+    if (res.status === 400 && !(await rateLimit(`stripe-bad:${clientIp(req)}`, { limit: 30, windowMs: 60_000 }, db)).ok) {
+      return json({ error: "rate_limited" }, 429, { "retry-after": "60" });
+    }
+    return res;
   } catch (e) {
     // 500 => Stripe retries; the event was NOT recorded, so the retry reprocesses it.
     log.error("stripe_webhook_failed", { message: (e as Error).message });
