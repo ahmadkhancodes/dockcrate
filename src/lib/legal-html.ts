@@ -22,10 +22,10 @@ export function legalHtml(doc: LegalDoc, opts: { subprocessorAnnex?: boolean } =
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(doc.title)} · ${esc(p.fullName)}</title>
 <style>
-body{font:16px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:#181818;max-width:44rem;margin:2rem auto;padding:0 1rem}
+body{font:16px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:#1b2125;max-width:44rem;margin:2rem auto;padding:0 1rem}
 h1{font-size:1.75rem;margin:0 0 .25rem}h2{font-size:1.15rem;margin:2rem 0 .5rem;break-after:avoid}
-.meta{color:#555;margin:0 0 1.5rem}table{border-collapse:collapse;width:100%;font-size:.95rem}
-th,td{border:1px solid #ccc;padding:.4rem .6rem;text-align:left;vertical-align:top}th{background:#f2f2f2}
+.meta{color:#434c51;margin:0 0 1.5rem}table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{border:1px solid #8a9397;padding:.4rem .6rem;text-align:left;vertical-align:top}th{background:#d3d8da}
 li{margin:.25rem 0}tr,li{break-inside:avoid}
 @media print{body{margin:0;max-width:none;font-size:11pt}a{color:inherit}.noprint{display:none}}
 </style></head><body>

@@ -42,7 +42,7 @@ function NavLink({ item, pathname, onNavigate }: { item: NavItem; pathname: stri
       aria-current={active ? "page" : undefined}
       className={cn(
         "relative flex min-h-11 items-center gap-3 rounded-sm px-3 py-2 body-5 transition-colors duration-300 focus-visible:focus-ring lg:min-h-10",
-        active ? "bg-surface font-semibold text-text before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-sm before:bg-mark" : "text-text-subtle hover:bg-surface hover:text-text",
+        active ? "bg-surface font-semibold text-text before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-sm before:bg-accent" : "text-text-subtle hover:bg-surface hover:text-text",
       )}
     >
       <Icon size={18} weight={active ? "bold" : "regular"} aria-hidden />

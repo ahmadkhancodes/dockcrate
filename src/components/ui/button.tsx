@@ -10,10 +10,10 @@ const base =
   "inline-flex items-center justify-center gap-2 rounded-md whitespace-nowrap select-none transition-[background-color,color,border-color,opacity,transform] duration-300 ease-out-kit active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-busy:cursor-progress focus-visible:focus-ring";
 const variants: Record<Variant, string> = {
   primary: "bg-action text-action-text hover:bg-action-hover",
-  secondary: "border border-border-strong bg-surface-raised text-text hover:border-text",
+  secondary: "border border-text bg-surface-raised text-text hover:bg-surface-sunken",
   tertiary: "text-text-subtle hover:text-text hover:bg-surface-sunken",
   danger: "bg-danger text-white hover:opacity-90",
-  /** On the graphite band only: white button, graphite text. */
+  /** On the graphite band only: light concrete button, graphite text. */
   inverse: "bg-surface-raised text-text hover:bg-mark hover:text-on-mark",
 };
 const sizes: Record<Size, string> = {

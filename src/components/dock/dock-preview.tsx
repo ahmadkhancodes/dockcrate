@@ -34,33 +34,34 @@ function ChecksCell({ checks }: { checks: Checks }) {
   );
 }
 
-const toneCls: Record<NonNullable<Cell["tone"]>, string> = { ok: "text-text", wait: "text-text-subtle", bad: "text-danger", none: "text-text-muted" };
+const toneCls: Record<NonNullable<Cell["tone"]>, string> = { ok: "text-success", wait: "text-text-subtle", bad: "text-danger", none: "text-text-muted" };
 
-/** Hero visual: the change sheet for one tenant. The paused row wears the lime mark, drawn in once. */
+/** Hero visual: the change sheet for one tenant. The paused row wears the teal wash, drawn in once. */
 export function HeroDock() {
   return (
     <figure className="m-0 flex flex-col gap-3">
       <figcaption className="sr-only">Illustrative change sheet for one client tenant, with demo data</figcaption>
-      <div className="overflow-hidden rounded-lg border border-border-strong bg-surface-raised shadow-sheet">
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-border bg-surface px-4 py-3 md:px-6">
-          <p className="flex items-center gap-3">
-            <span className="title-3 font-semibold text-text">{demoTenant.name}</span>
-            <span className="font-mono caption-4 text-text-subtle">Change sheet · week 46</span>
+      <div className="overflow-hidden rounded-lg border-2 border-text bg-surface-raised">
+        <div className="flex flex-wrap items-stretch justify-between border-b-2 border-text bg-surface-inverse">
+          <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-3 md:px-6">
+            <span className="stencil title-1 uppercase text-text-inverse">{demoTenant.name}</span>
+            <span className="font-mono caption-4 text-text-inverse-subtle">Change sheet · week 46</span>
           </p>
-          <p className="font-mono caption-4 text-text-subtle">Pilot {PILOT} devices, 0 h · Broad {BROAD} devices, 48 h · pause over 10% failed</p>
+          <p className="flex items-center px-4 py-3 font-mono caption-4 text-text-inverse-subtle md:px-6">Pilot {PILOT} devices, 0 h · Broad {BROAD} devices, 48 h · pause over 10% failed</p>
         </div>
+        <span aria-hidden className="hazard block h-2 border-b-2 border-text" />
         <table className="w-full border-collapse text-left">
           <thead className="max-md:sr-only">
-            <tr className="border-b border-border">
+            <tr className="border-b border-border-strong bg-surface-sunken">
               {["App", "Version", "Checks", "Pilot", "Broad", "Next"].map((h, i) => (
-                <th key={h} scope="col" className={cn("label-caps px-4 py-2 font-normal text-text-muted md:first:pl-6 md:last:pr-6", i === 1 && "hidden lg:table-cell")}>{h}</th>
+                <th key={h} scope="col" className={cn("label-caps px-4 py-2 font-normal text-text-subtle md:first:pl-6 md:last:pr-6", i === 1 && "hidden lg:table-cell")}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {sheet.map((r, i) => (
-              <tr key={r.slug} className={cn(i > 2 && "max-md:hidden!", "border-b border-border last:border-b-0 max-md:grid max-md:grid-cols-[1fr_auto] max-md:gap-x-3 max-md:gap-y-1 max-md:px-4 max-md:py-3")}>
-                <th scope="row" className="py-3 font-normal md:px-4 md:pl-6">
+              <tr key={r.slug} className={cn(i > 2 && "max-md:hidden!", r.flag && "bg-mark/40 shadow-[inset_4px_0_0_var(--accent)]", "border-b border-border last:border-b-0 max-md:grid max-md:grid-cols-[1fr_auto] max-md:gap-x-3 max-md:gap-y-1 max-md:px-4 max-md:py-2")}>
+                <th scope="row" className="py-3 font-normal md:px-4 md:py-2 md:pl-6">
                   <span className="flex min-w-0 items-center gap-3">
                     <CrateMonogram name={r.name} />
                     <span className="min-w-0">
@@ -69,13 +70,13 @@ export function HeroDock() {
                     </span>
                   </span>
                 </th>
-                <td className="hidden px-4 py-3 font-mono caption-2 tnum text-text lg:table-cell">{r.version}</td>
-                <td className="self-center md:px-4 md:py-3"><ChecksCell checks={r.checks} /></td>
-                <td className={cn("font-mono caption-2 tnum max-md:col-span-2 max-md:before:content-['Pilot_'] md:px-4 md:py-3", toneCls[r.pilot.tone ?? "ok"])}>{r.pilot.text}</td>
-                <td className={cn("font-mono caption-2 tnum max-md:col-span-2 max-md:before:content-['Broad_'] md:px-4 md:py-3", toneCls[r.broad.tone ?? "ok"])}>{r.broad.text}</td>
-                <td className="max-md:col-span-2 md:px-4 md:py-3 md:pr-6">
+                <td className="hidden px-4 py-2 font-mono caption-2 tnum text-text lg:table-cell">{r.version}</td>
+                <td className="self-center md:px-4 md:py-2"><ChecksCell checks={r.checks} /></td>
+                <td className={cn("font-mono caption-2 tnum max-md:col-span-2 max-md:before:content-['Pilot_'] md:px-4 md:py-2", toneCls[r.pilot.tone ?? "ok"])}>{r.pilot.text}</td>
+                <td className={cn("font-mono caption-2 tnum max-md:col-span-2 max-md:before:content-['Broad_'] md:px-4 md:py-2", toneCls[r.broad.tone ?? "ok"])}>{r.broad.text}</td>
+                <td className="max-md:col-span-2 md:px-4 md:py-2 md:pr-6">
                   {r.flag ? (
-                    <span className="mark-draw inline-flex items-center gap-2 rounded-sm px-2 py-0.5 body-4 text-on-mark">
+                    <span className="mark-draw inline-flex items-center gap-2 rounded-sm border border-accent px-2 py-0.5 body-4 text-on-mark">
                       <ArrowCounterClockwise size={14} weight="bold" aria-hidden /> {r.next}
                     </span>
                   ) : (
@@ -107,11 +108,11 @@ export function DockOverview() {
   return (
     <figure className="m-0 flex flex-col gap-3">
       <figcaption className="sr-only">Illustrative DockCrate by BufferSol dock overview with demo data</figcaption>
-      <div className="grid overflow-hidden rounded-lg border border-border-strong bg-surface-raised lg:grid-cols-12">
+      <div className="grid overflow-hidden rounded-lg border-2 border-text bg-surface-raised lg:grid-cols-12">
         <nav aria-label="Demo sidebar" className="hidden flex-col border-r border-border bg-surface py-3 lg:col-span-2 lg:flex">
           <p className="px-4 pb-3 font-mono caption-4 text-text-subtle">Northbay IT</p>
           {nav.map((label, i) => (
-            <span key={label} className={cn("flex min-h-10 items-center border-l-2 px-4 body-5", i === 0 ? "border-mark bg-surface-raised text-text" : "border-transparent text-text-subtle")}>
+            <span key={label} className={cn("flex min-h-10 items-center border-l-2 px-4 body-5", i === 0 ? "border-accent bg-surface-raised font-semibold text-text" : "border-transparent text-text-subtle")}>
               {label}
             </span>
           ))}
@@ -120,7 +121,7 @@ export function DockOverview() {
           <dl className="grid grid-cols-2 border-b border-border md:grid-cols-4">
             {kpis.map((k) => (
               <div key={k.label} className="flex flex-col gap-1 border-b border-r border-border p-4 even:border-r-0 md:border-b-0 md:even:border-r md:last:border-r-0">
-                <dt className="caption-2 text-text-subtle">{k.label}</dt>
+                <dt className="label-caps text-text-subtle">{k.label}</dt>
                 <dd className="figure-md text-text">{k.value}</dd>
                 <dd className="font-mono caption-5 text-text-muted">{k.note}</dd>
               </div>

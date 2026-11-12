@@ -48,10 +48,10 @@ export function PricingTable({ id = "pricing", title, earlyAccess = false }: { i
   return (
     <div id={id}>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        {title ? <h2 id={`${id}-title`} className="heading-4 md:heading-3 text-text">{title}</h2> : <span />}
+        {title ? <h2 id={`${id}-title`} className="heading-4 md:heading-3 text-text">{title}</h2> : <h2 className="sr-only">Plans</h2>}
         {saving ? (
           <div className="flex flex-col gap-2 md:items-end">
-            <div role="group" aria-label="Billing interval" className="inline-flex w-fit rounded-md border border-border-strong bg-surface p-1">
+            <div role="group" aria-label="Billing interval" className="inline-flex w-fit rounded-md border border-text bg-surface-raised p-1">
               {options.map((o) => (
                 <button
                   key={o.id}
@@ -72,46 +72,55 @@ export function PricingTable({ id = "pricing", title, earlyAccess = false }: { i
         ) : null}
       </div>
 
-      <ul className="mt-8 grid overflow-hidden rounded-lg border border-border-strong bg-surface-raised md:mt-12 md:grid-cols-2 xl:grid-cols-5">
-        {plans.map((plan) => {
-          const price = priceFor(plan, interval);
-          const free = !price;
-          const href = earlyAccess ? `/early-access?plan=${plan.id}` : `/sign-in?plan=${plan.id}&interval=${price?.interval ?? interval}`;
-          return (
-            <li
-              key={plan.id}
-              className={cn(
-                "-mb-px -mr-px grid grid-rows-[auto_auto_auto_auto_1fr] border-b border-r border-border p-6 xl:row-span-5 xl:grid-rows-subgrid",
-                plan.featured ? "bg-surface" : "bg-surface-raised",
-              )}
-            >
-              <div className="pb-6">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="heading-6 text-text">{plan.name}</h3>
-                  {plan.featured ? <span className="whitespace-nowrap rounded-sm bg-mark px-2 caption-3 text-on-mark">For MSPs</span> : null}
+      {/* Rate sheet: one plan per row, read across like a price list on a loading bay wall. */}
+      <div className="mt-8 overflow-hidden rounded-lg border-2 border-text bg-surface-raised md:mt-12">
+        <div aria-hidden className="hidden grid-cols-12 gap-6 border-b-2 border-text bg-surface-sunken px-6 py-2 lg:grid">
+          <span className="label-caps col-span-3 text-text-subtle">Plan</span>
+          <span className="label-caps col-span-2 text-text-subtle">Price</span>
+          <span className="label-caps col-span-5 text-text-subtle">Included</span>
+          <span className="label-caps col-span-2 text-text-subtle">Start</span>
+        </div>
+        <ul>
+          {plans.map((plan) => {
+            const price = priceFor(plan, interval);
+            const free = !price;
+            const href = earlyAccess ? `/early-access?plan=${plan.id}` : `/sign-in?plan=${plan.id}&interval=${price?.interval ?? interval}`;
+            return (
+              <li
+                key={plan.id}
+                className={cn(
+                  "grid gap-4 border-b border-border-strong p-4 last:border-b-0 md:px-6 md:py-4 lg:grid-cols-12 lg:gap-6",
+                  plan.featured && "bg-mark/40 shadow-[inset_4px_0_0_var(--accent)]",
+                )}
+              >
+                <div className="lg:col-span-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="heading-6 text-text">{plan.name}</h3>
+                    {plan.featured ? <span className="whitespace-nowrap rounded-sm bg-accent px-2 caption-3 text-action-text">For MSPs</span> : null}
+                  </div>
+                  <p className="body-6 mt-1 text-text-subtle">{plan.tagline}</p>
                 </div>
-                <p className="body-6 mt-1 text-text-subtle">{plan.tagline}</p>
-              </div>
-              <p className="flex flex-wrap items-baseline gap-x-1 pb-6">
-                <span className="figure-lg text-text">{free ? "$0" : money(price.usd)}</span>
-                <span className="whitespace-nowrap font-mono caption-4 text-text-subtle">{free ? "free" : `per ${price.interval}`}</span>
-              </p>
-              <div className="pb-3">
-                <Link href={href} className={cn(buttonClass(plan.featured ? "primary" : "secondary", "md"), "w-full")}>{earlyAccess ? earlyAccessCopy.pricingCta : plan.cta}</Link>
-              </div>
-              <p className="caption-2 pb-6 text-text-subtle">{free ? RISK_FREE : RISK_PAID}</p>
-              <ul className="flex flex-col border-t border-border pt-3">
-                {plan.highlights.map((h) => (
-                  <li key={h} className="flex items-start gap-2 border-b border-border py-2 body-6 text-text last:border-b-0">
-                    <Check size={16} weight="regular" aria-hidden className="mt-0.5 shrink-0 text-success" />
-                    <span>{h}{ROADMAP.test(h) ? <span className="ml-2 inline-flex rounded-sm border border-border-strong px-1 caption-4 text-text-subtle">Roadmap</span> : null}</span>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          );
-        })}
-      </ul>
+                <p className="flex flex-wrap items-baseline gap-x-1 lg:col-span-2 lg:flex-col lg:gap-0">
+                  <span className="figure-lg text-text">{free ? "$0" : money(price.usd)}</span>
+                  <span className="whitespace-nowrap font-mono caption-4 text-text-subtle">{free ? "free" : `per ${price.interval}`}</span>
+                </p>
+                <ul className="grid content-start gap-x-6 sm:grid-cols-2 lg:col-span-5">
+                  {plan.highlights.map((h) => (
+                    <li key={h} className="flex items-start gap-2 border-b border-border py-1 body-6 text-text">
+                      <Check size={16} weight="bold" aria-hidden className="mt-0.5 shrink-0 text-success" />
+                      <span>{h}{ROADMAP.test(h) ? <span className="ml-2 inline-flex rounded-sm border border-border-strong px-1 caption-4 text-text-subtle">Roadmap</span> : null}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex flex-col gap-2 lg:col-span-2">
+                  <Link href={href} className={cn(buttonClass(plan.featured ? "primary" : "secondary", "md"), "w-full")}>{earlyAccess ? earlyAccessCopy.pricingCta : plan.cta}</Link>
+                  <p className="caption-2 text-text-subtle">{free ? RISK_FREE : RISK_PAID}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
       {education ? (
         <p className="mt-8 max-w-2xl body-3 text-text-subtle">
           <strong className="font-semibold text-text">Education and non profit: {money(education)} per month</strong> for the Professional plan, with proof of status. Granted after a manual check. Contact {product.supportEmail}.
