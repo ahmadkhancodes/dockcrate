@@ -32,3 +32,14 @@ export async function currentUsage(db: Db, orgId: string, meters: MeterId[], now
   const plan = effectivePlan(ent, now.getTime());
   return Promise.all(meters.map(async (m) => usageState(m, await db.getUsage(orgId, m, periodOf(now)), plan.limits[m])));
 }
+
+/**
+ * The meter the app-wide banner should talk about, or null. Devices are the billed meter, so they warn from 80% (brief:
+ * banners at 80% and 100%). Tenants and catalog apps are allowances: using all of them (a Free org with its one tenant)
+ * is normal, so the banner only appears when they are over (for example after a downgrade). The tenants page and the
+ * 402 answer explain the cap at the moment someone tries to add one more.
+ */
+export function bannerMeter(usage: UsageState[]): UsageState | null {
+  const show = usage.filter((u) => (u.meter === "devices" ? u.level !== "ok" : u.used > u.limit));
+  return show.sort((a, b) => b.ratio - a.ratio)[0] ?? null;
+}

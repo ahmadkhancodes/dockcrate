@@ -14,6 +14,7 @@ import { defaultDeps } from "@/lib/deps";
 import { sendMail } from "@/lib/mail";
 import { log } from "@/lib/logger";
 import { inviteEmail, magicLinkEmail } from "@/lib/mail/templates";
+import { emitEvent } from "@/lib/webhooks/outbound";
 import { isDisposableEmail } from "@/lib/security/disposable";
 import { rateLimit, RULES } from "@/lib/security/ratelimit";
 import { getDb } from "@/lib/db";
@@ -179,6 +180,8 @@ export function createAuth(db: BetterAuthOptions["database"]) {
           const m = inviteEmail({ orgName: data.organization.name, inviter: data.inviter.user.name || data.inviter.user.email, url, role: data.role });
           // The invitation row exists; if the provider rejects, the inviter can resend. Never surface provider errors.
           await safeSend({ to: data.email, ...m, category: "transactional" }, "invitation");
+          // Customer webhooks subscribed to member.invited (offered in Settings, then Webhooks), e.g. to open a PSA ticket.
+          await emitEvent(data.organization.id, "member.invited", { invitationId: data.id, email: data.email, role: data.role, invitedBy: data.inviter.user.email }).catch(() => []);
         },
       }),
       apiKey({

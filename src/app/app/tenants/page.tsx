@@ -2,6 +2,7 @@ import { PageHeader, Panel } from "@/components/app/page-header";
 import { Notice } from "@/components/ui/states";
 import { apiCtx } from "@/lib/api/ctx";
 import { canAccess, filterTenants } from "@/lib/authz";
+import { orgLimits, upgradeFor } from "@/lib/billing/limits";
 import { PERMISSIONS, type Tenant } from "@/lib/tenants";
 import { TenantsClient } from "./tenants-client";
 
@@ -16,6 +17,8 @@ export default async function TenantsPage({ searchParams }: { searchParams: SP }
   const { org, membership, deps } = await apiCtx({ page: true });
   const tenants = filterTenants(membership, await deps.db.collection<Tenant>("tenants").find({ orgId: org.org.id })).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   const consent = one(sp.consent);
+  const limits = await orgLimits(deps.db, org.org.id);
+  const cap = limits.tenants.used >= limits.tenants.limit ? { planName: limits.plan.name, limit: limits.tenants.limit, upgrade: upgradeFor(limits.plan, "tenants") } : null;
   return (
     <>
       <PageHeader title="Tenants" description="Each customer Microsoft tenant is connected once, by an admin, with three permissions." />
@@ -26,7 +29,7 @@ export default async function TenantsPage({ searchParams }: { searchParams: SP }
           </Notice>
         </div>
       ) : null}
-      <TenantsClient tenants={tenants} canConnect={canAccess(membership, "tenant", "connect")} />
+      <TenantsClient tenants={tenants} canConnect={canAccess(membership, "tenant", "connect")} cap={cap} />
       <div className="mt-6">
         <Panel title="Permissions we ask for" description="Application permissions, granted once by a Global Administrator. We never store customer secrets.">
           <ul className="flex flex-col gap-3">

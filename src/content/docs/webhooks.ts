@@ -9,13 +9,13 @@ export const webhooks: DocPage = {
     {
       heading: "Overview",
       body: [
-        "Webhooks are available on Professional and above. Add an endpoint URL in Settings, then Webhooks. You can add up to 20 endpoints, each subscribed to named events or to *. We send an HTTP POST with a JSON body each time a subscribed event happens. Each endpoint has its own signing secret, shown once when you create it.",
+        "Any plan can add webhooks today. Add an endpoint URL in Settings, then Webhooks. You can add up to 20 endpoints, each subscribed to named events or to *. We send an HTTP POST with a JSON body each time a subscribed event happens. Each endpoint has its own signing secret, shown once when you create it.",
       ],
     },
     {
       heading: "Events",
       body: [
-        "Each delivery body is JSON with id, type, created (Unix time) and data. Today the event we send is billing.updated, with the Stripe event name, plan and status. Ring, rollback and QA events are planned.",
+        "Each delivery body is JSON with id, type, created (Unix time) and data. Today we send billing.updated (data: the Stripe event name, plan and status), member.invited (data: invitationId, email, role and invitedBy) and test.ping (from Send test, data: a message). Ring, rollback and QA events are planned.",
       ],
     },
     {

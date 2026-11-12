@@ -104,3 +104,13 @@ export async function deviceCountJob(deps: Deps, counter: DeviceCounter): Promis
   }
   return out;
 }
+
+export interface UpgradeHint { planId: string; planName: string; limit: number; monthlyUsd: number | null; href: string }
+
+/** The cheapest plan that raises a meter above the current plan's limit, with a deep link to the billing checkout. */
+export function upgradeFor(current: Plan, m: "devices" | "tenants" | "catalog_apps"): UpgradeHint | null {
+  const next = product.plans.find((p) => p.limits[m] > current.limits[m] && p.prices.length > 0);
+  if (!next) return null;
+  const monthly = next.prices.find((x) => x.interval === "month");
+  return { planId: next.id, planName: next.name, limit: next.limits[m], monthlyUsd: monthly ? monthly.usd / 100 : null, href: `/app/billing?plan=${next.id}&interval=month` };
+}

@@ -76,3 +76,9 @@ export async function createPortalSession(stripe: Pick<Stripe, "billingPortal">,
   const s = await stripe.billingPortal.sessions.create({ customer: acct.stripeCustomerId, return_url: returnUrl });
   return { url: s.url };
 }
+
+/** Where Stripe Checkout returns to. The billing page reads `checkout=success` (with session_id) and `checkout=canceled`. */
+export const checkoutReturnUrls = (base: string) => ({
+  success: `${base.replace(/\/$/, "")}/app/billing?checkout=success`,
+  cancel: `${base.replace(/\/$/, "")}/app/billing?checkout=canceled`,
+});

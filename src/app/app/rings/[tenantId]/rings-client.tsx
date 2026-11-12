@@ -7,6 +7,7 @@ import { Panel } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
 import { ErrorState, Notice, Skeleton } from "@/components/ui/states";
+import { guessRingGroups } from "@/lib/rings/guess-groups";
 import type { RingConfig } from "@/lib/rings/types";
 
 interface Group { id: string; displayName: string }
@@ -18,8 +19,12 @@ export function RingsClient({ tenantId, canConfigure, initial }: { tenantId: str
     if (!r.ok) throw new Error(r.code === "tenant_not_connected" ? "This tenant is not connected." : "We could not read the tenant's groups. Check that Group.Read.All consent is still granted, then try again.");
     return r.data.groups;
   }, [tenantId]);
-  const [pilot, setPilot] = useState(initial?.pilot.groupId ?? "");
-  const [broad, setBroad] = useState(initial?.broad.groupId ?? "");
+  const [pickedPilot, setPilot] = useState(initial?.pilot.groupId ?? "");
+  const [pickedBroad, setBroad] = useState(initial?.broad.groupId ?? "");
+  // First setup: preselect likely groups (DC-Pilot / DC-Broad, "Pilot", "All users"...) until the user picks.
+  const guess = !initial && groups.data ? guessRingGroups(groups.data) : { pilot: "", broad: "" };
+  const pilot = pickedPilot || guess.pilot;
+  const broad = pickedBroad || guess.broad;
   const [pilotDelay, setPilotDelay] = useState(String(initial?.pilot.delayHours ?? 0));
   const [broadDelay, setBroadDelay] = useState(String(initial?.broad.delayHours ?? 48));
   const [threshold, setThreshold] = useState(String(initial?.failThresholdPct ?? 10));
@@ -41,6 +46,8 @@ export function RingsClient({ tenantId, canConfigure, initial }: { tenantId: str
     });
     setBusy(false);
     if (!r.ok) return setMsg({ ok: false, text: r.code === "invalid_input" ? "Check the numbers: delays are whole hours and the threshold is 1 to 100." : r.message });
+    // First setup goes straight back to the dock, where the next step (Publish to Pilot) is waiting.
+    if (!initial) return router.push(`/app?tenant=${tenantId}&rings=saved`);
     setMsg({ ok: true, text: "Rings saved. You can publish now." });
     router.refresh();
   }
@@ -52,7 +59,7 @@ export function RingsClient({ tenantId, canConfigure, initial }: { tenantId: str
   const options = groups.data;
   return (
     <form onSubmit={save} className="flex flex-col gap-6">
-      {!initial ? <Notice tone="info" title="Rings are not set up yet">Pick the two groups below. Until you save, the dock cannot publish to this tenant.</Notice> : null}
+      {!initial ? <Notice tone="info" title="Rings are not set up yet">{guess.pilot && guess.broad ? "We picked the two groups that look like Pilot and Broad. Check them, then save. The defaults below suit most tenants." : "Pick the two groups below. Until you save, the dock cannot publish to this tenant."}</Notice> : null}
       <Panel title="Groups" description="Pilot gets each update first. Broad gets it after the delay, if Pilot stays healthy.">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Pilot group" htmlFor="r-pilot"><Select id="r-pilot" value={pilot} onChange={(e) => setPilot(e.target.value)} required disabled={!canConfigure}><option value="" disabled>Choose a group</option>{options.map((g) => <option key={g.id} value={g.id}>{g.displayName}</option>)}</Select></Field>

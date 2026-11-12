@@ -1,3 +1,4 @@
+import { roleText } from "@/lib/auth/role-text";
 import { product } from "@/config/product";
 import { brand } from "@/lib/brand";
 
@@ -43,10 +44,12 @@ export function otpEmail(code: string) {
 
 export function inviteEmail(opts: { orgName: string; inviter: string; url: string; role: string }) {
   const subject = `${opts.inviter} invited you to ${opts.orgName} on ${product.name}`;
-  const text = `${opts.inviter} invited you to join ${opts.orgName} on ${product.name} as ${opts.role}.\n\nAccept: ${opts.url}`;
+  const what = roleText(opts.role);
+  const text = `${opts.inviter} invited you to join ${opts.orgName} on ${product.name} as ${opts.role}.${what ? ` As ${opts.role}: ${what}` : ""}\n\nAccept: ${opts.url}\n\nThe link works for 7 days. Sign in with your work account; no new password is needed. If you did not expect this, ignore it.`;
   const html = layout(subject, `<h1 style="margin:0 0 8px;font-size:20px">Join ${esc(opts.orgName)}</h1>
-<p style="margin:0;font-size:14px;line-height:20px;color:${brand.inkSubtle}">${esc(opts.inviter)} invited you as ${esc(opts.role)}.</p>
-${button(opts.url, "Accept invitation")}`);
+<p style="margin:0;font-size:14px;line-height:20px;color:${brand.inkSubtle}">${esc(opts.inviter)} invited you as ${esc(opts.role)}.${what ? ` ${esc(what)}` : ""}</p>
+${button(opts.url, "Accept invitation")}
+<p style="margin:0;font-size:13px;line-height:18px;color:${brand.inkSubtle}">The link works for 7 days. Sign in with your work account; no new password is needed. If you did not expect this, ignore it.</p>`);
   return { subject, text, html };
 }
 

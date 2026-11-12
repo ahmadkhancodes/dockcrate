@@ -88,6 +88,7 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
         </Notice></div>
       ) : null}
       {openAlerts.map((a) => <div key={a.id} className="mb-3"><Notice tone={a.severity === "critical" ? "danger" : "warning"} title={a.kind}>{a.message}</Notice></div>)}
+      {one(sp.rings) === "saved" && config && !rows.some((r) => r.deployedVersion) ? <div className="mb-6"><Notice tone="success" title="Rings saved">Pick an app below and choose Publish to Pilot. It goes to {config.pilot.groupName || "your Pilot group"} first.</Notice></div> : null}
       {!config && tenant.status === "connected" ? <div className="mb-6"><Notice tone="info" title="Rings not set up" action={<Link href={`/app/rings/${tenant.id}`} className={buttonClass("primary")}>Set up rings</Link>}>Pick the Pilot and Broad groups for this tenant before publishing.</Notice></div> : null}
 
       {tenant.status === "connected" && (!config || !rows.some((r) => r.deployedVersion)) ? (

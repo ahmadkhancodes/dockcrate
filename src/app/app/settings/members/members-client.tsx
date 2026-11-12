@@ -7,6 +7,7 @@ import { Panel } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
 import { Badge, EmptyState, ErrorState, Skeleton } from "@/components/ui/states";
+import { roleText } from "@/lib/auth/role-text";
 import { authClient } from "@/lib/auth/client";
 import { ScopeEditor } from "./scope-editor";
 
@@ -98,7 +99,7 @@ export function MembersClient({ orgId, meId, canInvite, canCancelInvite, canUpda
             </div>
             <div className="sm:w-1/4">
               <Field label="Role" htmlFor="invite-role">
-                <Select id="invite-role" value={role} onChange={(e) => setRole(e.target.value as (typeof ROLES)[number])}>
+                <Select id="invite-role" aria-describedby="invite-role-help" value={role} onChange={(e) => setRole(e.target.value as (typeof ROLES)[number])}>
                   {ROLES.map((r) => <option key={r} value={r}>{roleLabel(r)}</option>)}
                 </Select>
               </Field>
@@ -107,6 +108,7 @@ export function MembersClient({ orgId, meId, canInvite, canCancelInvite, canUpda
               <Button type="submit" loading={inviting}>Send invitation</Button>
             </div>
           </form>
+          <p id="invite-role-help" aria-live="polite" className="mt-3 caption-2 text-text-subtle"><strong className="font-semibold text-text">{roleLabel(role)}:</strong> {roleText(role)}{role === "operator" || role === "viewer" ? " After they join, limit them to some tenants with Tenant access." : ""}</p>
         </Panel>
       ) : null}
 
