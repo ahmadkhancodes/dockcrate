@@ -1,5 +1,5 @@
 /**
- * Playwright screenshots of the M4 pages at 375 and 1440, light and dark: security, catalog, catalog app page, docs FAQ,
+ * Playwright screenshots of the M4 pages at 375 and 1440, light: security, catalog, catalog app page, docs FAQ,
  * notifications, members, audit log (with Verify chain) and the alert centre. Stub mode: memory DB, fake Graph.
  *   BASE_URL=http://localhost:3100 CHROME_PATH=/usr/bin/google-chrome npx tsx scripts/screenshots-m4.ts
  */
@@ -34,11 +34,10 @@ async function main() {
     if (overflow > 0) problems.push(`${path} @${width} ${theme}: horizontal overflow ${overflow}px`);
     await page.screenshot({ path: `${OUT}/${name}-${width}-${theme}.png`, fullPage: true });
   };
-  for (const theme of ["light", "dark"] as const) {
+  for (const theme of ["light"] as const) {
     for (const width of [375, 1440]) {
       await page.setViewportSize({ width, height: width < 800 ? 812 : 900 });
-      await page.emulateMedia({ colorScheme: theme });
-      await page.addInitScript((t) => { try { localStorage.setItem("theme", t); } catch {} }, theme);
+      await page.emulateMedia({ colorScheme: "light" });
       for (const [name, path] of [["security", "/security"], ["catalog", "/catalog"], ["catalog-app", "/catalog/7-zip"], ["docs-faq", "/docs/faq"], ["notifications", "/app/settings/notifications"], ["members", "/app/settings/members"]] as const) await shoot(name, path, width, theme);
       await shoot("audit-verify", "/app/settings/audit", width, theme, async () => { await page.getByRole("button", { name: "Verify chain" }).click(); await page.getByText("Chain intact").waitFor(); });
       await shoot("alert-centre", "/app", width, theme, async () => { await page.getByRole("button", { name: /^Alerts/ }).first().click({ trial: false }).catch(() => {}); });

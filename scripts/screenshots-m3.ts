@@ -1,6 +1,6 @@
 /**
  * Playwright screenshots of the M3 dashboard pages (ring setup, App Sets, MSP dashboard, audit log) at 375 and 1440,
- * light and dark. Stub mode: memory DB, fake Graph. No network, no real tenant.
+ * light. Stub mode: memory DB, fake Graph. No network, no real tenant.
  *   BASE_URL=http://localhost:3100 CHROME_PATH=/usr/bin/google-chrome npx tsx scripts/screenshots-m3.ts
  */
 import { chromium } from "playwright";
@@ -46,11 +46,10 @@ async function main() {
   if (!save.ok()) throw new Error(`rings save failed: ${save.status()}`);
   await page.request.post(`${BASE}/api/deployments`, { data: { tenantId: id, versionId: "7-zip@25.01" }, headers: origin });
 
-  for (const theme of ["light", "dark"] as const) {
+  for (const theme of ["light"] as const) {
     for (const width of [375, 1440]) {
       await page.setViewportSize({ width, height: width < 800 ? 812 : 900 });
-      await page.emulateMedia({ colorScheme: theme });
-      await page.addInitScript((t) => { try { localStorage.setItem("theme", t); } catch {} }, theme);
+      await page.emulateMedia({ colorScheme: "light" });
       for (const [name, path] of [["rings", `/app/rings/${id}`], ["app-sets", "/app/app-sets"], ["msp", "/app/msp"], ["msp-filtered", "/app/msp?kind=paused&q=zzz"], ["audit", "/app/settings/audit"]] as const) await shoot(name, path, width, theme);
     }
   }

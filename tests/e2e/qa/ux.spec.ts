@@ -33,16 +33,6 @@ test.describe("mobile 375", () => {
   });
 });
 
-test("theme toggle switches and survives a reload", async ({ page }) => {
-  await page.goto("/");
-  const before = await page.evaluate(() => document.documentElement.dataset.theme);
-  await page.getByRole("button", { name: /Switch to (dark|light) theme/ }).first().click();
-  const after = await page.evaluate(() => document.documentElement.dataset.theme);
-  expect(after).not.toBe(before);
-  await page.reload();
-  expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe(after);
-});
-
 test("keyboard only: sign in with Tab + Enter, focus lands in the first field, errors are announced", async ({ page }) => {
   await page.goto("/sign-in");
   await page.keyboard.press("Tab"); // skip link

@@ -13,7 +13,6 @@ function block(selector: string): Record<string, string> {
 }
 
 const light = block(":root");
-const dark = { ...light, ...block(':root[data-theme="dark"]') };
 
 function resolve(theme: Record<string, string>, name: string): string {
   let v = theme[`--${name}`];
@@ -49,7 +48,8 @@ const PAIRS: [string, string, number][] = [
   ["control-border", "surface", UI], ["control-border", "surface-raised", UI],
 ];
 
-describe.each([["light", light], ["dark", dark]] as const)("contrast on the real %s tokens", (_name, theme) => {
+describe("contrast on the real light tokens", () => {
+  const theme = light;
   it.each(PAIRS)("%s on %s is at least %s:1", (fg, bg, min) => {
     expect(contrast(resolve(theme, fg), resolve(theme, bg))).toBeGreaterThanOrEqual(min);
   });

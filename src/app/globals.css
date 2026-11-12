@@ -56,35 +56,6 @@
   color-scheme: light;
 }
 
-:root[data-theme="dark"] {
-  --surface: #15191c;
-  --surface-raised: #1d2327;
-  --surface-sunken: #1b2a26;
-  --surface-inverse: var(--n-50);
-  --text: #e8e6e1;
-  --text-subtle: #9aa3a9;
-  --text-muted: #838c92;
-  --text-inverse: var(--n-900);
-  --border: #2e363b;
-  --border-strong: #414a50;
-  --action: #4fae8c;
-  --action-hover: #66bf9f;
-  --action-text: #0e1412;
-  --focus: #f0b23a;
-  --control-border: #838c92;
-  --amber: #f0b23a;
-  --success: #4fbf7f;
-  --success-surface: #12261b;
-  --warning: #e0a04a;
-  --warning-surface: #2a210e;
-  --danger: #f0766b;
-  --danger-surface: #2c1513;
-  --shadow-color: 0 0% 0%;
-  color-scheme: dark;
-}
-
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
 @theme inline {
   --font-sans: var(--font-sans-family);
   --font-mono: var(--font-mono-family);

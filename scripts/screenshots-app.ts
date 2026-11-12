@@ -1,5 +1,5 @@
 /**
- * Playwright screenshots of the signed-in dashboard pages (/app and /app/tenants) at 375 and 1440, light and dark.
+ * Playwright screenshots of the signed-in dashboard pages (/app and /app/tenants) at 375 and 1440, light.
  * Runs against a server in stub mode (memory DB, fake Graph, console mail). No network, no real tenant.
  *   BASE_URL=http://localhost:3100 CHROME_PATH=/usr/bin/google-chrome npx tsx scripts/screenshots-app.ts
  */
@@ -45,11 +45,10 @@ async function main() {
   }
 
   const problems: string[] = [];
-  for (const theme of ["light", "dark"] as const) {
+  for (const theme of ["light"] as const) {
     for (const width of [375, 1440]) {
       await page.setViewportSize({ width, height: width < 800 ? 812 : 900 });
-      await page.emulateMedia({ colorScheme: theme });
-      await page.addInitScript((t) => { try { localStorage.setItem("theme", t); } catch {} }, theme);
+      await page.emulateMedia({ colorScheme: "light" });
       for (const [name, path] of [["dock", `/app?tenant=${ids[0]}&app=7-zip`], ["dock-waiting", `/app?tenant=${ids[1]}`], ["tenants", "/app/tenants"]] as const) {
         await page.goto(BASE + path, { waitUntil: "networkidle" });
         await page.waitForTimeout(300);
