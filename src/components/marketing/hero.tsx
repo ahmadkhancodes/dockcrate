@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
-import { ButtonLink } from "@/components/ui/button";
+import { SessionButtonLink } from "./session-button-link";
 import { Container } from "@/components/ui/layout";
 
 export interface HeroProps {
@@ -57,7 +57,7 @@ export function Hero({ eyebrow, title, subtitle, primaryCta, secondaryCta, note,
                   {secondaryCta.label}
                 </Link>
               ) : null}
-              <ButtonLink href={primaryCta.href} size="lg">{primaryCta.label}<ArrowRight size={18} aria-hidden /></ButtonLink>
+              <SessionButtonLink cta={primaryCta} size="lg"><ArrowRight size={18} aria-hidden /></SessionButtonLink>
             </div>
             {note ? <p className="caption-2 max-w-md text-text-muted lg:text-right">{note}</p> : null}
           </div>
