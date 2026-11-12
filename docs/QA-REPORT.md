@@ -36,3 +36,17 @@ Scope: every P0 journey that can be driven in the shipped configuration (stub mo
 ## Hardening round (12 Nov 2026)
 Added `tests/unit/hardening.test.ts` (forged, duplicate and out of order Stripe events, per-key rate limits, log scrubbing, CSV formula and unicode safety, CSP pins, no native third-party form posts, health shape without leaks, built-bundle secret scan) and `tests/e2e/qa/hardening.spec.ts` (health, signed-out and guessed-id export refusal, forged webhook, no CSP console errors on the dock). Changes are listed as H-1..H-6 and U-1..U-2 in docs/REVIEW.md. Still open: QA-9..QA-14 as above.
 Test fixes in this round: the sign-out spec used `goBack()` then `reload()`, which raced the redirect and failed on `main` too (`net::ERR_ABORTED`); it now makes a fresh visit to `/app` and still asserts the sign-in page. The API keys spec failed once in a loaded full run (a console or request problem, not reproduced in six solo and file runs); watch it.
+
+## Post-redesign regression pass (12 Nov 2026)
+Specs: `tests/e2e/qa2/visual.spec.ts`, `tests/e2e/qa2/journeys.spec.ts`; unit guards in `tests/unit/qa.test.ts` ("QA2 copy consistency"). Nothing was deployed.
+
+Journeys covered: every public page (including 404, invite error, docs, catalog detail, legal) and every signed-in page at 375 and 1440 with the OS asking for dark mode (page must stay light), computed fonts of all text (only Saira Stencil, IBM Plex Sans, IBM Plex Mono allowed, so no Archivo, Public Sans, JetBrains Mono or system fallbacks), clipped text, console, request and hydration problems; keyboard walk of 45 Tab stops on 11 pages for a visible focus indicator; sign-in with `?next` to a billing return, checkout cancel return, sign-out landing. The earlier crawl, click-everything and hostile suites still pass. Leftover dark-mode and old-palette code: greps of `src` found none (only the yard hex palette, brand.ts and the e-mail/legal HTML using it).
+
+| # | What the user would have seen | Fix | Regression |
+|---|---|---|---|
+| QA2-1 | Returning from Stripe through "cancel" (`/app/billing?checkout=canceled`) showed an unchanged page with no message. | Billing page reads `checkout=canceled` and shows "Checkout canceled. You were not charged." | `journeys.spec.ts` |
+| QA2-2 | (was QA-11) The landing hero, dock preview and demo rows showed the clean-VM check as passed while /security and the catalog say it has not run. Acrobat showed a failed VM test. | Demo data: VM is pending everywhere; Acrobat is held for a changed signer, as in the catalog seed. | `qa.test.ts`, `journeys.spec.ts` |
+| QA2-3 | (was QA-12) Pricing said "Cancel anytime from your account" on paid plans while the only path was "Join early access". | While early access is open the line reads "Early access is by request. No card needed." | `journeys.spec.ts` |
+| QA2-4 | The pipeline diagram on /security used the raw `ui-monospace` stack, so its labels did not use the brand mono font. | Uses the `--font-mono-family` token. | `visual.spec.ts`, `qa.test.ts` |
+
+Open: QA-9 (hydration #418 on /sign-in after a prefetch, Low, still not root-caused), QA-10 (real-tenant journeys, plan-limit banners and dialogs need a registered Entra app; the plan limit user cannot be built in stub mode because connecting is refused, Medium, owner), QA-13 and QA-14 as above. Not run: Lighthouse and axe on a deployed build.

@@ -13,3 +13,14 @@ describe("QA regressions", () => {
     expect((globalThis as { __dcOutbox?: unknown }).__dcOutbox).toBe(outbox);
   });
 });
+
+describe("QA2 copy consistency", () => {
+  it("no demo crate shows the VM check as passed (D-01: it has not run for any version)", async () => {
+    const { demoCrates } = await import("@/content/demo");
+    for (const c of demoCrates) expect(c.checks.vm, c.name).not.toBe("pass");
+  });
+  it("the retired inline mono font stack is gone from the marketing SVG", async () => {
+    const { readFileSync } = await import("node:fs");
+    expect(readFileSync("src/components/marketing/trust.tsx", "utf8")).not.toMatch(/ui-monospace/);
+  });
+});

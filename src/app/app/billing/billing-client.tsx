@@ -12,6 +12,8 @@ import type { UsageState } from "@/lib/billing/usage";
 
 interface Props {
   canManage: boolean;
+  /** Returned from Stripe through the cancel link: say so, nothing was charged. */
+  checkoutCanceled?: boolean;
   planId: PlanId;
   status: string;
   isPaid: boolean;
@@ -90,6 +92,7 @@ export function BillingClient(p: Props) {
   return (
     <div className="flex flex-col gap-6">
       {verifying ? <Notice title="Confirming your payment">This takes a few seconds.</Notice> : null}
+      {p.checkoutCanceled && !activated ? <Notice tone="info" title="Checkout canceled">You were not charged. Your plan has not changed.</Notice> : null}
       {activated ? <Notice tone="success" title="Your plan is active">You are now on {activated}. A receipt is on its way to your email.</Notice> : null}
       {error ? (
         <Notice tone={error.code === "billing_unavailable" ? "info" : "danger"} title={error.code === "billing_unavailable" ? "Billing is not connected yet" : "That did not go through"}>
