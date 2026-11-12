@@ -3,16 +3,18 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "./cn";
 
 // Buttons (playbook §7 states): primary, secondary, tertiary, danger. Hover/active/focus/disabled/loading.
-type Variant = "primary" | "secondary" | "tertiary" | "danger";
+type Variant = "primary" | "secondary" | "tertiary" | "danger" | "inverse";
 type Size = "sm" | "md" | "lg";
 
 const base =
   "inline-flex items-center justify-center gap-2 rounded-md whitespace-nowrap select-none transition-[background-color,color,border-color,opacity,transform] duration-300 ease-out-kit active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-busy:cursor-progress focus-visible:focus-ring";
 const variants: Record<Variant, string> = {
   primary: "bg-action text-action-text hover:bg-action-hover",
-  secondary: "border border-border-strong bg-surface text-text hover:bg-surface-raised",
-  tertiary: "text-text-subtle hover:text-text hover:bg-surface-raised",
+  secondary: "border border-border-strong bg-surface-raised text-text hover:border-text",
+  tertiary: "text-text-subtle hover:text-text hover:bg-surface-sunken",
   danger: "bg-danger text-white hover:opacity-90",
+  /** On the graphite band only: white button, graphite text. */
+  inverse: "bg-surface-raised text-text hover:bg-mark hover:text-on-mark",
 };
 const sizes: Record<Size, string> = {
   sm: "button-sm min-h-11 px-3 py-1 sm:min-h-8",

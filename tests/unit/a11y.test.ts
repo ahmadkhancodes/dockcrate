@@ -42,7 +42,7 @@ const PAIRS: [string, string, number][] = [
   ["success", "success-surface", TEXT], ["warning", "warning-surface", TEXT], ["danger", "danger-surface", TEXT],
   ["success", "surface", TEXT], ["warning", "surface", TEXT], ["danger", "surface", TEXT],
   ["text", "success-surface", TEXT], ["text", "warning-surface", TEXT], ["text", "danger-surface", TEXT],
-  ["on-amber", "amber", TEXT],
+  ["on-mark", "mark", TEXT],
   // non text: focus ring, input borders
   ["focus", "surface", UI], ["focus", "surface-raised", UI], ["focus", "surface-sunken", UI],
   ["control-border", "surface", UI], ["control-border", "surface-raised", UI],

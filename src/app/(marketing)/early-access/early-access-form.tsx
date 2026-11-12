@@ -57,7 +57,7 @@ export function EarlyAccessForm({ plan }: { plan?: string }) {
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-5" noValidate>
+    <form onSubmit={submit} className="flex flex-col gap-6" noValidate>
       <Field label="Work email" htmlFor="ea-email">
         <Input id="ea-email" name="email" type="email" autoComplete="email" inputMode="email" required placeholder="name@company.com" />
       </Field>

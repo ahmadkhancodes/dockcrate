@@ -1,5 +1,7 @@
 # DESIGN: DockCrate by BufferSol
 
+> **Superseded on 12 Nov 2026 by `docs/design-brief.md`** (the "change sheet" system: white and graphite, signal lime mark, Archivo expanded + Public Sans + JetBrains Mono). The research notes below stay for history; the palette, type and crate/stencil visuals in sections 4 and 5 no longer apply.
+
 Status: Phase 0, awaiting orchestrator approval. Proof: `docs/design/mock.html` (+ `mock-1440.png`, `mock-375.png`). Rebuild the mock with `python3 docs/design/tools/build-mock.py <fontsource dir>`.
 Always write the full name "DockCrate by BufferSol" in copy. The wordmark may show "DockCrate" with "by BufferSol" beneath.
 

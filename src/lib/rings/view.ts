@@ -46,11 +46,11 @@ export function dockRows(entries: CatalogEntry[], deployments: Deployment[], con
     }
     if (active.state === "paused") return { ...base, rollbackTo: rb, bays: ["done", "paused", "idle"] as DockRow["bays"], status: "paused" as const, statusLabel: "Paused" };
     if (active.state === "promoted") return { ...base, rollbackTo: rb, bays: ["done", "done", "done"] as DockRow["bays"], status: "shipped" as const, statusLabel: "Shipped" };
-    let label = "Bay 2 pending";
+    let label = "Broad pending";
     if (!plan.rings.includes("broad")) label = "Pilot only";
     else if (config && active.pilotAssignedAt) {
       const left = Math.max(0, Math.ceil((new Date(active.pilotAssignedAt).getTime() + config.broad.delayHours * 3_600_000 - now) / 3_600_000));
-      label = `Bay 2 in ${left} h`;
+      label = `Broad in ${left} h`;
     }
     return { ...base, rollbackTo: rb, bays: ["done", "done", "idle"] as DockRow["bays"], status: "bay2-waiting" as const, statusLabel: label };
   });

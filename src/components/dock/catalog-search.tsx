@@ -57,12 +57,12 @@ export function CatalogSearch({ rows }: { rows: CatalogRow[] }) {
               {results.map((c) => (
                 <tr key={c.slug} className="block border-b border-border last:border-b-0 md:table-row">
                   <th scope="row" className="block px-4 pt-4 text-left md:table-cell md:py-3">
-                    <span className="flex items-center gap-3"><CrateMonogram name={c.name} /><span><span className="block title-4 text-text">{c.name} {c.demo ? <span className="ml-1 rounded-sm border border-border-strong px-1.5 caption-5 font-normal text-text-subtle">Demo data</span> : null}</span><span className="block caption-5 font-normal text-text-subtle">{c.publisher} · {c.category}</span></span></span>
+                    <span className="flex items-center gap-3"><CrateMonogram name={c.name} /><span><span className="block title-4 text-text">{c.name} {c.demo ? <span className="ml-1 rounded-sm border border-border-strong px-2 font-mono caption-5 font-normal text-text-subtle">Demo data</span> : null}</span><span className="block caption-5 font-normal text-text-subtle">{c.publisher} · {c.category}</span></span></span>
                   </th>
                   <td className="inline-block px-4 pt-3 font-mono caption-2 text-text md:table-cell md:py-3"><span className="label-caps mr-2 font-sans text-text-subtle md:hidden">Version</span>{c.version}</td>
                   <td className="inline-block px-4 pt-3 md:table-cell md:py-3"><InspectionTag checks={c.checks} /><span className="sr-only"> {passedLabel(passed(c.checks))}</span></td>
                   <td className="block px-4 pt-3 font-mono caption-2 text-text-subtle md:table-cell md:py-3"><span className="label-caps mr-2 font-sans md:hidden">Last tested</span>{c.testedAt}</td>
-                  <td className="block px-4 py-3 md:table-cell"><Link href={`/catalog/${c.slug}`} className="inline-flex min-h-11 items-center underline underline-offset-4 button-sm text-text hover:text-action focus-visible:focus-ring">Open QA log<span className="sr-only"> for {c.name}</span></Link></td>
+                  <td className="block px-4 py-3 md:table-cell"><Link href={`/catalog/${c.slug}`} className="inline-flex min-h-11 items-center underline underline-offset-4 button-sm text-text decoration-border-strong hover:decoration-text focus-visible:focus-ring">Open QA log<span className="sr-only"> for {c.name}</span></Link></td>
                 </tr>
               ))}
             </tbody>

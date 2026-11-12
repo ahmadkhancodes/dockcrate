@@ -59,11 +59,12 @@ test("public pages render with metadata and no horizontal overflow at 375px", as
   expect(await (await page.request.get("/llms.txt")).text()).toContain("DockCrate by BufferSol");
 });
 
-test("landing shows the crate label, bay track, demo labels and the Microsoft footer line", async ({ page }) => {
+test("landing shows the change sheet, the paused ring mark, demo labels and the Microsoft footer line", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Third-party apps for Intune");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Patch third party apps");
   await expect(page.getByRole("link", { name: "Get early access" }).first()).toBeVisible();
-  await expect(page.getByText("Bay track")).toBeVisible();
+  await expect(page.getByText("Change sheet · week 46")).toBeVisible();
+  await expect(page.getByText("Roll back to 6.3.0 or review the log")).toBeVisible();
   await expect(page.getByText("Demo data").first()).toBeVisible();
   await expect(page.locator("footer")).toContainText("Works with Microsoft Intune. Microsoft and Intune are trademarks of Microsoft. DockCrate by BufferSol is not endorsed by Microsoft.");
   expect(await page.content()).not.toMatch(/postslot|web3forms|submission/i);

@@ -72,7 +72,7 @@ export function LegalDoc({ doc }: { doc: LegalDocData }) {
   });
   return (
     <Container className="py-12 md:py-20">
-      <article className="mx-auto max-w-3xl">
+      <article className="mx-auto max-w-3xl [overflow-wrap:anywhere]">
         <header className="flex flex-col gap-3 border-b border-border pb-8">
           <h1 className="heading-4 text-text">{doc.title}</h1>
           <p className="body-3 text-text-subtle">{doc.description}</p>
@@ -85,7 +85,7 @@ export function LegalDoc({ doc }: { doc: LegalDocData }) {
           <ol className="body-6 flex list-decimal flex-col gap-1 pl-6 text-text-subtle">
             {doc.sections.map((s) => (
               <li key={s.id}>
-                <a href={`#${s.id}`} className="inline-flex min-h-11 items-center text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring sm:min-h-8">
+                <a href={`#${s.id}`} className="inline-flex min-h-11 items-center text-action underline underline-offset-4 decoration-border-strong hover:decoration-text-hover focus-visible:focus-ring sm:min-h-8">
                   {s.title}
                 </a>
               </li>

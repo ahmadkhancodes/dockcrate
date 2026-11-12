@@ -47,8 +47,8 @@ export default async function CratePage({ params }: Props) {
 
   return (
     <Section labelledBy="crate-title" className="pt-24 md:pt-32">
-      <p className="label-caps text-text-subtle"><Link href="/catalog" className="underline underline-offset-4 hover:text-action focus-visible:focus-ring">Catalog</Link> / {demo ? "Demo QA log" : "QA log"}</p>
-      <h1 id="crate-title" className="heading-3 md:heading-1 mt-4 text-text">{c.name} {c.version} {demo ? <span className="ml-2 align-middle rounded-sm border border-border-strong px-2 caption-4 font-normal text-text-subtle">Demo data</span> : null}</h1>
+      <p className="label-caps text-text-subtle"><Link href="/catalog" className="underline underline-offset-4 decoration-border-strong hover:decoration-text focus-visible:focus-ring">Catalog</Link> / {demo ? "Demo QA log" : "QA log"}</p>
+      <h1 id="crate-title" className="heading-3 md:heading-1 mt-4 text-text">{c.name} {c.version} {demo ? <span className="ml-2 inline-block align-middle rounded-sm border border-border-strong px-2 font-mono caption-4 font-normal tracking-normal [font-stretch:100%] text-text-subtle">Demo data</span> : null}</h1>
       <div className="mt-8 max-w-3xl"><Notice tone="warning" title="Demo data">This version comes from the seeded demo catalog: the hash, signer and timings are illustrative until the live pipeline runs. The VM check has not run because no Windows test lab is attached.</Notice></div>
       <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-6"><CrateLabel crate={c} /></div>
@@ -80,7 +80,7 @@ export default async function CratePage({ params }: Props) {
                   <span className="font-mono title-4 text-text">{h.version}</span>
                   <InspectionTag checks={h.verification.checks} />
                   <span className="font-mono caption-2 text-text-subtle">Tested {h.testedAt}</span>
-                  {isDemoVersion(h) ? <span className="rounded-sm border border-border-strong px-1.5 caption-5 text-text-subtle">Demo data</span> : null}
+                  {isDemoVersion(h) ? <span className="rounded-sm border border-border-strong px-2 font-mono caption-5 text-text-subtle">Demo data</span> : null}
                   {h.id === entry.version.id ? <span className="caption-4 text-text-subtle">Current</span> : null}
                 </summary>
                 <ol className="border-t border-border px-4 py-2">

@@ -115,7 +115,7 @@ export function SignInForm({ callbackURL, expiredLink, earlyAccess, oauthError }
         <Fingerprint size={20} weight="regular" aria-hidden />
         Sign in with a passkey
       </Button>
-      <p className="caption-2 text-text-subtle">Want your own Intune tenant connected first? <a href="/early-access" className="underline underline-offset-4 hover:text-action focus-visible:focus-ring">Get early access</a>.</p>
+      <p className="caption-2 text-text-subtle">Want your own Intune tenant connected first? <a href="/early-access" className="underline underline-offset-4 decoration-border-strong hover:decoration-text focus-visible:focus-ring">Get early access</a>.</p>
     </div>
   );
 }

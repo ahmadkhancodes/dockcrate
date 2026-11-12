@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", images: twitterImages() },
 };
 
-const linkClass = "underline underline-offset-4 hover:text-action focus-visible:focus-ring";
+const linkClass = "underline underline-offset-4 decoration-border-strong hover:decoration-text focus-visible:focus-ring";
 
 export default function SecurityPage() {
   const open = earlyAccessOpen();
@@ -38,7 +38,7 @@ export default function SecurityPage() {
 
       <Section tone="raised" labelledBy="qa-title">
         <div className="flex max-w-3xl flex-col gap-4">
-          <h2 id="qa-title" className="heading-4 md:heading-2 text-text">Four checks before a version reaches Bay 1</h2>
+          <h2 id="qa-title" className="heading-4 md:heading-3 text-text">Four checks before a version reaches Pilot</h2>
           <p className="body-3 text-text-subtle">Every version carries an inspection tag and a QA log you can open without logging in.</p>
         </div>
         <div className="mt-12"><QaPipeline /></div>
@@ -49,7 +49,7 @@ export default function SecurityPage() {
 
       <Section labelledBy="data-title">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-          <h2 id="data-title" className="heading-4 md:heading-2 text-text lg:col-span-5">How we handle your data</h2>
+          <h2 id="data-title" className="heading-4 md:heading-3 text-text lg:col-span-5">How we handle your data</h2>
           <ul className="flex flex-col lg:col-span-7">
             {dataHandling.map((item, i) => <li key={i} className="border-t border-border py-4 body-3 text-text last:border-b">{item}</li>)}
           </ul>
@@ -62,7 +62,7 @@ export default function SecurityPage() {
 
       <Section tone="raised" labelledBy="trust-title">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-          <h2 id="trust-title" className="heading-4 md:heading-2 text-text lg:col-span-5">What we do and do not claim</h2>
+          <h2 id="trust-title" className="heading-4 md:heading-3 text-text lg:col-span-5">What we do and do not claim</h2>
           <ul className="flex flex-col lg:col-span-7">
             {[
               <>Publisher verification with Microsoft Partner Center is pending. Until it completes, the Microsoft consent screen shows the app as unverified.</>,

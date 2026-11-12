@@ -32,8 +32,18 @@ export default function PricingPage() {
   const cta = primaryCta(open);
   return (
     <>
-      <Section labelledBy="pricing-title" className="pt-24 md:pt-32">
-        <h1 id="pricing-title" className="heading-3 md:heading-1 mb-12 max-w-3xl text-text">Pricing by managed device. Rings and rollback on every plan.</h1>
+      <Section labelledBy="pricing-title" className="pt-12 md:pt-20">
+        <div className="mb-12 grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-8">
+          <h1 id="pricing-title" className="heading-3 md:heading-1 text-text lg:col-span-8">Priced by managed device, <br className="max-md:hidden" />with rings and rollback on every plan</h1>
+          <dl className="flex flex-col border-t border-text lg:col-span-4">
+            {[["Free plan", "25 devices, no card"], ["Multi tenant from", "Starter, 5 tenants"], ["Device tiers", "Same as Pckgr"]].map(([k, v]) => (
+              <div key={k} className="flex items-baseline justify-between gap-4 border-b border-border py-2">
+                <dt className="caption-2 text-text-subtle">{k}</dt>
+                <dd className="font-mono caption-1 text-text">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
         <PricingTable earlyAccess={open} />
         <p className="mt-8 caption-2 text-text-subtle">Prices in US dollars. Items tagged Roadmap are planned and not shipped yet.</p>
       </Section>

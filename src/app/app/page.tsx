@@ -30,11 +30,21 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
   if (tenants.length === 0) {
     return (
       <>
-        <PageHeader title="Dock" description={`${org.org.name}: every app, every tenant, every bay.`} />
+        <PageHeader title="Dock" description={`${org.org.name}: every app, every tenant, every ring.`} />
         <EmptyState
           title="No tenants connected yet"
           body="Connect a Microsoft tenant to see its apps here. An admin approves three permissions once; you can email them a link if you are not an admin."
           action={<Link href="/app/tenants" className={buttonClass("primary")}>Connect a tenant</Link>}
+          example={
+            <ul className="flex flex-col rounded-md border border-border bg-surface-raised">
+              {[["7-Zip", "25.01", "Pilot 14/14 · Broad in 31 h"], ["Google Chrome", "152.0.6913", "Pilot and Broad installed"], ["Zoom Workplace", "6.3.1", "Broad paused, roll back offered"]].map(([n, v, st]) => (
+                <li key={n} className="flex items-center justify-between gap-3 border-b border-border px-3 py-2 last:border-b-0">
+                  <span className="min-w-0"><span className="block truncate body-5 text-text">{n}</span><span className="font-mono caption-5 text-text-subtle">{v}</span></span>
+                  <span className="text-right font-mono caption-5 text-text-subtle">{st}</span>
+                </li>
+              ))}
+            </ul>
+          }
         />
       </>
     );
@@ -63,11 +73,11 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
 
   return (
     <>
-      <PageHeader title="Dock" description={`${org.org.name}: every app, every tenant, every bay.`} actions={<><Link href="/app/msp" className={buttonClass("secondary")}>MSP view</Link>{tenant.status === "connected" ? <Link href={`/app/rings/${tenant.id}`} className={buttonClass("secondary")}>Rings</Link> : null}<Link href="/app/tenants" className={buttonClass("secondary")}>Tenants</Link></>} />
-      <nav aria-label="Tenant switcher" className="mb-6 flex flex-wrap gap-2">
+      <PageHeader title="Dock" description={`${org.org.name}: every app, every tenant, every ring.`} actions={<><Link href="/app/msp" className={buttonClass("tertiary")}>MSP view</Link><Link href="/app/tenants" className={buttonClass("tertiary")}>Tenants</Link>{tenant.status === "connected" ? <Link href={`/app/rings/${tenant.id}`} className={buttonClass("secondary")}>Ring settings</Link> : null}</>} />
+      <nav aria-label="Tenant switcher" className="-mt-2 flex gap-1 overflow-x-auto border-b border-border">
         {tenants.map((t) => (
           <Link key={t.id} href={`/app?tenant=${t.id}`} aria-current={t.id === tenant.id ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center gap-2 rounded-md border px-3 body-5 focus-visible:focus-ring ${t.id === tenant.id ? "border-text bg-surface-sunken text-text" : "border-border-strong text-text-subtle hover:bg-surface-raised"}`}>
+            className={`relative inline-flex min-h-11 shrink-0 items-center gap-2 rounded-sm px-3 body-5 transition-colors duration-200 focus-visible:focus-ring ${t.id === tenant.id ? "font-semibold text-text after:absolute after:inset-x-3 after:-bottom-px after:h-0.5 after:bg-text" : "text-text-subtle hover:text-text"}`}>
             {t.name} <Badge tone={tone[t.status]}>{STATUS_LABEL[t.status]}</Badge>
           </Link>
         ))}
@@ -80,35 +90,39 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
       {openAlerts.map((a) => <div key={a.id} className="mb-3"><Notice tone={a.severity === "critical" ? "danger" : "warning"} title={a.kind}>{a.message}</Notice></div>)}
       {!config && tenant.status === "connected" ? <div className="mb-6"><Notice tone="info" title="Rings not set up" action={<Link href={`/app/rings/${tenant.id}`} className={buttonClass("primary")}>Set up rings</Link>}>Pick the Pilot and Broad groups for this tenant before publishing.</Notice></div> : null}
 
-      <div className="grid overflow-hidden rounded-md border border-border bg-surface-raised lg:grid-cols-12">
+      <ul aria-label="Dock summary" className="grid grid-cols-2 overflow-hidden rounded-lg border border-border bg-surface-raised md:grid-cols-4">
+        {kpis.map((k) => (
+          <li key={k.label} className="-mb-px -mr-px flex flex-col gap-1 border-b border-r border-border px-4 py-3">
+            <p className="caption-2 text-text-subtle">{k.label}</p>
+            <p className="figure-md text-text">{k.value}</p>
+            <p className="truncate font-mono caption-5 text-text-muted">{k.note}</p>
+          </li>
+        ))}
+      </ul>
+
+      <div className="grid overflow-hidden rounded-lg border border-border bg-surface-raised lg:grid-cols-12">
         <div className="min-w-0 lg:col-span-8">
-          <ul aria-label="Dock summary" className="grid grid-cols-2 border-b border-border md:grid-cols-4">
-            {kpis.map((k) => (
-              <li key={k.label} className="flex flex-col gap-1 border-b border-r border-border p-4 md:border-b-0 md:last:border-r-0">
-                <p className="label-caps text-text-subtle">{k.label}</p>
-                <p className="heading-4 tnum text-text">{k.value}</p>
-                <p className="caption-5 text-text-subtle">{k.note}</p>
-              </li>
-            ))}
-          </ul>
-          <div className="flex items-baseline gap-3 px-4 py-3">
-            <p className="heading-6 uppercase text-text">Apps</p>
-            <p className="caption-2 text-text-subtle">{tenant.name} · Pilot {config?.pilot.delayHours ?? 0} h · Broad {config?.broad.delayHours ?? 48} h</p>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b border-border px-4 py-3">
+            <h2 className="title-3 font-semibold text-text">Apps in {tenant.name}</h2>
+            <p className="font-mono caption-5 text-text-muted">Pilot {config?.pilot.delayHours ?? 0} h · Broad {config?.broad.delayHours ?? 48} h</p>
+          </div>
+          <div aria-hidden className="hidden grid-cols-[1fr_8rem_4rem_auto] gap-x-3 bg-surface px-4 py-2 label-caps text-text-muted md:grid">
+            <span>App</span><span>Version</span><span>Rings</span><span className="text-right">Status</span>
           </div>
           <ul aria-label="Apps">
             {rows.map((r) => (
-              <li key={r.slug} className={`border-t border-border ${r.slug === selected?.slug ? "bg-surface-sunken" : ""}`}>
-                <Link href={`/app?tenant=${tenant.id}&app=${r.slug}`} aria-current={r.slug === selected?.slug ? "true" : undefined} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-4 py-3 focus-visible:focus-ring focus-visible:[outline-offset:-2px] md:grid-cols-[1fr_auto_4rem_auto]">
+              <li key={r.slug} className={`border-t border-border transition-colors duration-200 ${r.slug === selected?.slug ? "bg-surface-sunken" : "hover:bg-surface"}`}>
+                <Link href={`/app?tenant=${tenant.id}&app=${r.slug}`} aria-current={r.slug === selected?.slug ? "true" : undefined} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-4 py-2 focus-visible:focus-ring focus-visible:[outline-offset:-2px] md:grid-cols-[1fr_8rem_4rem_14rem]">
                   <span className="flex min-w-0 items-center gap-3">
                     <CrateMonogram name={r.name} />
                     <span className="min-w-0">
-                      <span className="block truncate title-4 text-text">{r.name}</span>
+                      <span className="block truncate body-4 text-text">{r.name}</span>
                       <span className="block truncate caption-5 text-text-subtle">{r.publisher}</span>
                     </span>
                   </span>
-                  <span className="hidden font-mono caption-2 text-text md:block">{r.deployedVersion ?? r.catalogVersion}</span>
+                  <span className="hidden truncate font-mono caption-2 tnum text-text md:block">{r.deployedVersion ?? r.catalogVersion}</span>
                   <span className="hidden w-16 md:block"><BayTrack bays={r.bays} compact /></span>
-                  <span className="flex flex-wrap items-center justify-end gap-2"><InspectionTag checks={r.checks} className="hidden md:inline-flex" /><StatusChip status={r.status} label={r.statusLabel} /></span>
+                  <span className="flex flex-wrap items-center justify-end gap-2"><InspectionTag checks={r.checks} className="max-md:hidden!" /><StatusChip status={r.status} label={r.statusLabel} /></span>
                 </Link>
               </li>
             ))}
@@ -116,15 +130,11 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
         </div>
         {selected && entry ? (
           <aside aria-label="Manifest of the selected app" className="flex min-w-0 flex-col gap-4 border-t border-border p-4 lg:col-span-4 lg:border-l lg:border-t-0 lg:p-6">
-            <div>
-              <p className="label-caps text-text-subtle">Manifest</p>
-              <p className="heading-5 uppercase text-text">{selected.name} {selected.catalogVersion}</p>
-            </div>
-            <CrateLabel crate={toCrate(entry, selected.status, selected.statusLabel)} size="md" className="p-4 md:p-4" />
+            <CrateLabel crate={toCrate(entry, selected.status, selected.statusLabel)} size="md" />
             {selected.paused ? (
-              <div role="status" className="flex gap-3 rounded-sm border border-warning bg-warning-surface p-3">
+              <div role="status" className="flex gap-3 rounded-md border border-warning bg-warning-surface p-3">
                 <Warning size={20} aria-hidden className="mt-0.5 shrink-0 text-warning" />
-                <p className="body-6 text-text"><strong className="font-semibold">Bay 2 paused.</strong> {selected.pausedReason} Roll back or review the log.</p>
+                <p className="body-6 text-text"><strong className="font-semibold">Broad paused.</strong> {selected.pausedReason} Roll back or review the log.</p>
               </div>
             ) : null}
             {selected.publishReason ? <p className="body-6 text-text-subtle">{selected.publishReason}</p> : null}
@@ -133,7 +143,7 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
               canPublish={selected.canPublish} ringsReady={!!config} canOperate={canOperate} hasDeployment={!!selected.deployedVersion}
               autoUpdate={tenantApps.find((a) => a.appSlug === selected.slug)?.autoUpdate ?? config?.autoUpdateDefault ?? true}
             />
-            {selected.rollbackTo ? <p className="caption-2 text-text-subtle">Rollback re-assigns {selected.rollbackTo.version} as Required and {selected.deployedVersion} as Uninstall for the rings it reached. An audit entry is written.</p> : null}
+            {selected.rollbackTo ? <p className="caption-2 text-text-subtle">Rollback assigns {selected.rollbackTo.version} as Required and {selected.deployedVersion} as Uninstall for the rings it reached. An audit entry is written.</p> : null}
           </aside>
         ) : null}
       </div>

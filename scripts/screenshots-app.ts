@@ -31,13 +31,15 @@ async function main() {
   const ids: string[] = [];
   for (const [i, name] of ["Halvorsen Dental", "Bluebird Logistics"].entries()) {
     const r = await (await page.request.post(`${BASE}/api/tenants`, { data: { name }, headers: origin })).json();
+    if (!r.tenant) { if (i === 0) throw new Error(JSON.stringify(r)); console.log(`second tenant skipped: ${r.error}`); break; }
     ids.push(r.tenant.id);
     if (i === 0) {
       const state = new URL(r.consentUrl).searchParams.get("state")!;
       await page.request.get(`${BASE}/api/tenants/consent/callback?${new URLSearchParams({ state, tenant: "5b0f3c1e-2a47-4d1e-9a60-1c5d8f2b7e90", admin_consent: "True" })}`, { maxRedirects: 0 });
+      await page.request.post(`${BASE}/api/dev/connect-tenant?id=${r.tenant.id}`, { headers: origin });
     }
   }
-  await page.request.post(`${BASE}/api/tenants/${ids[1]}/consent-link`, { data: { email: "it-admin@bluebird.test" }, headers: origin });
+  if (ids[1]) await page.request.post(`${BASE}/api/tenants/${ids[1]}/consent-link`, { data: { email: "it-admin@bluebird.test" }, headers: origin });
   await page.request.post(`${BASE}/api/rings`, { data: { tenantId: ids[0], pilot: { id: "g-pilot", name: "DC-Pilot" }, broad: { id: "g-broad", name: "DC-Broad" } }, headers: origin });
   for (const v of ["7-zip@25.01", "google-chrome@152.0.6913"]) {
     const r = await page.request.post(`${BASE}/api/deployments`, { data: { tenantId: ids[0], versionId: v }, headers: origin });
@@ -50,6 +52,7 @@ async function main() {
       await page.setViewportSize({ width, height: width < 800 ? 812 : 900 });
       await page.emulateMedia({ colorScheme: "light" });
       for (const [name, path] of [["dock", `/app?tenant=${ids[0]}&app=7-zip`], ["dock-waiting", `/app?tenant=${ids[1]}`], ["tenants", "/app/tenants"]] as const) {
+        if (name === "dock-waiting" && !ids[1]) continue;
         await page.goto(BASE + path, { waitUntil: "networkidle" });
         await page.waitForTimeout(300);
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);

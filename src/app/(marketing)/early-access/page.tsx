@@ -28,9 +28,9 @@ export default async function EarlyAccessPage({ searchParams }: { searchParams: 
           <h1 id="ea-title" className="heading-3 md:heading-1 text-text">Get early access</h1>
           <p className="body-3 text-text-subtle md:title-1">Publishing into your own Intune tenant opens with early access. Tell us about your fleet and we connect you first.</p>
           <p className="body-4 text-text-subtle">{earlyAccessCopy.realToday}</p>
-          <p className="body-6 text-text-subtle">Meanwhile, <Link href="/catalog" className="underline underline-offset-4 hover:text-action focus-visible:focus-ring">browse the public catalog</Link> and read any QA log, no login.</p>
+          <p className="body-6 text-text-subtle">Meanwhile, <Link href="/catalog" className="underline underline-offset-4 decoration-border-strong hover:decoration-text focus-visible:focus-ring">browse the public catalog</Link> and read any QA log, no login.</p>
         </div>
-        <div className="lg:col-span-5 lg:col-start-8">
+        <div className="rounded-lg border border-border-strong bg-surface p-4 md:p-6 lg:col-span-5 lg:col-start-8">
           <EarlyAccessForm plan={plan} />
         </div>
       </div>

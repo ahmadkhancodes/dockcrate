@@ -15,7 +15,7 @@ export default function DocsIndexPage() {
     <Container className="py-12 md:py-20">
       <header className="mb-12 flex max-w-3xl flex-col gap-3">
         <h1 className="heading-4 text-text">Documentation</h1>
-        <p className="body-3 text-text-subtle">Everything you need to connect {product.name} to your sites and systems.</p>
+        <p className="body-3 text-text-subtle">How to connect a tenant, set up rings, roll back a version and run App Sets in {product.name}.</p>
       </header>
       <div className="flex flex-col gap-12">
         {docGroups.map((g) => (
