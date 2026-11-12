@@ -72,3 +72,4 @@ Standing decisions are in docs/factory/BATCH1_PLAN.md (Mongo instead of Postgres
 
 ## D-ads-1 (10 Nov 2026): honest cadence and early access
 Production is Vercel Hobby (daily cron, 60 s functions, no worker). Copy about background timing reads `cadence` in `src/config/product.ts`; flip `CADENCE_MODE` to "frequent" once a faster scheduler calls the jobs. Early access is open when `ENTRA_CLIENT_ID` is unset or `EARLY_ACCESS=1` (`src/lib/early-access.ts`). Leads live in the Db collection `leads` (Mongo `dc_leads`), one per email.
+- **D-52 Light only (12 Nov 2026).** Dark mode is removed everywhere (marketing, app, mails, OS fallback): no theme toggle, init script, `data-theme`, localStorage key or dark token set; one light token set, `color-scheme: light`, one `theme-color`. D-08 dark backgrounds and the dark column in DESIGN.md are historical. Guard: `tests/unit/no-dark-mode.test.ts`.

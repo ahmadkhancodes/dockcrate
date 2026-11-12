@@ -24,11 +24,10 @@ async function audit(page: Page) {
 }
 
 for (const vp of [{ w: 375, h: 812 }, { w: 1440, h: 900 }]) {
-  for (const scheme of ["light", "dark"] as const) {
-    test(`crawl ${vp.w} ${scheme}: public pages and app pages are clean`, async ({ page, request }) => {
+  {
+    test(`crawl ${vp.w} light: public pages and app pages are clean`, async ({ page, request }) => {
       test.setTimeout(240_000);
       await page.setViewportSize({ width: vp.w, height: vp.h });
-      await page.emulateMedia({ colorScheme: scheme });
       let step = "";
       const problems = watch(page, () => step);
       const found: string[] = [];
@@ -49,7 +48,7 @@ for (const vp of [{ w: 375, h: 812 }, { w: 1440, h: 900 }]) {
         await page.waitForLoadState("networkidle");
         for (const a of await audit(page)) found.push(`${p} ${a}`);
       }
-      console.log(JSON.stringify({ vp, scheme, found: [...new Set(found)], problems: [...new Set(problems)] }, null, 1));
+      console.log(JSON.stringify({ vp, found: [...new Set(found)], problems: [...new Set(problems)] }, null, 1));
       expect(found).toEqual([]);
       // Known open defect QA-9 (docs/QA-REPORT.md): React #418 on /sign-in after a router prefetch. Tracked by the fixme test below, not hidden.
       expect(problems.filter((p) => !(p.startsWith("/sign-in [public /sign-in]") && p.includes("React error #418")))).toEqual([]);

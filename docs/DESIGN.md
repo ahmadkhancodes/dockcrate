@@ -1,6 +1,6 @@
 # DESIGN: DockCrate by BufferSol
 
-Status: Phase 0, awaiting orchestrator approval. Proof: `docs/design/mock.html` (+ `mock-1440.png`, `mock-375.png`, dark variants). Rebuild the mock with `python3 docs/design/tools/build-mock.py <fontsource dir>`.
+Status: Phase 0, awaiting orchestrator approval. Proof: `docs/design/mock.html` (+ `mock-1440.png`, `mock-375.png`). Rebuild the mock with `python3 docs/design/tools/build-mock.py <fontsource dir>`.
 Always write the full name "DockCrate by BufferSol" in copy. The wordmark may show "DockCrate" with "by BufferSol" beneath.
 
 ## 1. Competitor and ICP research (live sites, 5 Nov 2026)
@@ -110,7 +110,7 @@ Don't
 5. **Accessible by default** (WCAG 2.2 AA targets, 44px targets, status never by colour alone), which matters for school and government-adjacent buyers.
 
 ## 7. Scorecard targets (M5)
-Run the DESIGN_PLAYBOOK scorecard at 375 and 1440 in light and dark. Targets: contrast pairs all AA, zero arbitrary type/spacing values, Lighthouse 90+ (performance, accessibility, SEO), CLS under 0.05, hero LCP under 2.0 s on mobile (fonts preloaded, no web-font CDN).
+Run the DESIGN_PLAYBOOK scorecard at 375 and 1440 in light. Targets: contrast pairs all AA, zero arbitrary type/spacing values, Lighthouse 90+ (performance, accessibility, SEO), CLS under 0.05, hero LCP under 2.0 s on mobile (fonts preloaded, no web-font CDN).
 
 ## 8. Open points for the orchestrator
 - Dock green `#1F5C4A` sits near Packer's green family. Mitigation: it is far darker and paired with amber and concrete, never mint. If you want more separation, swap to the runner-up "steel teal" with no other change (one token edit).

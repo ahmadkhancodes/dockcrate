@@ -1,6 +1,6 @@
 # Design QA scorecard (DESIGN_PLAYBOOK section 9), M1-B, 5 Nov 2026
 
-Screenshots: `docs/qa/` (`/`, `/pricing`, `/security`, `/compare/pckgr`, `/catalog`, `/sign-in`; 375 and 1440; light and dark). Captured from `npm run build && npm start`. `scripts/screenshots.ts` reports zero horizontal overflow on all 24 captures; the e2e test repeats the 375 check on 9 routes.
+Screenshots: `docs/qa/` (`/`, `/pricing`, `/security`, `/compare/pckgr`, `/catalog`, `/sign-in`; 375 and 1440; light). Captured from `npm run build && npm start`. `scripts/screenshots.ts` reports zero horizontal overflow on all 24 captures; the e2e test repeats the 375 check on 9 routes.
 
 | Category | Score | Worst problem |
 |---|---|---|

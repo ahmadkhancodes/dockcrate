@@ -1,6 +1,6 @@
 # ROADMAP: DockCrate by BufferSol (full workbook MVP, M1 to M5)
 
-Each milestone ends with: lint + typecheck + tests + build green, deploy, Playwright screenshots (375/1440, light/dark) in `docs/qa/`, PROGRESS.md updated, PR merged, one line to the orchestrator. P0 numbers refer to `docs/ARCHITECTURE.md` section 8.
+Each milestone ends with: lint + typecheck + tests + build green, deploy, Playwright screenshots (375/1440, light) in `docs/qa/`, PROGRESS.md updated, PR merged, one line to the orchestrator. P0 numbers refer to `docs/ARCHITECTURE.md` section 8.
 
 | Milestone | Scope | P0s | Exit check |
 |---|---|---|---|

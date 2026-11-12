@@ -3,7 +3,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { earlyAccessCopy, product } from "@/config/product";
-import { ThemeToggle } from "@/components/theme";
 import { buttonClass } from "@/components/ui/button";
 import { cn } from "@/components/ui/cn";
 
@@ -96,7 +95,6 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
           ) : (
             <Link href="/sign-in" className={cn(buttonClass("primary", "md"), "max-md:hidden")}><span>Start free<span className="hidden lg:inline"> with Microsoft</span></span></Link>
           )}
-          <ThemeToggle />
           <button
             ref={toggleRef}
             type="button"
