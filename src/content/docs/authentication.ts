@@ -1,4 +1,5 @@
 import { product as p } from "@/config/product";
+import { apiKeySnippet } from "./snippets";
 import type { DocPage } from "./types";
 
 export const authentication: DocPage = {
@@ -25,7 +26,8 @@ export const authentication: DocPage = {
     {
       heading: "Roles",
       body: [
-        "Each organization has owner, admin, member and viewer roles. Owners manage billing. Owners and admins manage API keys and webhooks and read the audit log. Members can read them. Viewers have read access to data only.",
+        "Each organization has four roles. Owner: everything, including billing. Admin: everything except changing the plan: connects tenants, sets up rings, publishes and rolls back, invites members, manages API keys and webhooks. Operator (technician): publishes, rolls back and turns auto update on or off in the tenants they are given; reads the audit log; cannot connect tenants, change rings, invite people or manage keys. Viewer: reads apps, tenants and rings, and changes nothing.",
+        "Operators and viewers can be limited to some tenants in Settings, then Members, then Tenant access. They then see only those tenants, including in the audit log.",
       ],
     },
     {
@@ -35,7 +37,7 @@ export const authentication: DocPage = {
       ],
       code: {
         lang: "bash",
-        code: `curl ${p.url}/api/v1/me \\\n  -H "x-api-key: YOUR_API_KEY"`,
+        code: apiKeySnippet(p.url),
       },
     },
   ],

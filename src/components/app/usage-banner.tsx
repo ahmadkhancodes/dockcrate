@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { Notice } from "@/components/ui/states";
 import type { Entitlement } from "@/lib/db/types";
-import type { UsageState } from "@/lib/billing/usage";
+import { bannerMeter, type UsageState } from "@/lib/billing/usage";
 import { product } from "@/config/product";
 import { METER_LABELS, fmt } from "./labels";
 
 /** Shown in the app layout when a meter is near/over its limit, or a payment failed. */
 export function UsageBanner({ usage, entitlement, graceEndsAt = null, graceExpired = false }: { usage: UsageState[]; entitlement: Entitlement | null; graceEndsAt?: string | null; graceExpired?: boolean }) {
-  const worst = [...usage].filter((u) => u.level !== "ok").sort((a, b) => b.ratio - a.ratio)[0];
+  const worst = bannerMeter(usage);
   const pastDue = entitlement?.status === "past_due";
   if (!worst && !pastDue) return null;
   const link = (label: string) => (

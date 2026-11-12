@@ -1,4 +1,4 @@
-import { product as p } from "@/config/product";
+import { freePlan as free, product as p } from "@/config/product";
 import type { DocPage } from "./types";
 
 export const gettingStarted: DocPage = {
@@ -13,7 +13,7 @@ export const gettingStarted: DocPage = {
     {
       heading: "Before you start",
       body: [
-        `${p.fullName} publishes third-party apps to your own Intune tenant as Win32 apps. You need a Microsoft work account to sign in and a Global Admin to approve the connection once. New accounts start on the ${p.plans[0]?.name ?? "Free"} plan: 25 devices, 1 tenant and 15 catalog apps, with rings and rollback included.`,
+        `${p.fullName} publishes third-party apps to your own Intune tenant as Win32 apps. You need a Microsoft work account to sign in and a Global Admin to approve the connection once. New accounts start on the ${free.name} plan: ${free.limits.devices} devices, ${free.limits.tenants} tenant and ${free.limits.catalog_apps} catalog apps, with rings and rollback included.`,
       ],
     },
     {
@@ -26,7 +26,7 @@ export const gettingStarted: DocPage = {
     {
       heading: "Pick your Pilot and Broad groups",
       body: [
-        "Rings are two Entra groups. Pilot receives each new version first. Broad receives it after a delay. Choose existing groups, or let us create DC-Pilot and DC-Broad for you.",
+        "Rings are two Entra groups. Pilot receives each new version first. Broad receives it after a delay. Pick two existing groups. If you have none yet, create them in Entra first, for example DC-Pilot with a few IT devices and DC-Broad with everyone else. The ring picker preselects groups named like that. DockCrate reads groups and never creates or changes them.",
         "Defaults are 0 hours for Pilot and 48 hours for Broad. A version reaches Broad only if Pilot failures stay under the threshold, which defaults to 10%. Otherwise Broad is paused at the next daily check and you get an alert.",
       ],
     },

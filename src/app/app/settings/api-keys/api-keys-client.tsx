@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { authError, formatDate, useAsync } from "@/components/app/api";
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
-import { SecretReveal } from "@/components/app/copy-button";
+import { CopyButton, SecretReveal } from "@/components/app/copy-button";
+import { apiKeySnippet } from "@/content/docs/snippets";
 import { DataTable, Td } from "@/components/app/data-table";
 import { Panel } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ export function ApiKeysClient({ orgId, canManage }: { orgId: string; canManage: 
     <div className="flex flex-col gap-6">
       {!canManage ? <Notice title="Read only">Only owners and admins can create or delete API keys.</Notice> : null}
       {created ? <SecretReveal title={`Key created: ${created.name}`} value={created.key} onDismiss={() => setCreated(null)} /> : null}
+      {created ? <KeySnippet apiKey={created.key} orgId={orgId} /> : null}
 
       {canManage ? (
         <Panel title="Create a key">
@@ -116,5 +118,21 @@ export function ApiKeysClient({ orgId, canManage }: { orgId: string; canManage: 
         Anything using this key stops working right away. This cannot be undone.
       </ConfirmDialog>
     </div>
+  );
+}
+
+/** The first request, ready to paste: this app's real URL and the key just created (same snippet as the docs). */
+function KeySnippet({ apiKey, orgId }: { apiKey: string; orgId: string }) {
+  const code = apiKeySnippet(typeof window === "undefined" ? "" : window.location.origin, apiKey);
+  return (
+    <Panel title="Try it from your terminal" description="Run this on your server or laptop. It answers with your organization id, so you know the key works.">
+      <div className="flex flex-col gap-3">
+        <pre aria-label="curl command with your key" className="overflow-x-auto rounded-md border border-border bg-surface-sunken p-3 font-mono caption-2 text-text"><code>{code}</code></pre>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="caption-2 text-text-subtle">Expected answer: <code className="font-mono">{`{"orgId":"${orgId}"}`}</code></p>
+          <CopyButton value={code} label="Copy command" />
+        </div>
+      </div>
+    </Panel>
   );
 }

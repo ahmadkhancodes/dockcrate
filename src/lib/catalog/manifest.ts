@@ -25,13 +25,15 @@ export function createEd25519Signer(privateKey: KeyObject): ManifestSigner {
 
 export const generateTestSigner = () => createEd25519Signer(generateKeyPairSync("ed25519").privateKey);
 
-let devSigner: ManifestSigner | undefined;
+// Held on globalThis: Next.js loads this module once per server layer (route handlers, pages), and a per-module key
+// meant the catalog was signed by one layer and verified by another, so stub-mode publishing failed with manifest_invalid.
+const devKey = globalThis as unknown as { __dcDevManifestSigner?: ManifestSigner };
 /** MANIFEST_SIGNING_KEY (PKCS#8 PEM). Without it a real deployment refuses; dev and the memory stub use an ephemeral per process key. */
 export function envManifestSigner(): ManifestSigner {
   const pem = env().MANIFEST_SIGNING_KEY?.replace(/\\n/g, "\n");
   if (pem) return createEd25519Signer(createPrivateKey(pem));
   if (isProd() && dbDriver() !== "memory") throw new HttpError(503, "manifest_signing_unavailable");
-  return (devSigner ??= generateTestSigner());
+  return (devKey.__dcDevManifestSigner ??= generateTestSigner());
 }
 
 /** Canonical payload: stable key order over everything that decides what gets installed. */

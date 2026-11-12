@@ -5,6 +5,8 @@ import { api } from "@/components/app/api";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { Badge, EmptyState, Notice } from "@/components/ui/states";
+import { product, UNLIMITED } from "@/config/product";
+import type { UpgradeHint } from "@/lib/billing/limits";
 import { STATUS_LABEL, type Tenant, type TenantStatus } from "@/lib/tenants/labels";
 
 const tone = { connected: "success", waiting_consent: "warning", disconnected: "danger", pending: "info" } as const;
@@ -72,10 +74,24 @@ function TenantRow({ initial, canConnect }: { initial: Tenant; canConnect: boole
   );
 }
 
-export function TenantsClient({ tenants, canConnect }: { tenants: Tenant[]; canConnect: boolean }) {
+export interface TenantCap { planName: string; limit: number; upgrade: UpgradeHint | null }
+
+/** Shown instead of the add form when the plan's tenants are all in use, so the next step is an upgrade, not an error. */
+export function TenantCapNotice({ cap }: { cap: TenantCap }) {
+  const u = cap.upgrade;
+  return (
+    <Notice tone="info" title={`Your ${cap.planName} plan includes ${cap.limit} tenant${cap.limit === 1 ? "" : "s"}, all in use`}
+      action={u ? <Link href={u.href} className={buttonClass("primary")}>Upgrade to {u.planName}</Link> : <a href={`mailto:${product.supportEmail}`} className={buttonClass("secondary")}>Contact us</a>}>
+      {u ? `${u.planName} adds ${u.limit >= UNLIMITED ? "unlimited tenants" : `up to ${u.limit} tenants`}${u.monthlyUsd ? ` for $${u.monthlyUsd.toFixed(2)} a month` : ""}. Your connected tenants, rings and apps stay as they are.` : "Write to us about a larger plan."}
+    </Notice>
+  );
+}
+
+export function TenantsClient({ tenants, canConnect, cap = null }: { tenants: Tenant[]; canConnect: boolean; cap?: TenantCap | null }) {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [limitHit, setLimitHit] = useState(false);
 
   async function create(e: React.FormEvent) {
     e.preventDefault();
@@ -83,18 +99,19 @@ export function TenantsClient({ tenants, canConnect }: { tenants: Tenant[]; canC
     setBusy(true);
     setError(null);
     const r = await api<{ consentUrl: string }>("/api/tenants", { body: { name: name.trim() } });
-    if (!r.ok) { setBusy(false); return setError(r.message); }
+    if (!r.ok) { setBusy(false); if (r.code === "limit_reached") setLimitHit(true); return setError(r.message); }
     window.location.assign(r.data.consentUrl);
   }
 
   return (
     <div className="flex flex-col gap-6">
-      {canConnect ? (
+      {canConnect && cap ? <TenantCapNotice cap={cap} /> : canConnect ? (
         <form onSubmit={create} className="flex flex-col gap-3 rounded-lg border border-border bg-surface-raised p-4 sm:flex-row sm:items-end">
           <div className="flex-1"><Field label="Customer name" htmlFor="tenant-name" error={error}><Input id="tenant-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Halvorsen Dental" autoComplete="off" /></Field></div>
           <Button type="submit" loading={busy}>Add and connect</Button>
         </form>
       ) : <Notice tone="info">Your role can view tenants but not connect them.</Notice>}
+      {limitHit && !cap ? <Link href="/app/billing" className={`${buttonClass("secondary")} self-start`}>See plans</Link> : null}
       {tenants.length === 0 ? (
         <EmptyState title="No tenants yet" body="Add a customer above. An admin of that Microsoft tenant approves DockCrate once, and it shows as Connected within a minute." />
       ) : (
