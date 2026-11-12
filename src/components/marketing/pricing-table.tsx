@@ -5,6 +5,8 @@ import { earlyAccessCopy, product, plans, type Interval, type Plan, type PlanPri
 import { buttonClass } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/components/ui/cn";
+import { useSessionState } from "@/lib/auth/use-signed-in";
+import { pricingCtaFor } from "./session-labels";
 
 const money = (cents: number) =>
   new Intl.NumberFormat("en-US", {
@@ -34,10 +36,12 @@ const ROADMAP = /macOS|Scheduled windows|Client PDF|Custom Apps|Defender|Policy 
 
 const RISK_FREE = "No credit card needed.";
 const RISK_PAID = "Cancel anytime from your account.";
+const RISK_SIGNED_IN = "Opens billing for your organization.";
 const RISK_EARLY = "Early access is by request. No card needed.";
 
 export function PricingTable({ id = "pricing", title, earlyAccess = false }: { id?: string; title?: string; earlyAccess?: boolean }) {
   const [interval, setBilling] = useState<Interval>(product.defaultInterval);
+  const signedIn = useSessionState() === "in";
   const saving = annualSavings();
   const education = plans.find((p) => p.educationUsd)?.educationUsd;
   const savingText = saving ? (saving.min === saving.max ? `${saving.max}%` : `${saving.min}% to ${saving.max}%`) : null;
@@ -85,7 +89,11 @@ export function PricingTable({ id = "pricing", title, earlyAccess = false }: { i
           {plans.map((plan) => {
             const price = priceFor(plan, interval);
             const free = !price;
-            const href = earlyAccess ? `/early-access?plan=${plan.id}` : `/sign-in?plan=${plan.id}&interval=${price?.interval ?? interval}`;
+            const out = {
+              href: earlyAccess ? `/early-access?plan=${plan.id}` : `/sign-in?plan=${plan.id}&interval=${price?.interval ?? interval}`,
+              label: earlyAccess ? earlyAccessCopy.pricingCta : plan.cta,
+            };
+            const action = pricingCtaFor(signedIn, { id: plan.id, cta: plan.cta, free }, price?.interval ?? interval, out);
             return (
               <li
                 key={plan.id}
@@ -114,8 +122,8 @@ export function PricingTable({ id = "pricing", title, earlyAccess = false }: { i
                   ))}
                 </ul>
                 <div className="flex flex-col gap-2 lg:col-span-2">
-                  <Link href={href} className={cn(buttonClass(plan.featured ? "primary" : "secondary", "md"), "w-full")}>{earlyAccess ? earlyAccessCopy.pricingCta : plan.cta}</Link>
-                  <p className="caption-2 text-text-subtle">{free ? RISK_FREE : earlyAccess ? RISK_EARLY : RISK_PAID}</p>
+                  <Link href={action.href} className={cn(buttonClass(plan.featured ? "primary" : "secondary", "md"), "w-full")}>{action.label}</Link>
+                  <p className="caption-2 text-text-subtle">{free ? RISK_FREE : signedIn ? RISK_SIGNED_IN : earlyAccess ? RISK_EARLY : RISK_PAID}</p>
                 </div>
               </li>
             );

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
-import { ButtonLink } from "@/components/ui/button";
+import { SessionButtonLink } from "./session-button-link";
 import { Section } from "@/components/ui/layout";
 
 /** Closing action: the same CTA as the hero, on the graphite band, left aligned with the type doing the work. */
@@ -13,7 +13,7 @@ export function FinalCta({ title, body, cta, note }: { title: ReactNode; body?: 
           {body ? <p className="body-3 max-w-2xl text-border">{body}</p> : null}
         </div>
         <div className="flex flex-col items-start gap-3 lg:col-span-4 lg:items-end">
-          <ButtonLink href={cta.href} size="lg" variant="inverse">{cta.label}<ArrowRight size={18} aria-hidden /></ButtonLink>
+          <SessionButtonLink cta={cta} size="lg" variant="inverse"><ArrowRight size={18} aria-hidden /></SessionButtonLink>
           {note ? <p className="caption-2 text-border lg:text-right">{note}</p> : null}
         </div>
       </div>

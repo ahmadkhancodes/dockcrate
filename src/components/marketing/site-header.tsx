@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { earlyAccessCopy, product } from "@/config/product";
 import { buttonClass } from "@/components/ui/button";
 import { cn } from "@/components/ui/cn";
+import { useSessionState } from "@/lib/auth/use-signed-in";
+import { APP_HOME, OPEN_APP_LABEL } from "./session-labels";
 import { Wordmark } from "@/components/ui/wordmark";
 
 const STAGGER_MS = 60;
@@ -12,6 +14,7 @@ const STAGGER_MS = 60;
 /** Floating bar, off the top edge. Mobile: full-height panel, staggered links (60ms, 24px rise, <= 400ms total). */
 export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
   const pathname = usePathname();
+  const signedIn = useSessionState() === "in";
   // The menu counts as open only on the page it was opened on, so navigating closes it without an effect.
   const [openFor, setOpenFor] = useState<string | null>(null);
   const open = openFor === pathname;
@@ -69,10 +72,12 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
 
   const panelItems = [
     ...product.nav.map((n) => ({ ...n, kind: "link" as const })),
-    { href: "/sign-in", label: "Sign in", kind: "link" as const },
-    earlyAccess
-      ? { href: "/early-access", label: earlyAccessCopy.cta, kind: "cta" as const }
-      : { href: "/sign-in", label: "Start free with Microsoft", kind: "cta" as const },
+    ...(signedIn ? [] : [{ href: "/sign-in", label: "Sign in", kind: "link" as const }]),
+    signedIn
+      ? { href: APP_HOME, label: OPEN_APP_LABEL, kind: "cta" as const }
+      : earlyAccess
+        ? { href: "/early-access", label: earlyAccessCopy.cta, kind: "cta" as const }
+        : { href: "/sign-in", label: "Start free with Microsoft", kind: "cta" as const },
   ];
 
   return (
@@ -89,8 +94,10 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/sign-in" className={cn(buttonClass("tertiary", "md"), "max-md:hidden")}>Sign in</Link>
-          {earlyAccess ? (
+          {signedIn ? null : <Link href="/sign-in" className={cn(buttonClass("tertiary", "md"), "max-md:hidden")}>Sign in</Link>}
+          {signedIn ? (
+            <Link href={APP_HOME} className={cn(buttonClass("primary", "md"), "max-md:hidden")}>{OPEN_APP_LABEL}</Link>
+          ) : earlyAccess ? (
             <Link href="/early-access" className={cn(buttonClass("primary", "md"), "max-md:hidden")}>{earlyAccessCopy.cta}</Link>
           ) : (
             <Link href="/sign-in" className={cn(buttonClass("primary", "md"), "max-md:hidden")}><span>Start free<span className="hidden lg:inline"> with Microsoft</span></span></Link>
