@@ -61,7 +61,7 @@ export function HeroDock() {
           </thead>
           <tbody>
             {sheet.map((r, i) => (
-              <tr key={r.slug} className={cn(i > 2 && "max-md:hidden!", r.flag && "bg-mark/40 shadow-[inset_4px_0_0_var(--accent)]", "border-b border-border last:border-b-0 max-md:grid max-md:grid-cols-[1fr_auto] max-md:gap-x-3 max-md:gap-y-1 max-md:px-4 max-md:py-2")}>
+              <tr key={r.slug} className={cn(i > 2 && "max-md:hidden!", r.flag && "bg-mark/40 ring-2 ring-inset ring-accent", "border-b border-border last:border-b-0 max-md:grid max-md:grid-cols-[1fr_auto] max-md:gap-x-3 max-md:gap-y-1 max-md:px-4 max-md:py-2")}>
                 <th scope="row" className="py-3 font-normal md:px-4 md:py-2 md:pl-6">
                   <span className="flex min-w-0 items-center gap-3">
                     <CrateMonogram name={r.name} />
@@ -113,7 +113,7 @@ export function DockOverview() {
         <nav aria-label="Demo sidebar" className="hidden flex-col border-r border-border bg-surface py-3 lg:col-span-2 lg:flex">
           <p className="px-4 pb-3 font-mono caption-4 text-text-subtle">Northbay IT</p>
           {nav.map((label, i) => (
-            <span key={label} className={cn("flex min-h-10 items-center border-l-2 px-4 body-5", i === 0 ? "border-accent bg-surface-raised font-semibold text-text" : "border-transparent text-text-subtle")}>
+            <span key={label} className={cn("mx-2 flex min-h-10 items-center border-2 px-2 body-5", i === 0 ? "border-accent bg-surface-raised font-semibold text-text" : "border-transparent text-text-subtle")}>
               {label}
             </span>
           ))}

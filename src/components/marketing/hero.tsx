@@ -29,7 +29,7 @@ export function Hero({ eyebrow, title, subtitle, primaryCta, secondaryCta, note,
         <div className="grid gap-8 border-b-2 border-text pb-8 lg:grid-cols-12 lg:items-end lg:gap-8 lg:pb-12">
           <div className="flex min-w-0 flex-col items-start gap-6 lg:col-span-8">
             {eyebrow ? <p className="label-caps text-text-subtle">{eyebrow}</p> : null}
-            <h1 id="hero-title" className="heading-3 md:heading-1 max-w-4xl font-display text-text">{title}</h1>
+            <h1 id="hero-title" className="heading-3 md:heading-1 max-w-[680px] font-display text-text">{title}</h1>
           </div>
           {proof ? (
             <div className="self-end border-2 border-text bg-surface-raised lg:col-span-4">
@@ -49,7 +49,7 @@ export function Hero({ eyebrow, title, subtitle, primaryCta, secondaryCta, note,
           ) : null}
         </div>
         <div className="mt-8 grid gap-6 lg:grid-cols-12 lg:items-start lg:gap-8">
-          <p className="body-3 max-w-2xl text-text-subtle md:title-2 lg:col-span-7">{subtitle}</p>
+          <p className="body-3 max-w-[680px] text-text-subtle md:title-2 lg:col-span-7">{subtitle}</p>
           <div className="flex flex-col items-start gap-3 lg:col-span-5 lg:items-end">
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 lg:justify-end">
               {secondaryCta ? (
@@ -57,7 +57,7 @@ export function Hero({ eyebrow, title, subtitle, primaryCta, secondaryCta, note,
                   {secondaryCta.label}
                 </Link>
               ) : null}
-              <SessionButtonLink cta={primaryCta} size="lg"><ArrowRight size={18} aria-hidden /></SessionButtonLink>
+              <SessionButtonLink cta={primaryCta} size="md"><ArrowRight size={16} aria-hidden /></SessionButtonLink>
             </div>
             {note ? <p className="caption-2 max-w-md text-text-muted lg:text-right">{note}</p> : null}
           </div>

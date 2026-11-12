@@ -53,8 +53,8 @@ export const product = {
   legalEmail: "contact@buffersoltech.com",
   mailFrom: "DockCrate <hello@dockcrate.buffersoltech.com>",
   description:
-    "MSP-first Intune app packaging and patching. No app version publishes until its hash, signer and malware scan checks pass, and a version without a clean-VM install test stays in the Pilot ring. It is published to your own Intune tenant as a Win32 app and kept updated through Pilot and Broad rings with auto-pause and one-click rollback.",
-  tagline: "Third-party apps for Intune, packaged, inspected and shipped in rings.",
+    "Intune app packaging and patching, built for MSPs first. No app version publishes until its hash, signer and malware scan checks pass, and a version without a clean VM install test stays in the Pilot ring. It is published to your own Intune tenant as a Win32 app and kept updated through Pilot and Broad rings with auto pause and one click rollback.",
+  tagline: "Third party apps for Intune, packaged, inspected and shipped in rings.",
   /** Legal entity details used by the legal templates. */
   legal: {
     entity: "BufferSol Technologies LLC",
@@ -111,7 +111,7 @@ export const product = {
       tagline: "For larger managed fleets",
       prices: [price("business", "month", 7499), price("business", "year", 74950)],
       limits: { devices: 2500, tenants: UNLIMITED, catalog_apps: UNLIMITED, custom_apps: 25 },
-      highlights: ["2,500 devices", "25 Custom Apps (VM-validated)", "Defender patch queue", "Policy backup", "Priority support"],
+      highlights: ["2,500 devices", "25 Custom Apps (VM validated)", "Defender patch queue", "Policy backup", "Priority support"],
       cta: "Choose Business",
       trialDays: 0,
     },
@@ -121,7 +121,7 @@ export const product = {
       tagline: "For the largest MSP fleets",
       prices: [price("fleet", "month", 9999), price("fleet", "year", 99990)],
       limits: { devices: 5000, tenants: UNLIMITED, catalog_apps: UNLIMITED, custom_apps: 100 },
-      highlights: ["5,000 devices", "100 Custom Apps", "SSO-enforced RBAC", "99.9% SLA", "Custom quote above 5,000 devices"],
+      highlights: ["5,000 devices", "100 Custom Apps", "RBAC with SSO enforced", "99.9% SLA", "Custom quote above 5,000 devices"],
       cta: "Choose Fleet",
       trialDays: 0,
     },
@@ -180,6 +180,6 @@ export const cadence = { mode: CADENCE_MODE, ...CADENCE_COPY[CADENCE_MODE] };
 export const earlyAccessCopy = {
   cta: "Get early access",
   pricingCta: "Join early access",
-  signInLine: "Microsoft work-account sign-in opens with early access. Use an email link meanwhile.",
+  signInLine: "Signing in with a Microsoft work account opens with early access. Use an email link meanwhile.",
   realToday: "Available today: the public catalog with inspection tags and QA logs, the .intunewin packer and the rings model. Coming with early access: publishing into your own Intune tenant.",
 };

@@ -55,7 +55,7 @@ export function PricingTable({ id = "pricing", title, earlyAccess = false }: { i
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         {title ? <h2 id={`${id}-title`} className="heading-4 md:heading-3 text-text">{title}</h2> : <h2 className="sr-only">Plans</h2>}
         {saving ? (
-          <div className="flex flex-col gap-2 md:items-end">
+          <div className="flex flex-col gap-2 md:ml-auto md:items-end">
             <div role="group" aria-label="Billing interval" className="inline-flex w-fit rounded-md border border-text bg-surface-raised p-1">
               {options.map((o) => (
                 <button
@@ -99,7 +99,7 @@ export function PricingTable({ id = "pricing", title, earlyAccess = false }: { i
                 key={plan.id}
                 className={cn(
                   "grid gap-4 border-b border-border-strong p-4 last:border-b-0 md:px-6 md:py-4 lg:grid-cols-12 lg:gap-6",
-                  plan.featured && "bg-mark/40 shadow-[inset_4px_0_0_var(--accent)]",
+                  plan.featured && "bg-mark/40 ring-2 ring-inset ring-accent",
                 )}
               >
                 <div className="lg:col-span-3">
