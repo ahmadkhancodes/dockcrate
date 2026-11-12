@@ -61,6 +61,11 @@ export function consentRedirectUri(baseUrl: string) {
   return `${baseUrl}/api/tenants/consent/callback`;
 }
 
+/** Without a registered Entra app (early access) a consent URL points at a Microsoft error page, so connecting is refused up front. */
+export function assertConnectAvailable() {
+  if (!entraClientId()) throw new HttpError(503, "connect_unavailable");
+}
+
 /** The admin consent URL for our multi tenant app. `state` is a signed nonce that carries the org and tenant row. */
 export function buildConsentUrl(opts: { baseUrl: string; orgId: string; tenantId: string; clientId?: string; now?: number }): string {
   const clientId = opts.clientId ?? entraClientId() ?? "";

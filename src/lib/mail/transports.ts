@@ -3,7 +3,11 @@ import { log } from "@/lib/logger";
 import type { MailMessage, MailTransport, SendResult } from "./types";
 
 /** Dev/test/stub transport: keeps messages in memory and logs the subject (never the body). */
-export const outbox: (MailMessage & { from: string; id: string; at: Date })[] = [];
+type Outboxed = MailMessage & { from: string; id: string; at: Date };
+// On globalThis: the server render layer and the route handlers get separate module copies, so a module-level array would
+// hide mail sent from one layer from the e2e outbox route in the other.
+const g = globalThis as { __dcOutbox?: Outboxed[] };
+export const outbox: Outboxed[] = (g.__dcOutbox ??= []);
 
 export function consoleTransport(): MailTransport {
   return {
