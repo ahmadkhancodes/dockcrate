@@ -127,3 +127,16 @@ All P1s fixable in code were already closed; P1-5 and P1-14 stay open because th
 - **P1-15 (fixed): Resend rejection on "Send consent link" returned 500.** Now 502 `mail_unavailable`, provider text only in the log, tenant status unchanged. Test failed before the fix.
 - **P1-16 (fixed): invitation and magic link mail failures threw inside Better Auth** (500 to the inviter or visitor). `safeSend` in `src/lib/auth/index.ts` logs and swallows; the invitation row exists and can be resent. Alert and digest mail already caught errors.
 - **Money paths (checked, no defect):** signature on the raw body (400, nothing written); duplicate event ids ignored; every subscription, invoice, checkout and refund event recomputes from Stripe, so out of order delivery converges; a failed run is not recorded and gets a Stripe retry (500); events for other apps' customers are ignored; entitlement comes from the webhook and the read-time expiry, never the success redirect. Unknown events now answer 200 and log `stripe_event_ignored`. Tests added for unknown events and for retry after a failure.
+
+## Usefulness and hardening pass (12 Nov 2026)
+Tests: `tests/unit/hardening.test.ts`, `tests/e2e/qa/hardening.spec.ts`.
+- **P2 "Ring tick cost" and the rest of the P2 list:** unchanged and still open. Reason: none is a defect at launch scale; they need the real tenant (QA-10) or an owner call (compare-page claim, roadmap tags). Fixing them blind would add untested Graph behaviour.
+- **H-1 (fixed): no abuse brake on signed-in APIs.** `apiCtx()` now rate limits every signed-in API call and page load per user (`RULES.api`, 600 per minute).
+- **H-2 (fixed): forged Stripe webhook calls were unthrottled.** 400 answers are counted per IP; over 30 a minute returns 429. Stripe's own deliveries never get a 4xx, so they are not counted. Signature, duplicate and out of order handling re-tested.
+- **H-3 (fixed): `/api/health` now also reports `deps` (stripe, mail, entra configured, booleans only).** No keys, hosts or error text.
+- **H-4 (fixed): log scrubbing matched only keys that end in a secret-like word.** It now matches anywhere in the key (`apiKey`, `stripeSignature`, `userEmail`, `otp`), with `code`, `statusCode` and `errorCode` kept.
+- **H-5 (added): built client bundle is scanned for key-shaped strings and server env names** (runs after `npm run build`).
+- **H-6 (added): CSP test** pins form-action (Stripe), connect-src, blob workers, framing and objects, and fails if any app form posts natively to a third party (every form submits by fetch, so the CSP's form-action cannot block a button).
+- **U-1 (added): dock CSV export** (`GET /api/tenants/:id/export`, "Export CSV" on the dock): org and tenant scoped, formulas neutralised.
+- **U-2 (added): "Get to your first published app" checklist** on the dock for a connected tenant until rings are set and one app is published.
+- **Not done in this pass, with reason:** keyboard shortcuts and bulk publish (no design for them in the brief, and the connected-tenant UI cannot be driven here, QA-10); import from other tools (no export format of Pckgr or Intune scripts is documented in the brief); real Mongo/slow-DB fault injection (needs Atlas, health already answers 503 after a 3 s timeout).

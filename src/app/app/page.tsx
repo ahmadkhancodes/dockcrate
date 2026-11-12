@@ -73,7 +73,7 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
 
   return (
     <>
-      <PageHeader title="Dock" description={`${org.org.name}: every app, every tenant, every ring.`} actions={<><Link href="/app/msp" className={buttonClass("tertiary")}>MSP view</Link><Link href="/app/tenants" className={buttonClass("tertiary")}>Tenants</Link>{tenant.status === "connected" ? <Link href={`/app/rings/${tenant.id}`} className={buttonClass("secondary")}>Ring settings</Link> : null}</>} />
+      <PageHeader title="Dock" description={`${org.org.name}: every app, every tenant, every ring.`} actions={<><Link href="/app/msp" className={buttonClass("tertiary")}>MSP view</Link><Link href="/app/tenants" className={buttonClass("tertiary")}>Tenants</Link><a href={`/api/tenants/${tenant.id}/export`} className={buttonClass("tertiary")}>Export CSV</a>{tenant.status === "connected" ? <Link href={`/app/rings/${tenant.id}`} className={buttonClass("secondary")}>Ring settings</Link> : null}</>} />
       <nav aria-label="Tenant switcher" className="-mt-2 flex gap-1 overflow-x-auto border-b border-border">
         {tenants.map((t) => (
           <Link key={t.id} href={`/app?tenant=${t.id}`} aria-current={t.id === tenant.id ? "page" : undefined}
@@ -89,6 +89,25 @@ export default async function DockPage({ searchParams }: { searchParams: SP }) {
       ) : null}
       {openAlerts.map((a) => <div key={a.id} className="mb-3"><Notice tone={a.severity === "critical" ? "danger" : "warning"} title={a.kind}>{a.message}</Notice></div>)}
       {!config && tenant.status === "connected" ? <div className="mb-6"><Notice tone="info" title="Rings not set up" action={<Link href={`/app/rings/${tenant.id}`} className={buttonClass("primary")}>Set up rings</Link>}>Pick the Pilot and Broad groups for this tenant before publishing.</Notice></div> : null}
+
+      {tenant.status === "connected" && (!config || !rows.some((r) => r.deployedVersion)) ? (
+        <section aria-label="Getting started" className="mb-6 rounded-lg border border-border bg-surface-raised p-4">
+          <h2 className="title-3 font-semibold text-text">Get to your first published app</h2>
+          <ol className="mt-3 flex flex-col gap-2 body-5">
+            {[
+              { done: true, label: "Connect a tenant", href: "/app/tenants" },
+              { done: !!config, label: "Pick the Pilot and Broad groups", href: `/app/rings/${tenant.id}` },
+              { done: rows.some((r) => r.deployedVersion), label: "Publish an app to Pilot (select one below, then Publish)", href: "/app" },
+            ].map((s) => (
+              <li key={s.label} className="flex items-center gap-2">
+                <span aria-hidden className={`inline-flex size-5 items-center justify-center rounded-full border text-xs ${s.done ? "border-success bg-success-surface text-success" : "border-border text-text-muted"}`}>{s.done ? "✓" : ""}</span>
+                {s.done ? <span className="text-text-subtle line-through">{s.label}</span> : <Link href={s.href} className="text-text underline underline-offset-2 focus-visible:focus-ring">{s.label}</Link>}
+                <span className="sr-only">{s.done ? " (done)" : " (to do)"}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
 
       <ul aria-label="Dock summary" className="grid grid-cols-2 overflow-hidden rounded-lg border border-border bg-surface-raised md:grid-cols-4">
         {kpis.map((k) => (

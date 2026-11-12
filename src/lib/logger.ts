@@ -2,11 +2,13 @@
 type Level = "debug" | "info" | "warn" | "error";
 type Fields = { code?: string; route?: string; userId?: string; orgId?: string; [k: string]: unknown };
 
-const SECRETISH = /(token|secret|password|authorization|cookie|email|code)$/i;
+const SECRETISH = /(token|secret|password|passwd|authorization|cookie|apikey|api_key|signature|otp|email|code)/i;
+
+const SAFE_KEYS = new Set(["code", "statusCode", "errorCode", "tokens"]);
 
 export function scrub(fields: Fields): Fields {
   const out: Fields = {};
-  for (const [k, v] of Object.entries(fields)) out[k] = SECRETISH.test(k) && k !== "code" ? "[redacted]" : v;
+  for (const [k, v] of Object.entries(fields)) out[k] = SECRETISH.test(k) && !SAFE_KEYS.has(k) ? "[redacted]" : v;
   return out;
 }
 
