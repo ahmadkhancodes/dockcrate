@@ -12,7 +12,8 @@ interface SheetRow { slug: string; name: string; version: string; checks: Checks
 
 const PILOT = 14;
 const BROAD = 148;
-const all: Checks = { hash: "pass", signer: "pass", scan: "pass", vm: "pass" };
+/** The VM check is pending for every version today (D-01), so no demo row may show it as passed. */
+const all: Checks = { hash: "pass", signer: "pass", scan: "pass", vm: "pending" };
 const byslug = (s: string) => demoCrates.find((c) => c.slug === s)!;
 
 const sheet: SheetRow[] = [
@@ -20,7 +21,7 @@ const sheet: SheetRow[] = [
   { slug: "7-zip", name: "7-Zip", version: "25.01", checks: all, pilot: { text: `${PILOT}/${PILOT} installed`, tone: "ok" }, broad: { text: "Waiting", tone: "wait" }, next: "Broad in 31 h" },
   { slug: "google-chrome", name: "Google Chrome", version: "152.0.6913", checks: all, pilot: { text: `${PILOT}/${PILOT} installed`, tone: "ok" }, broad: { text: `147/${BROAD} installed`, tone: "ok" }, next: "Up to date" },
   { slug: "notepad-plus-plus", name: "Notepad++", version: "8.8.5", checks: all, pilot: { text: `${PILOT}/${PILOT} installed`, tone: "ok" }, broad: { text: `146/${BROAD} installed`, tone: "ok" }, next: "Up to date" },
-  { slug: "adobe-acrobat-reader", name: "Adobe Acrobat Reader", version: "25.001.20630", checks: byslug("adobe-acrobat-reader").checks, pilot: { text: "Not sent", tone: "none" }, broad: { text: "Not sent", tone: "none" }, next: "Held in QA: test install failed" },
+  { slug: "adobe-acrobat-reader", name: "Adobe Acrobat Reader", version: "25.001.20630", checks: byslug("adobe-acrobat-reader").checks, pilot: { text: "Not sent", tone: "none" }, broad: { text: "Not sent", tone: "none" }, next: "Held in QA: signer changed" },
 ];
 
 const checkNames: [keyof Checks, string][] = [["hash", "Hash"], ["signer", "Signer"], ["scan", "Scan"], ["vm", "VM"]];

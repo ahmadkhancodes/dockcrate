@@ -34,6 +34,7 @@ const ROADMAP = /macOS|Scheduled windows|Client PDF|Custom Apps|Defender|Policy 
 
 const RISK_FREE = "No credit card needed.";
 const RISK_PAID = "Cancel anytime from your account.";
+const RISK_EARLY = "Early access is by request. No card needed.";
 
 export function PricingTable({ id = "pricing", title, earlyAccess = false }: { id?: string; title?: string; earlyAccess?: boolean }) {
   const [interval, setBilling] = useState<Interval>(product.defaultInterval);
@@ -114,7 +115,7 @@ export function PricingTable({ id = "pricing", title, earlyAccess = false }: { i
                 </ul>
                 <div className="flex flex-col gap-2 lg:col-span-2">
                   <Link href={href} className={cn(buttonClass(plan.featured ? "primary" : "secondary", "md"), "w-full")}>{earlyAccess ? earlyAccessCopy.pricingCta : plan.cta}</Link>
-                  <p className="caption-2 text-text-subtle">{free ? RISK_FREE : RISK_PAID}</p>
+                  <p className="caption-2 text-text-subtle">{free ? RISK_FREE : earlyAccess ? RISK_EARLY : RISK_PAID}</p>
                 </div>
               </li>
             );

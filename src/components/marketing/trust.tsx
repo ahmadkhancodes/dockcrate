@@ -64,7 +64,7 @@ export function QaPipelineDiagram() {
           return (
             <g key={name}>
               <rect x={x} y={20} width={w} height={h} rx={6} className={ring ? "fill-surface stroke-text" : "fill-surface-raised stroke-border-strong"} strokeWidth={1.5} />
-              <text x={x + w / 2} y={20 + h / 2 - 4} textAnchor="middle" className="fill-current" fontSize={14} fontWeight={600} fontFamily="ui-monospace, monospace">{name}</text>
+              <text x={x + w / 2} y={20 + h / 2 - 4} textAnchor="middle" className="fill-current" fontSize={14} fontWeight={600} style={{ fontFamily: "var(--font-mono-family)" }}>{name}</text>
               <text x={x + w / 2} y={20 + h / 2 + 14} textAnchor="middle" className="fill-text-subtle" fontSize={11}>{i < 4 ? `check ${i + 1} of 4` : i === 4 ? "0 h" : "after 48 h"}</text>
               {i < FLOW.length - 1 ? <path d={`M${x + w + 3} ${20 + h / 2} H${x + w + gap - 3} m-6 -4 l6 4 l-6 4`} className="fill-none stroke-text-subtle" strokeWidth={1.5} /> : null}
             </g>
