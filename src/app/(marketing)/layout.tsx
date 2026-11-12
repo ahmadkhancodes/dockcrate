@@ -7,7 +7,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <SiteHeader earlyAccess={earlyAccessOpen()} />
-      <main id="main" className="pt-20">{children}</main>
+      <main id="main" className="bg-surface-raised pt-16">{children}</main>
       <SiteFooter />
     </>
   );

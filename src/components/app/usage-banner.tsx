@@ -11,7 +11,7 @@ export function UsageBanner({ usage, entitlement, graceEndsAt = null, graceExpir
   const pastDue = entitlement?.status === "past_due";
   if (!worst && !pastDue) return null;
   const link = (label: string) => (
-    <Link href="/app/billing" className="button-sm inline-flex min-h-11 items-center rounded-md border border-border-strong bg-surface px-3 py-2 text-text transition-colors duration-300 hover:bg-surface-raised focus-visible:focus-ring">
+    <Link href="/app/billing" className="button-sm inline-flex min-h-11 items-center rounded-md border border-border-strong bg-surface-raised px-3 py-2 text-text transition-colors duration-300 hover:border-text focus-visible:focus-ring">
       {label}
     </Link>
   );
@@ -24,7 +24,7 @@ export function UsageBanner({ usage, entitlement, graceEndsAt = null, graceExpir
       ) : null}
       {worst ? (
         <Notice
-          tone={worst.level === "over" ? "danger" : "warning"}
+          tone={worst.used > worst.limit ? "danger" : "warning"}
           title={worst.used > worst.limit ? "You are over your limit" : worst.level === "over" ? "You have reached your limit" : "You are close to your limit"}
           action={link("Upgrade")}
         >

@@ -160,7 +160,7 @@ export function BillingClient(p: Props) {
               <article
                 key={pl.id}
                 aria-label={pl.name}
-                className={cn("flex flex-col gap-4 rounded-lg border bg-surface p-4", current || chosen ? "border-action" : "border-border")}
+                className={cn("flex flex-col gap-4 rounded-lg border bg-surface-raised p-4", current || chosen ? "border-text ring-1 ring-text" : "border-border")}
               >
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="title-3 text-text">{pl.name}</h3>

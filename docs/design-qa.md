@@ -1,4 +1,34 @@
-# Design QA scorecard (DESIGN_PLAYBOOK section 9), M1-B, 5 Nov 2026
+# Design QA scorecard (DESIGN_PLAYBOOK section 9)
+
+## Redesign "change sheet", 12 Nov 2026 (docs/design-brief.md)
+
+Screenshots (light, full page, 1440 and 375) in `docs/qa/design/`: home, pricing, sign-in, catalog QA log, app dock, app dock empty, billing, tenants. Every other route was captured during the loop with `scripts/screenshots-design.ts` (the script reported no horizontal overflow on any capture). Competitor and reference shots in `docs/design/refs/2026-11-12/`.
+
+### Rounds
+| Round | Hero (/) | Core app screen (/app dock) | Pricing |
+|---|---|---|---|
+| 0 (before) | Cream paper, dock green, condensed stencil, dashed crate card beside the copy: reads as the "Claude" palette | 288px icon sidebar, KPI tiles with caps labels, amber tag on every row | Five rounded cards, green ring on the featured plan |
+| 1 | Graphite and white, Archivo expanded H1, full width change sheet with the lime mark on the paused row. Problems: H1 wrapped to three lines with empty space on the right; logo glyph read as a pause icon | 240px rail with lime current bar, tenant tabs, ruled KPI strip, app table. Problems: columns misaligned (auto width status cell); amber "Checks 3/4" on every row was noise | One ruled sheet, five columns, featured column on canvas. Problems: "per year" and "For MSPs" wrapped |
+| 2 | H1 across the full container on two lines, copy and CTA on 7 columns, ruled spec list on 4; new crate glyph; step 02 of How it works fixed (grid order) | Fixed column tracks; neutral tag when only VM is pending, red only on a failed check; row tag hidden on phones so names stay readable | No wrap on units and the tag |
+| 3 | Hero padding tightened; at 375 the sheet shows three rows only (the paused one first) | Sidebar background runs the full page; filter bars and plan cards on white over the canvas | H1 without periods, ruled facts beside it |
+
+### Final scores
+| Category | Score | Worst remaining problem |
+|---|---|---|
+| 1. Message clarity | 5 | none: H1 names the job and the buyer's world ("every Intune tenant"), one primary CTA |
+| 2. ICP fit | 5 | none: white and graphite with mono identifiers, unlike the navy, purple and teal field and unlike our old cream |
+| 3. Hero and product proof | 5 | none: the real change sheet, legible at 375, labelled Demo data |
+| 4. Structure and rhythm | 4 | Long page; the comparison and price strip could merge later |
+| 5. Typography | 4 | Expanded H2s still wrap to three lines on a few long questions at 1440 |
+| 6. Spacing and radius | 4 | A few legacy app panels still mix p-4 and p-6 |
+| 7. Color and contrast | 5 | none: contrast pairs asserted in tests/unit/a11y.test.ts, one lime mark per view |
+| 8. Motion and states | 4 | Usage banner shows a warning at exactly 1 of 1 tenants on Free, which is normal use |
+| 9. Content honesty | 5 | none: no invented numbers, logos or quotes; demo surfaces labelled |
+| 10. Responsive and ship | 4 | Lighthouse not run (no Lighthouse in this runner) |
+
+Total 45/50, no category below 4, no hard fail. Greps: zero `text-[`, `p-[`, `m-[`, `gap-[`, `rounded-[` in src; no gradients, backdrop blur, banned fonts or filler words (asserted in tests/unit/design-system.test.ts).
+
+## Previous: M1-B, 5 Nov 2026 (superseded look)
 
 Screenshots: `docs/qa/` (`/`, `/pricing`, `/security`, `/compare/pckgr`, `/catalog`, `/sign-in`; 375 and 1440; light). Captured from `npm run build && npm start`. `scripts/screenshots.ts` reports zero horizontal overflow on all 24 captures; the e2e test repeats the 375 check on 9 routes.
 

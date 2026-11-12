@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { earlyAccessCopy, product } from "@/config/product";
 import { buttonClass } from "@/components/ui/button";
 import { cn } from "@/components/ui/cn";
+import { Wordmark } from "@/components/ui/wordmark";
 
 const STAGGER_MS = 60;
 
@@ -62,8 +63,8 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
   const isCurrent = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const linkClass = (href: string) =>
     cn(
-      "inline-flex min-h-11 items-center rounded-md px-3 button-sm transition-colors duration-300 ease-out-kit hover:bg-surface-raised hover:text-text focus-visible:focus-ring",
-      isCurrent(href) ? "text-text" : "text-text-subtle",
+      "relative inline-flex min-h-11 items-center rounded-sm px-3 body-5 transition-colors duration-300 ease-out-kit hover:text-text focus-visible:focus-ring",
+      isCurrent(href) ? "text-text after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:bg-mark" : "text-text-subtle",
     );
 
   const panelItems = [
@@ -75,20 +76,19 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
   ];
 
   return (
-    <header className="fixed inset-x-0 top-3 z-50 px-4 sm:px-6">
-      <div className="relative z-50 mx-auto flex w-full max-w-7xl items-center justify-between gap-4 rounded-lg border border-border bg-surface py-1 pl-4 pr-1">
-        <Link href="/" className="inline-flex min-h-11 flex-col justify-center rounded-md text-text focus-visible:focus-ring" aria-label={`${product.fullName} home`}>
-          <span className="heading-6 leading-none">{product.name}</span>
-          <span aria-hidden className="label-caps whitespace-nowrap leading-none text-text-subtle">by BufferSol</span>
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-surface-raised">
+      <div className="relative z-50 mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="inline-flex min-h-11 items-center rounded-sm focus-visible:focus-ring" aria-label={`${product.fullName} home`}>
+          <Wordmark />
         </Link>
-        <nav aria-label="Primary" className="hidden items-center md:flex">
+        <nav aria-label="Primary" className="hidden items-center md:flex lg:mr-auto lg:ml-8">
           {product.nav.map((n) => (
             <Link key={n.href} href={n.href} aria-current={isCurrent(n.href) ? "page" : undefined} className={linkClass(n.href)}>
               {n.label}
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <Link href="/sign-in" className={cn(buttonClass("tertiary", "md"), "max-md:hidden")}>Sign in</Link>
           {earlyAccess ? (
             <Link href="/early-access" className={cn(buttonClass("primary", "md"), "max-md:hidden")}>{earlyAccessCopy.cta}</Link>
@@ -102,7 +102,7 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => (open ? close() : setOpenFor(pathname))}
-            className="inline-flex size-11 items-center justify-center rounded-md text-text transition-colors duration-300 ease-out-kit hover:bg-surface-raised focus-visible:focus-ring md:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-md text-text transition-colors duration-300 ease-out-kit hover:bg-surface focus-visible:focus-ring md:hidden"
           >
             <span aria-hidden className="relative block size-6">
               <span className={cn("absolute left-1 right-1 top-2 h-0.5 rounded-sm bg-current transition-transform duration-300 ease-out-kit", open && "translate-y-1 rotate-45")} />
@@ -120,7 +120,7 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
         aria-label="Menu"
         inert={!open}
         className={cn(
-          "fixed inset-0 z-40 flex flex-col bg-surface px-4 pt-24 transition-[opacity,visibility] duration-200 ease-out-kit md:hidden",
+          "fixed inset-0 z-40 flex flex-col bg-surface-raised px-4 pt-20 transition-[opacity,visibility] duration-200 ease-out-kit md:hidden",
           open ? "visible opacity-100" : "invisible opacity-0",
         )}
       >
@@ -136,7 +136,7 @@ export function SiteHeader({ earlyAccess = false }: { earlyAccess?: boolean }) {
                 open ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
                 item.kind === "cta"
                   ? cn(buttonClass("primary", "lg"), "mt-8")
-                  : "flex min-h-12 items-center border-b border-border heading-5 text-text",
+                  : "flex min-h-12 items-center border-b border-border heading-6 text-text",
               )}
             >
               {item.label}

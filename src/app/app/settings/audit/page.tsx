@@ -54,7 +54,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
         actions={<a href={`/api/audit${withQuery({ format: "csv" })}`} className={buttonClass("secondary")} download><DownloadSimple size={16} aria-hidden /> Export CSV</a>}
       />
       {can(ctx.role, "apiKey", "manage") ? <VerifyChainButton /> : null}
-      <form method="get" className="mb-6 grid gap-3 rounded-md border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
+      <form method="get" className="mb-6 grid gap-3 rounded-lg border border-border bg-surface-raised p-4 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
         <Field label="Action" htmlFor="f-action" hint="Exact, or a prefix like tenant."><Input id="f-action" name="action" defaultValue={one(sp.action) ?? ""} placeholder="deployment." autoComplete="off" /></Field>
         <Field label="Actor" htmlFor="f-actor" hint="User id, or system"><Input id="f-actor" name="actor" defaultValue={one(sp.actor) ?? ""} autoComplete="off" /></Field>
         <Field label="From" htmlFor="f-from"><Input id="f-from" name="from" type="date" defaultValue={one(sp.from) ?? ""} /></Field>

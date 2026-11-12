@@ -56,13 +56,13 @@ export default async function MspPage({ searchParams }: { searchParams: Promise<
       <ul className="mb-6 grid grid-cols-2 overflow-hidden rounded-md border border-border bg-surface-raised md:grid-cols-4">
         {kpis.map((k) => (
           <li key={k.label} className="flex flex-col gap-1 border-b border-r border-border p-4 md:border-b-0 md:last:border-r-0">
-            <p className="label-caps text-text-subtle">{k.label}</p>
-            <p className="heading-4 tnum text-text">{k.value.toLocaleString("en")}</p>
+            <p className="caption-2 text-text-subtle">{k.label}</p>
+            <p className="figure-md text-text">{k.value.toLocaleString("en")}</p>
             <p className="caption-5 text-text-subtle">{k.note}</p>
           </li>
         ))}
       </ul>
-      <form method="get" aria-label="Filters" className="mb-6 grid gap-3 rounded-md border border-border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
+      <form method="get" aria-label="Filters" className="mb-6 grid gap-3 rounded-lg border border-border bg-surface-raised p-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
         <Field label="Tenant" htmlFor="m-tenant">
           <Select id="m-tenant" name="tenant" defaultValue={filter.tenant ?? ""}>
             <option value="">All tenants</option>
@@ -85,7 +85,7 @@ export default async function MspPage({ searchParams }: { searchParams: Promise<
       ) : (
         <div className="flex flex-col gap-6">
           {o.paused.length > 0 ? (
-            <Panel title="Paused rings" description="Bay 2 stopped after Pilot failures. Roll back or review in the dock.">
+            <Panel title="Paused rings" description="Broad stopped after Pilot failures. Roll back or review in the dock.">
               <DataTable caption="Paused rings" columns={[{ key: "t", label: "Tenant" }, { key: "a", label: "App" }, { key: "v", label: "Version" }, { key: "r", label: "Reason" }, { key: "o", label: "Actions", align: "right" }]}>
                 {o.paused.map((r) => (
                   <tr key={`${r.tenantId}:${r.slug}`}>

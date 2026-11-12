@@ -26,7 +26,7 @@ export default async function CatalogPage() {
   return (
     <Section labelledBy="catalog-title" className="pt-24 md:pt-32">
       <div className="flex max-w-3xl flex-col gap-6">
-        <h1 id="catalog-title" className="heading-3 md:heading-1 text-text">Search the catalog. Open the QA log.</h1>
+        <h1 id="catalog-title" className="heading-3 md:heading-1 text-text">Search the catalog, <br className="max-md:hidden" />open the QA log</h1>
         <p className="body-3 text-text-subtle md:title-1">Every version lists its inspection tag and a QA log you can read without logging in.</p>
       </div>
       <div className="mt-8 max-w-3xl">

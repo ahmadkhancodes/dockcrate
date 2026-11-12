@@ -109,7 +109,7 @@ function SetCard({ set, apps, tenants, canRun, allowed, onStarted, onDeleted }: 
         <Button variant="tertiary" disabled={!canRun || !allowed} onClick={remove} aria-label={`Delete ${set.name}`}>Delete</Button>
       </div>
       {open ? (
-        <fieldset id={`${set.id}-tenants`} className="flex flex-col gap-1 rounded-md border border-border bg-surface p-3">
+        <fieldset id={`${set.id}-tenants`} className="flex flex-col gap-1 rounded-md border border-border bg-surface-raised p-3">
           <legend className="caption-3 px-1 text-text-subtle">Tenants</legend>
           {tenants.map((t) => <Check key={t.id} id={`${set.id}-${t.id}`} checked={picked.includes(t.id)} onChange={(v) => setPicked((p) => (v ? [...p, t.id] : p.filter((x) => x !== t.id)))}>{t.name}{t.connected ? "" : " (not connected: will fail)"}</Check>)}
           <div className="flex flex-wrap items-center gap-2 pt-2">

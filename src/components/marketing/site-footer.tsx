@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { product } from "@/config/product";
+import { Wordmark } from "@/components/ui/wordmark";
 
 const columns = [
   {
@@ -29,24 +30,24 @@ const linkClass =
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-surface-raised">
+    <footer className="border-t border-border bg-surface">
       <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="flex max-w-xs flex-col gap-3 md:col-span-5">
-            <Link href="/" className="heading-5 w-fit rounded-sm text-text focus-visible:focus-ring">{product.name}<span className="label-caps block text-text-subtle">by BufferSol</span></Link>
+            <Link href="/" aria-label={`${product.fullName} home`} className="inline-flex min-h-11 w-fit items-center rounded-sm focus-visible:focus-ring"><Wordmark /></Link>
             <p className="body-6 text-text-subtle">{product.tagline}</p>
           </div>
           <div className="grid grid-cols-2 gap-8 md:col-span-7 md:grid-cols-3">
             {columns.map((col) => (
               <nav key={col.title} aria-label={col.title} className="flex flex-col">
-                <p className="caption-3 mb-2 text-text">{col.title}</p>
+                <p className="label-caps mb-2 text-text-subtle">{col.title}</p>
                 {col.links.map((l) => (
                   <Link key={l.href} href={l.href} className={linkClass}>{l.label}</Link>
                 ))}
               </nav>
             ))}
             <nav aria-label="Company" className="flex flex-col">
-              <p className="caption-3 mb-2 text-text">Company</p>
+              <p className="label-caps mb-2 text-text-subtle">Company</p>
               <a href={product.companyUrl} className={linkClass}>{product.company}</a>
             </nav>
           </div>

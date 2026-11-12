@@ -45,12 +45,12 @@ export default async function ComparePage({ params }: Props) {
           <CompareTable caption={`${product.fullName} compared with ${entry.competitor}`} rowHeader="Compared on" columns={entry.columns} highlightColumn={1} rows={entry.rows.map((r) => ({ label: r.label, values: [...r.values] }))} />
         </div>
         <p className="mt-4 caption-2 text-text-subtle">
-          {entry.competitor} facts: <a href={entry.source.href} rel="noopener noreferrer" className="underline underline-offset-4 hover:text-action focus-visible:focus-ring">{entry.source.label}</a>, checked {CHECKED}. Prices are USD list prices.
+          {entry.competitor} facts: <a href={entry.source.href} rel="noopener noreferrer" className="underline underline-offset-4 decoration-border-strong hover:decoration-text focus-visible:focus-ring">{entry.source.label}</a>, checked {CHECKED}. Prices are USD list prices.
         </p>
       </Section>
       <Section tone="raised" labelledBy="better-title">
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-16">
-          <h2 id="better-title" className="heading-4 md:heading-2 text-text lg:col-span-5">Where {entry.competitor} is better</h2>
+          <h2 id="better-title" className="heading-4 md:heading-3 text-text lg:col-span-5">Where {entry.competitor} is better</h2>
           <ul className="flex flex-col lg:col-span-7">
             {entry.better.map((b) => (
               <li key={b} className="border-t border-border py-4 body-3 text-text last:border-b">{b}</li>

@@ -16,11 +16,11 @@ export function Faq({ title = "Questions, answered", items }: { title?: string; 
   return (
     <Section labelledBy="faq-title">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
-        <h2 id="faq-title" className="heading-4 md:heading-2 text-text lg:col-span-4">{title}</h2>
+        <h2 id="faq-title" className="heading-4 md:heading-3 self-start text-text lg:sticky lg:top-24 lg:col-span-4">{title}</h2>
         <div className="lg:col-span-8">
           {items.map((item) => (
             <details key={item.q} className="group border-t border-border last:border-b">
-              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-4 title-2 text-text transition-colors duration-300 ease-out-kit hover:text-action focus-visible:focus-ring [&::-webkit-details-marker]:hidden">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-4 title-2 text-text transition-colors duration-300 ease-out-kit decoration-border-strong hover:decoration-text focus-visible:focus-ring [&::-webkit-details-marker]:hidden">
                 {item.q}
                 <Plus size={20} weight="regular" aria-hidden className="shrink-0 transition-transform duration-300 ease-out-kit group-open:rotate-45" />
               </summary>

@@ -3,6 +3,11 @@ import { Check, Clock, Pause, Warning, X, Hourglass } from "@phosphor-icons/reac
 import { cn } from "@/components/ui/cn";
 import type { BayState, CheckState, Checks, DemoCrate, Shipment } from "@/content/demo";
 
+/**
+ * Release evidence parts in the "change sheet" style (docs/design-brief.md section 6):
+ * hairline rules, mono identifiers, status as icon plus word, the lime mark only for what needs a human.
+ */
+
 const checkList: { key: keyof Checks; label: string }[] = [
   { key: "hash", label: "Hash" },
   { key: "signer", label: "Signer" },
@@ -12,20 +17,20 @@ const checkList: { key: keyof Checks; label: string }[] = [
 
 export const passed = (c: Checks) => Object.values(c).filter((v) => v === "pass").length;
 
-function CheckIcon({ state }: { state: CheckState }) {
-  if (state === "pass") return <Check size={12} weight="bold" aria-hidden className="text-success" />;
-  if (state === "fail") return <X size={12} weight="bold" aria-hidden className="text-danger" />;
-  return <Hourglass size={12} weight="bold" aria-hidden className="text-warning" />;
+export function CheckIcon({ state, size = 14 }: { state: CheckState; size?: number }) {
+  if (state === "pass") return <Check size={size} weight="bold" aria-hidden className="shrink-0 text-success" />;
+  if (state === "fail") return <X size={size} weight="bold" aria-hidden className="shrink-0 text-danger" />;
+  return <Hourglass size={size} weight="bold" aria-hidden className="shrink-0 text-warning" />;
 }
 
 const stateWord: Record<CheckState, string> = { pass: "passed", pending: "pending", fail: "failed" };
 
-/** The four punched checks. Status is icon plus label, never colour alone. */
+/** The four checks as a ruled inline list. Status is icon plus label, never colour alone. */
 export function CheckChips({ checks }: { checks: Checks }) {
   return (
-    <ul className="flex flex-wrap gap-2">
+    <ul className="flex flex-wrap gap-x-4 gap-y-1">
       {checkList.map((c) => (
-        <li key={c.key} className="inline-flex min-h-6 items-center gap-1 rounded-sm border border-border-strong bg-surface-raised px-2 caption-3 text-text">
+        <li key={c.key} className="inline-flex min-h-6 items-center gap-1 font-mono caption-4 text-text">
           <CheckIcon state={checks[c.key]} />
           {c.label}
           <span className="sr-only"> {stateWord[checks[c.key]]}</span>
@@ -35,58 +40,65 @@ export function CheckChips({ checks }: { checks: Checks }) {
   );
 }
 
-/** Amber inspection tag with a punched hole. Black text on amber only. */
+/** Check count stamp: "Checks 4/4". Square, mono, bordered. */
 export function InspectionTag({ checks, className }: { checks: Checks; className?: string }) {
   const n = passed(checks);
+  const failed = Object.values(checks).includes("fail");
   return (
-    <span className={cn("inline-flex items-center gap-2 rounded-sm bg-amber px-2 py-0.5 caption-3 uppercase tracking-wide text-on-amber", className)}>
-      <span aria-hidden className="size-2 rounded-full border border-on-amber" />
-      {n === 4 ? "Inspected" : "Inspection"} <span className="tnum">{n}/4</span>
+    <span className={cn("inline-flex min-h-6 items-center gap-1 whitespace-nowrap rounded-sm border px-2 font-mono caption-4", n === 4 ? "border-success text-success" : failed ? "border-danger text-danger" : "border-border-strong text-text-subtle", className)}>
+      {n === 4 ? <Check size={12} weight="bold" aria-hidden /> : <Hourglass size={12} weight="bold" aria-hidden />}
+      {n === 4 ? "Inspected" : "Checks"} <span className="tnum">{n}/4</span>
     </span>
   );
 }
 
-/** The crate label: dashed stencilled box with name, version, architecture and SHA-256 prefix. */
+/** The release sheet: name and version as the header, ticket fields in mono, then the checks. */
 export function CrateLabel({ crate, size = "lg", className }: { crate: DemoCrate; size?: "lg" | "md"; className?: string }) {
+  const fields: [string, string][] = [["SHA-256", crate.sha], ["Publisher", crate.publisher], ["Installer", crate.installer], ["Arch", `Windows ${crate.arch}`]];
   return (
-    <div className={cn("flex flex-col gap-3 rounded-sm border-2 border-dashed border-text bg-surface-raised p-4 md:p-6", className)}>
-      <div className={cn("flex gap-4", size === "lg" ? "items-start justify-between" : "flex-col")}>
+    <div className={cn("flex flex-col rounded-lg border border-border-strong bg-surface-raised", className)}>
+      <div className={cn("flex flex-wrap items-start justify-between gap-3 border-b border-border", size === "lg" ? "p-4 md:p-6" : "p-4")}>
         <div className="flex min-w-0 flex-col gap-1">
-          <p className="label-caps text-text-subtle">Crate · Windows {crate.arch}</p>
-          <p className={cn("min-w-0 break-words text-text", size === "lg" ? "stencil-lg" : "stencil-md")}>
-            {crate.name} {crate.version}
+          <p className="label-caps text-text-subtle">Release</p>
+          <p className={cn("min-w-0 break-words text-text", size === "lg" ? "heading-5 md:heading-4" : "heading-6")}>
+            {crate.name} <span className="font-mono tnum">{crate.version}</span>
           </p>
         </div>
-        <InspectionTag checks={crate.checks} className="shrink-0 self-start" />
+        <InspectionTag checks={crate.checks} className="shrink-0" />
       </div>
-      <p className="flex flex-wrap gap-x-4 gap-y-1 font-mono caption-2 text-text-subtle">
-        <span>SHA-256 {crate.sha}</span>
-        <span>{crate.publisher}</span>
-        <span>{crate.installer}</span>
-      </p>
-      <CheckChips checks={crate.checks} />
+      <dl className={cn("grid grid-cols-2 gap-x-4 gap-y-3", size === "lg" ? "p-4 md:px-6" : "p-4")}>
+        {fields.map(([k, v]) => (
+          <div key={k} className="min-w-0">
+            <dt className="label-caps text-text-muted">{k}</dt>
+            <dd className="truncate font-mono caption-2 text-text">{v}</dd>
+          </div>
+        ))}
+      </dl>
+      <div className={cn("border-t border-border", size === "lg" ? "px-4 py-3 md:px-6" : "px-4 py-3")}>
+        <CheckChips checks={crate.checks} />
+      </div>
     </div>
   );
 }
 
 const segment: Record<BayState, string> = {
-  done: "bg-action",
-  active: "bg-action",
+  done: "bg-text",
+  active: "bg-text",
   paused: "bg-warning",
   idle: "bg-border",
 };
-const segmentName = ["Dock", "Bay 1", "Bay 2"];
+const segmentName = ["Ready", "Pilot", "Broad"];
 
-/** Segmented ring progress: dock, Bay 1 (Pilot), Bay 2 (Broad). */
+/** Ring progress: ready, Pilot, Broad. */
 export function BayTrack({ bays, className, compact }: { bays: [BayState, BayState, BayState]; className?: string; compact?: boolean }) {
   return (
     <div className={cn("flex flex-col gap-1", className)}>
-      <div className="grid grid-cols-3 gap-1" role="img" aria-label={bays.map((b, i) => `${segmentName[i]} ${b === "done" ? "reached" : b === "paused" ? "paused" : "not reached"}`).join(", ")}>
+      <div className="grid grid-cols-3 gap-0.5" role="img" aria-label={bays.map((b, i) => `${segmentName[i]} ${b === "done" ? "reached" : b === "paused" ? "paused" : "not reached"}`).join(", ")}>
         {bays.map((b, i) => (
-          <span key={i} className={cn("h-2", segment[b])} />
+          <span key={i} className={cn("h-1", segment[b])} />
         ))}
       </div>
-      {compact ? null : <div aria-hidden className="grid grid-cols-3 gap-1 label-caps text-text-subtle">
+      {compact ? null : <div aria-hidden className="grid grid-cols-3 gap-0.5 font-mono caption-5 text-text-muted">
         {segmentName.map((n) => <span key={n}>{n}</span>)}
       </div>}
     </div>
@@ -94,30 +106,32 @@ export function BayTrack({ bays, className, compact }: { bays: [BayState, BaySta
 }
 
 const chipTone: Record<Shipment, { cls: string; icon: ReactNode }> = {
-  shipped: { cls: "border-success text-success", icon: <Check size={14} weight="bold" aria-hidden /> },
-  "bay2-waiting": { cls: "border-border-strong text-text", icon: <Clock size={14} weight="bold" aria-hidden /> },
-  paused: { cls: "border-warning text-warning", icon: <Pause size={14} weight="bold" aria-hidden /> },
-  held: { cls: "border-danger text-danger", icon: <Warning size={14} weight="bold" aria-hidden /> },
+  shipped: { cls: "text-success", icon: <Check size={14} weight="bold" aria-hidden /> },
+  "bay2-waiting": { cls: "text-text", icon: <Clock size={14} weight="bold" aria-hidden /> },
+  paused: { cls: "bg-mark text-on-mark", icon: <Pause size={14} weight="bold" aria-hidden /> },
+  held: { cls: "text-danger", icon: <Warning size={14} weight="bold" aria-hidden /> },
 };
 
+/** Ring status as icon plus word. A paused ring wears the lime mark: it is the one thing that needs a human. */
 export function StatusChip({ status, label }: { status: Shipment; label: string }) {
   const t = chipTone[status];
   return (
-    <span className={cn("inline-flex min-h-6 items-center gap-1 whitespace-nowrap rounded-sm border bg-surface-raised px-2 caption-3", t.cls)}>
+    <span className={cn("inline-flex min-h-6 items-center gap-1 whitespace-nowrap rounded-sm px-2 caption-3", t.cls)}>
       {t.icon}
       {label}
     </span>
   );
 }
 
+/** App initial in a small square, mono. Stands in for vendor icons we do not have rights to show. */
 export function CrateMonogram({ name }: { name: string }) {
   return (
-    <span aria-hidden className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm border-2 border-text bg-surface-raised stencil-md text-text">
+    <span aria-hidden className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm border border-border-strong bg-surface font-mono button-sm text-text">
       {name.charAt(0)}
     </span>
   );
 }
 
 export function DemoNote({ children = "Demo data. Tenants and versions in this preview are illustrative." }: { children?: ReactNode }) {
-  return <p className="caption-2 text-text-subtle">{children}</p>;
+  return <p className="caption-2 text-text-muted">{children}</p>;
 }

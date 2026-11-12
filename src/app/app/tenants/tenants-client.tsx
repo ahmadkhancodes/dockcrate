@@ -90,7 +90,7 @@ export function TenantsClient({ tenants, canConnect }: { tenants: Tenant[]; canC
   return (
     <div className="flex flex-col gap-6">
       {canConnect ? (
-        <form onSubmit={create} className="flex flex-col gap-3 rounded-md border border-border bg-surface p-4 sm:flex-row sm:items-end">
+        <form onSubmit={create} className="flex flex-col gap-3 rounded-lg border border-border bg-surface-raised p-4 sm:flex-row sm:items-end">
           <div className="flex-1"><Field label="Customer name" htmlFor="tenant-name" error={error}><Input id="tenant-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Halvorsen Dental" autoComplete="off" /></Field></div>
           <Button type="submit" loading={busy}>Add and connect</Button>
         </form>
