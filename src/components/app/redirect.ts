@@ -19,3 +19,8 @@ export function afterSignIn(p: { next?: string | null; plan?: string | null; int
 
 export const slugify = (s: string) =>
   s.toLowerCase().normalize("NFKD").replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "workspace";
+
+/** Where a brand new user lands after first sign-in: onboarding, except when they came to accept an invitation (they join that organization instead of creating their own). */
+export function newUserCallback(callbackURL: string): string {
+  return callbackURL.startsWith("/accept-invite/") ? callbackURL : `/onboarding?next=${encodeURIComponent(callbackURL)}`;
+}

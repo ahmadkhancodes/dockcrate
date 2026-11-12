@@ -2,6 +2,7 @@
 import { Fingerprint } from "@phosphor-icons/react";
 import { useState } from "react";
 import { authError } from "@/components/app/api";
+import { newUserCallback } from "@/components/app/redirect";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { Notice } from "@/components/ui/states";
@@ -20,7 +21,7 @@ export function SignInForm({ callbackURL, expiredLink, earlyAccess, oauthError }
     const { error: err } = await authClient.signIn.social({
       provider: "microsoft",
       callbackURL,
-      newUserCallbackURL: `/onboarding?next=${encodeURIComponent(callbackURL)}`,
+      newUserCallbackURL: newUserCallback(callbackURL),
       errorCallbackURL: "/sign-in",
     });
     if (err) {
@@ -46,7 +47,7 @@ export function SignInForm({ callbackURL, expiredLink, earlyAccess, oauthError }
     const { error: err } = await authClient.signIn.magicLink({
       email: value,
       callbackURL,
-      newUserCallbackURL: `/onboarding?next=${encodeURIComponent(callbackURL)}`,
+      newUserCallbackURL: newUserCallback(callbackURL),
       errorCallbackURL: "/sign-in",
     });
     if (err) {

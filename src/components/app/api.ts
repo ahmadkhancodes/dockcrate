@@ -11,6 +11,7 @@ const MESSAGES: Record<string, string> = {
   rate_limited: "Too many attempts. Wait a minute and try again.",
   invalid_url: "Enter a full URL starting with https://.",
   invalid_body: "Some fields are missing or invalid.",
+  connect_unavailable: "Connecting a Microsoft tenant opens with early access. We have not switched it on for your account yet.",
   not_found: "That item no longer exists.",
 };
 

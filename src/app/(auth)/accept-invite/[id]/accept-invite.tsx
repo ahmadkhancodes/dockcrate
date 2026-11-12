@@ -27,10 +27,13 @@ export function AcceptInvite({ id, email }: { id: string; email: string }) {
   }
   if (inv.error || !inv.data) {
     return (
-      <ErrorState
-        title="We cannot open this invitation"
-        body={<>{inv.error ?? "It may have expired."} You are signed in as {email}. Ask the person who invited you to send a new one to that address.</>}
-      />
+      <>
+        <h1 className="sr-only">Invitation</h1>
+        <ErrorState
+          title="We cannot open this invitation"
+          body={<>{inv.error ?? "It may have expired."} You are signed in as {email}. Ask the person who invited you to send a new one to that address.</>}
+        />
+      </>
     );
   }
   const i = inv.data;

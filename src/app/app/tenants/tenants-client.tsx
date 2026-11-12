@@ -29,8 +29,9 @@ function TenantRow({ initial, canConnect }: { initial: Tenant; canConnect: boole
 
   async function connect() {
     setBusy("connect");
-    const r = await api<{ consentUrl: string }>(`/api/tenants/${t.id}`);
+    const r = await api<{ consentUrl: string | null }>(`/api/tenants/${t.id}`);
     if (!r.ok) { setBusy(null); return setMsg({ ok: false, text: r.message }); }
+    if (!r.data.consentUrl) { setBusy(null); return setMsg({ ok: false, text: "Connecting a Microsoft tenant opens with early access. We have not switched it on for your account yet." }); }
     window.location.assign(r.data.consentUrl);
   }
   async function send(e: React.FormEvent) {
