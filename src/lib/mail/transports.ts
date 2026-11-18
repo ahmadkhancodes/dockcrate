@@ -47,6 +47,53 @@ export function resendTransport(apiKey: string, fetchFn: typeof fetch = fetch): 
 }
 
 /**
+ * BufferSol mail gateway (POST {url}/v1/send, Bearer key). The gateway forces this app's own From, so no `from` is sent;
+ * `record: "metadata"` keeps bodies out of the gateway log. One idempotency key spans all attempts (retry on 429/502/503
+ * and network errors/timeouts) so a retry never double-sends.
+ */
+export function gatewayTransport(
+  opts: { url: string; key: string; timeoutMs?: number; attempts?: number; retryDelayMs?: number },
+  fetchFn: typeof fetch = fetch,
+): MailTransport {
+  const { url, key, timeoutMs = 8_000, attempts = 2, retryDelayMs = 300 } = opts;
+  return {
+    name: "gateway",
+    async send(msg): Promise<SendResult> {
+      const idem = `dc-${uuidv7()}`;
+      const body = JSON.stringify({
+        to: msg.to, subject: msg.subject, text: msg.text, html: msg.html, replyTo: msg.replyTo,
+        record: "metadata", category: "transactional",
+      });
+      let status = 0;
+      for (let attempt = 1; attempt <= attempts; attempt++) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+        try {
+          const res = await fetchFn(`${url.replace(/\/+$/, "")}/v1/send`, {
+            method: "POST",
+            headers: { authorization: `Bearer ${key}`, "content-type": "application/json", "idempotency-key": idem },
+            body,
+            signal: ctrl.signal,
+          });
+          if (res.ok) {
+            const j = (await res.json().catch(() => ({}))) as { id?: string; messageId?: string };
+            return { id: j.messageId ?? j.id ?? uuidv7(), provider: "gateway", accepted: true };
+          }
+          status = res.status;
+          if (![429, 502, 503].includes(res.status)) break;
+        } catch {
+          status = 0;
+        } finally {
+          clearTimeout(timer);
+        }
+        if (attempt < attempts) await new Promise((r) => setTimeout(r, retryDelayMs));
+      }
+      throw new Error(`mail_gateway_failed_${status || "network"}`);
+    },
+  };
+}
+
+/**
  * SMTP adapter stub for the VPS (own Postfix/KumoMTA). Implement with nodemailer when the VPS exists;
  * the interface stays the same so no caller changes.
  */

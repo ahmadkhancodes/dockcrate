@@ -10,7 +10,7 @@ export async function GET() {
   const base = { db: dbDriver(), version: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "dev", at: new Date().toISOString() };
   // Configured or not, never keys or hostnames. "configured" means the provider can be called, not that it is up.
   const e = env();
-  const deps = { stripe: !!e.STRIPE_SECRET_KEY && !!e.STRIPE_WEBHOOK_SECRET, mail: !!e.RESEND_API_KEY, entra: entraConfigured(e) };
+  const deps = { stripe: !!e.STRIPE_SECRET_KEY && !!e.STRIPE_WEBHOOK_SECRET, mail: !!e.MAIL_GATEWAY_URL || !!e.RESEND_API_KEY, entra: entraConfigured(e) };
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const timeout = new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error("timeout")), 3000); });

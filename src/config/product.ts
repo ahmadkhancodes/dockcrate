@@ -49,7 +49,7 @@ export const product = {
   companyUrl: "https://buffersoltech.com",
   host: "dockcrate.buffersoltech.com",
   url: process.env.NEXT_PUBLIC_APP_URL ?? "https://dockcrate.buffersoltech.com",
-  supportEmail: "contact@buffersoltech.com",
+  supportEmail: "dockcrate@buffersoltech.com",
   legalEmail: "contact@buffersoltech.com",
   mailFrom: "DockCrate <hello@dockcrate.buffersoltech.com>",
   description:

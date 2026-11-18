@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { createMemoryDb } from "@/lib/db/memory";
 import type { Db } from "@/lib/db/types";
 import { MAX_ATTEMPTS, backoffMs, emitEvent, isSafeWebhookUrl, retryDueDeliveries, signPayload, verifySignature } from "@/lib/webhooks/outbound";
-import { sendMail, unsubscribeToken } from "@/lib/mail";
-import { consoleTransport, outbox, resendTransport } from "@/lib/mail/transports";
+import { sendMail, transportFromEnv, unsubscribeToken } from "@/lib/mail";
+import { consoleTransport, gatewayTransport, outbox, resendTransport } from "@/lib/mail/transports";
 import { magicLinkEmail } from "@/lib/mail/templates";
 
 let db: Db;
@@ -98,5 +98,53 @@ describe("mailer", () => {
     expect(body.from).toBe("A <a@x.test>");
     const bad = resendTransport("re_test", (async () => new Response("", { status: 422 })) as unknown as typeof fetch);
     await expect(bad.send({ to: "a@x.test", subject: "s", text: "t", from: "x" })).rejects.toThrow("mail_send_failed_422");
+  });
+
+  it("gateway adapter posts /v1/send with bearer, no from, metadata record; retries 503 with the same idempotency key", async () => {
+    const seen: { url: string; init: RequestInit }[] = [];
+    let n = 0;
+    const f = (async (url: string, init: RequestInit) => {
+      seen.push({ url, init });
+      return n++ === 0 ? new Response("{}", { status: 503 }) : new Response(JSON.stringify({ ok: true, id: "i1", messageId: "m1" }));
+    }) as unknown as typeof fetch;
+    const t = gatewayTransport({ url: "https://gw.test/", key: "k_test", retryDelayMs: 1 }, f);
+    const r = await t.send({ to: "a@x.test", subject: "s", text: "t", replyTo: "r@x.test", from: "ignored" });
+    expect(r).toMatchObject({ id: "m1", provider: "gateway", accepted: true });
+    expect(seen).toHaveLength(2);
+    expect(seen[0]!.url).toBe("https://gw.test/v1/send");
+    const h = seen[0]!.init.headers as Record<string, string>;
+    expect(h.authorization).toBe("Bearer k_test");
+    expect(h["idempotency-key"]).toBe((seen[1]!.init.headers as Record<string, string>)["idempotency-key"]);
+    const body = JSON.parse(seen[0]!.init.body as string);
+    expect(body).toMatchObject({ to: "a@x.test", record: "metadata", category: "transactional", replyTo: "r@x.test" });
+    expect(body.from).toBeUndefined();
+  });
+
+  it("gateway adapter does not retry 401/422 and times out hung requests", async () => {
+    let calls = 0;
+    const bad = gatewayTransport({ url: "https://gw.test", key: "k" }, (async () => { calls++; return new Response("{}", { status: 401 }); }) as unknown as typeof fetch);
+    await expect(bad.send({ to: "a@x.test", subject: "s", text: "t", from: "x" })).rejects.toThrow("mail_gateway_failed_401");
+    expect(calls).toBe(1);
+    const hang = gatewayTransport({ url: "https://gw.test", key: "k", timeoutMs: 20, attempts: 1 }, ((_u: string, init: RequestInit) =>
+      new Promise((_, rej) => init.signal?.addEventListener("abort", () => rej(new Error("aborted"))))) as unknown as typeof fetch);
+    await expect(hang.send({ to: "a@x.test", subject: "s", text: "t", from: "x" })).rejects.toThrow("mail_gateway_failed_network");
+  });
+
+  it("transportFromEnv prefers the gateway, errors on a missing key, and falls back to Resend only when the URL is unset", () => {
+    const keepP = process.env.MAIL_PROVIDER; delete process.env.MAIL_PROVIDER;
+    const keep = { u: process.env.MAIL_GATEWAY_URL, k: process.env.MAIL_GATEWAY_KEY, r: process.env.RESEND_API_KEY };
+    try {
+      process.env.RESEND_API_KEY = "re_x";
+      delete process.env.MAIL_GATEWAY_URL; delete process.env.MAIL_GATEWAY_KEY;
+      expect(transportFromEnv().name).toBe("resend");
+      process.env.MAIL_GATEWAY_URL = "https://gw.test";
+      expect(() => transportFromEnv()).toThrow(/MAIL_GATEWAY_KEY/);
+      process.env.MAIL_GATEWAY_KEY = "k";
+      expect(transportFromEnv().name).toBe("gateway");
+    } finally {
+      if (keepP !== undefined) process.env.MAIL_PROVIDER = keepP;
+      for (const [n, v] of [["MAIL_GATEWAY_URL", keep.u], ["MAIL_GATEWAY_KEY", keep.k], ["RESEND_API_KEY", keep.r]] as const)
+        { if (v === undefined) delete process.env[n]; else process.env[n] = v; }
+    }
   });
 });

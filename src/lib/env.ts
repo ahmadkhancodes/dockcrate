@@ -15,6 +15,8 @@ const schema = z.object({
   MAIL_PROVIDER: z.enum(["resend", "console", "smtp", "none"]).optional(),
   RESEND_API_KEY: z.string().optional(),
   MAIL_FROM: z.string().optional(),
+  MAIL_GATEWAY_URL: z.string().optional(),
+  MAIL_GATEWAY_KEY: z.string().optional(),
   CRON_SECRET: z.string().optional(),
   ALTCHA_HMAC_KEY: z.string().optional(),
   APP_FLAGS: z.string().optional(),

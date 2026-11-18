@@ -2,13 +2,18 @@ import { product } from "@/config/product";
 import { appUrl, env } from "@/lib/env";
 import { getDb } from "@/lib/db";
 import { hmacSha256Hex } from "@/lib/ids";
-import { consoleTransport, resendTransport, smtpTransport } from "./transports";
+import { consoleTransport, gatewayTransport, resendTransport, smtpTransport } from "./transports";
 import type { MailMessage, MailTransport, SendResult } from "./types";
 
 export type { MailMessage, MailTransport, SendResult } from "./types";
 
 export function transportFromEnv(): MailTransport {
   const e = env();
+  // Gateway wins whenever MAIL_GATEWAY_URL is set; Resend stays only as the fallback when it is unset. No silent fallback on a missing key.
+  if (e.MAIL_GATEWAY_URL) {
+    if (!e.MAIL_GATEWAY_KEY) throw new Error("MAIL_GATEWAY_URL is set but MAIL_GATEWAY_KEY is missing");
+    return gatewayTransport({ url: e.MAIL_GATEWAY_URL, key: e.MAIL_GATEWAY_KEY });
+  }
   const p = e.MAIL_PROVIDER ?? (e.RESEND_API_KEY ? "resend" : "console");
   if (p === "resend" && e.RESEND_API_KEY) return resendTransport(e.RESEND_API_KEY);
   if (p === "smtp") return smtpTransport();
@@ -44,5 +49,5 @@ export async function sendMail(msg: MailMessage, transport: MailTransport = tran
     headers["List-Unsubscribe"] = `<${url}>`;
     headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
   }
-  return transport.send({ ...msg, headers, from: msg.from ?? env().MAIL_FROM ?? product.mailFrom });
+  return transport.send({ ...msg, replyTo: msg.replyTo ?? product.supportEmail, headers, from: msg.from ?? env().MAIL_FROM ?? product.mailFrom });
 }

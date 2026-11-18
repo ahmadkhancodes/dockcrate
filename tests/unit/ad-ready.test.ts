@@ -136,7 +136,7 @@ describe("early-access form", () => {
     const leads = await listLeads(deps);
     expect(leads).toHaveLength(1);
     expect(leads[0]).toMatchObject({ email: "dana@acme-msp.com", company: "Acme MSP", endpoints: 420 });
-    expect(sent.map((m) => m.to).sort()).toEqual(["contact@buffersoltech.com", "dana@acme-msp.com"]);
+    expect(sent.map((m) => m.to).sort()).toEqual(["dana@acme-msp.com", "dockcrate@buffersoltech.com"]);
   }, 30_000);
 
   it("rejects a missing, garbage or replayed ALTCHA proof and stores nothing", async () => {
@@ -207,6 +207,6 @@ describe("founder leads admin", () => {
 describe("indexes", () => {
   it("the leads collection is indexed", () => {
     expect(readFileSync("src/lib/db/mongo.ts", "utf8")).toMatch(/ix\("dc_leads", \{ app: 1, createdAt: -1 \}\)[\s\S]*ix\("dc_leads", \{ app: 1, email: 1 \}, \{ unique: true \}\)/);
-    expect(product.supportEmail).toBe("contact@buffersoltech.com");
+    expect(product.supportEmail).toBe("dockcrate@buffersoltech.com");
   });
 });
